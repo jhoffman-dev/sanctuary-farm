@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { COLD_START_CREATURE_FAMILY } from '@/contracts'
-import type { GradeResult } from '@/contracts'
+import type { GradeResult, HatchedCreature } from '@/contracts'
 import { GameProvider, useGame } from './gameState'
 
 function setup() {
@@ -95,11 +95,11 @@ describe('GameProvider — hatch', () => {
     act(() => result.current.onGraded(gradeResult({ familyJustMastered: 5 })))
     expect(result.current.pendingHatch).toBe(5)
 
-    let born: ReturnType<typeof result.current.claimHatch> = null
+    let born: HatchedCreature | null = null
     act(() => {
       born = result.current.claimHatch('Sparky')
     })
-    expect(born?.family).toBe(5)
+    expect((born as HatchedCreature | null)?.family).toBe(5)
     expect(result.current.creatures.some((c) => c.family === 5 && c.name === 'Sparky')).toBe(true)
     expect(result.current.pendingHatch).toBeNull()
   })
