@@ -7,7 +7,7 @@
   },
   "overrides": [
     {
-      "files": ["src/dev/routes/*.route.tsx"],
+      "files": ["src/dev/routes/*.route.tsx", "src/game/gameState.tsx"],
       "rules": {
         "react/only-export-components": "off"
       }

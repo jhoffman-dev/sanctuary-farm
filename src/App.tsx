@@ -1,16 +1,42 @@
-// PHASE 2 owns this file — the real screen graph:
+// PHASE 2 — the real screen graph.
 //   farmyard ⇄ barn ⇄ stall,  nest / paddock / feedshed / farmhouse → summary
-// Until then it is a stub so the project type-checks and builds.
+import { GameProvider, useGame } from './game/gameState'
+import { FarmyardScreen } from './game/screens/FarmyardScreen'
+import { BarnScreen } from './game/screens/BarnScreen'
+import { StallScreen } from './game/screens/StallScreen'
+import { PaddockScreen } from './game/screens/PaddockScreen'
+import { NestScreen } from './game/screens/NestScreen'
+import { SummaryScreen } from './game/screens/SummaryScreen'
+import { DashboardScreen } from './game/screens/DashboardScreen'
+
+function Screens() {
+  const { view } = useGame()
+  switch (view.screen) {
+    case 'farmyard':
+      return <FarmyardScreen />
+    case 'barn':
+      return <BarnScreen />
+    case 'stall':
+      return <StallScreen stallIndex={view.stallIndex} />
+    case 'paddock':
+      return <PaddockScreen />
+    case 'nest':
+      return <NestScreen />
+    case 'summary':
+      return <SummaryScreen />
+    case 'dashboard':
+      return <DashboardScreen />
+    default:
+      return <FarmyardScreen />
+  }
+}
+
 export function App() {
   return (
-    <div className="grid min-h-dvh place-items-center bg-stone-50 text-stone-700">
-      <div className="text-center">
-        <p className="text-2xl">🌾 Sanctuary Farm</p>
-        <p className="mt-2 text-sm opacity-60">
-          Game shell — assembled in Phase 2. Add <code>?app=1</code> once wired; for now
-          use the dev routes.
-        </p>
+    <GameProvider>
+      <div className="min-h-dvh bg-[#f3efe4] text-stone-800">
+        <Screens />
       </div>
-    </div>
+    </GameProvider>
   )
 }

@@ -6,7 +6,7 @@
 // is due across every family.
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'motion/react'
-import type { HatchedCreature, Scheduler, SessionLog, CreatureMood } from '@/contracts'
+import type { GradeResult, HatchedCreature, Scheduler, SessionLog, CreatureMood } from '@/contracts'
 import { CHORE_QUESTIONS_PER_STALL } from '@/contracts'
 import { CreatureSVG } from '@/creatures/CreatureSVG'
 import { moodVariants, MOOD_TRANSFORM_ORIGIN } from '@/creatures/animations'
@@ -18,9 +18,18 @@ export type StallPanelProps = {
   onRename: (name: string) => void
   onFed: (log: SessionLog) => void
   onClose: () => void
+  /** Forwarded to the embedded QuizPanel — Phase 2 uses it to persist per answer. */
+  onQuestionGraded?: (result: GradeResult) => void
 }
 
-export function StallPanel({ creature, scheduler, onRename, onFed, onClose }: StallPanelProps) {
+export function StallPanel({
+  creature,
+  scheduler,
+  onRename,
+  onFed,
+  onClose,
+  onQuestionGraded,
+}: StallPanelProps) {
   const [name, setName] = useState(creature.name)
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(creature.name)
@@ -115,6 +124,7 @@ export function StallPanel({ creature, scheduler, onRename, onFed, onClose }: St
           familyContext={creature.family}
           creatureSlot={<CreatureSVG params={creature.params} mood={mood} size={96} title={name} />}
           onMood={setMood}
+          onQuestionGraded={onQuestionGraded}
           onComplete={finishFeeding}
         />
       ) : (

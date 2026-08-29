@@ -1,13 +1,27 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import { DevRoutes } from './dev/DevRoutes'
 import { App } from './App'
 
-// During track development this renders the dev-route index.
-// Phase 2 flips DEV_MODE off (or removes this branch) to boot the real game.
-const DEV_MODE = new URLSearchParams(location.search).get('app') !== '1'
+// The game boots by default. Track dev routes stay reachable in development
+// only, at ?dev=1 (they exercise components in isolation).
+async function boot() {
+  const devRequested = import.meta.env.DEV && new URLSearchParams(location.search).get('dev') === '1'
+  const root = createRoot(document.getElementById('root')!)
+  if (devRequested) {
+    const { DevRoutes } = await import('./dev/DevRoutes')
+    root.render(
+      <StrictMode>
+        <DevRoutes />
+      </StrictMode>,
+    )
+  } else {
+    root.render(
+      <StrictMode>
+        <App />
+      </StrictMode>,
+    )
+  }
+}
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>{DEV_MODE ? <DevRoutes /> : <App />}</StrictMode>,
-)
+void boot()
