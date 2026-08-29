@@ -1,10 +1,11 @@
-import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { HatchedCreature, SessionLog } from '@/contracts'
 import { CHORE_QUESTIONS_PER_STALL } from '@/contracts'
 import { createScheduler, initialSchedulerState } from '@/engine/scheduler'
 import { defaultCreatureParams } from '@/creatures/definitions'
+import { ENTRANCE_MS, CHEW_MS } from '@/quiz/QuizPanel'
 import { StallPanel } from './StallPanel'
 
 function gift(): HatchedCreature {
@@ -16,6 +17,10 @@ function gift(): HatchedCreature {
     stallIndex: 0,
   }
 }
+
+afterEach(() => {
+  vi.useRealTimers()
+})
 
 describe('StallPanel', () => {
   it('shows the creature name at rest', () => {
@@ -53,6 +58,10 @@ describe('StallPanel', () => {
   })
 
   it('feeds the creature through QuizPanel and returns the session log', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    const user = userEvent.setup({ advanceTimers: (ms) => vi.advanceTimersByTime(ms) })
+    const tick = (ms: number) => act(async () => void (await vi.advanceTimersByTimeAsync(ms)))
+
     const onFed = vi.fn()
     const scheduler = createScheduler(initialSchedulerState())
     render(
@@ -65,12 +74,19 @@ describe('StallPanel', () => {
       />,
     )
 
-    await userEvent.click(screen.getByRole('button', { name: 'Feed' }))
-    expect(document.querySelector('[data-stub="QuizPanel"]')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Feed' }))
+    // the real QuizPanel has mounted
+    expect(screen.getByTestId('number-pad')).toBeInTheDocument()
 
     for (let i = 0; i < CHORE_QUESTIONS_PER_STALL; i++) {
-      await userEvent.click(screen.getByRole('button', { name: '1' }))
-      await userEvent.click(screen.getByRole('button', { name: 'Enter' }))
+      await tick(ENTRANCE_MS + 20) // past the entrance backstop → answerable
+      const factId = screen.getByTestId('prompt').getAttribute('data-fact') ?? ''
+      const [a, b] = factId.split('x').map(Number)
+      for (const digit of String(a * b)) {
+        await user.click(screen.getByRole('button', { name: digit }))
+      }
+      await user.click(screen.getByRole('button', { name: 'Confirm answer' }))
+      await tick(CHEW_MS + 20) // chew the correct answer, advance
     }
 
     expect(onFed).toHaveBeenCalledTimes(1)
@@ -80,7 +96,7 @@ describe('StallPanel', () => {
     expect(log.entries).toHaveLength(CHORE_QUESTIONS_PER_STALL)
 
     // quiz unmounts, creature back at rest
-    expect(document.querySelector('[data-stub="QuizPanel"]')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('number-pad')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Feed' })).toBeInTheDocument()
   })
 
