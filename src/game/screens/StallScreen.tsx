@@ -1,8 +1,11 @@
 import { StallPanel } from '@/barn/StallPanel'
+import { emptyAnimalCare } from '@/contracts'
 import { useGame } from '../gameState'
+import { todayStr } from '../todayStr'
 
 export function StallScreen({ stallIndex }: { stallIndex: number }) {
-  const { creatures, scheduler, renameCreature, completeSession, onGraded, back } = useGame()
+  const { creatures, care, save, scheduler, renameCreature, completeCare, onGraded, back, go } =
+    useGame()
   const creature = creatures.find((c) => c.stallIndex === stallIndex)
 
   if (!creature) {
@@ -18,17 +21,27 @@ export function StallScreen({ stallIndex }: { stallIndex: number }) {
 
   return (
     <div className="min-h-dvh">
-      <header className="p-3">
+      <header className="flex items-center justify-between p-3">
         <button type="button" onClick={back} className="rounded bg-white/80 px-3 py-1 text-sm shadow">
           ← Barn
+        </button>
+        <button
+          type="button"
+          onClick={() => go('feedshed')}
+          className="rounded bg-white/80 px-3 py-1 text-sm shadow"
+        >
+          🌾 {save.feed} feed · 🪙 {save.coins}
         </button>
       </header>
       <StallPanel
         key={creature.family}
         creature={creature}
+        care={care[creature.family] ?? emptyAnimalCare(creature.family)}
+        today={todayStr()}
+        feed={save.feed}
         scheduler={scheduler}
         onRename={(name) => renameCreature(creature.family, name)}
-        onFed={(log) => completeSession(log)}
+        onCareComplete={(task, log) => completeCare(creature.family, task, log)}
         onClose={back}
         onQuestionGraded={onGraded}
       />

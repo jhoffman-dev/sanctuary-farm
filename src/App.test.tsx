@@ -24,8 +24,8 @@ describe('App', () => {
     render(<App />)
     // farmyard is the opening screen
     expect(screen.getByText(/walk to the barn/i)).toBeInTheDocument()
-    // currency starts at zero and is visible
-    expect(screen.getByText(/🌾 0 · 🪙 0/)).toBeInTheDocument()
+    // coins start at zero and are visible in the HUD
+    expect(screen.getByText(/🪙 0/)).toBeInTheDocument()
     // the farmhouse long-press target for the parent dashboard
     expect(screen.getByRole('button', { name: /farmhouse sign/i })).toBeInTheDocument()
   })

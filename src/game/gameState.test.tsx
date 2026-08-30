@@ -1,7 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
-import { COLD_START_CREATURE_FAMILY } from '@/contracts'
-import type { GradeResult, HatchedCreature } from '@/contracts'
+import {
+  CARE_TASKS,
+  COINS_PER_CORRECT,
+  COINS_PER_FLUENT,
+  COLD_START_CREATURE_FAMILY,
+  FEED_BUNDLE_PRICE,
+  FEED_BUNDLE_UNITS,
+  FEED_PER_FEEDING,
+} from '@/contracts'
+import type { GradeResult, HatchedCreature, SessionLog } from '@/contracts'
 import { GameProvider, useGame } from './gameState'
 
 function setup() {
@@ -39,10 +47,18 @@ describe('GameProvider — cold start', () => {
     expect(result.current.creatures[0].stallIndex).toBe(0)
   })
 
-  it('starts the day with the anchor stall hungry', () => {
+  it('starts the day with the anchor animal needing every care task', () => {
     const { result } = setup()
-    expect(result.current.choreStalls).toEqual([0])
+    expect(result.current.choreFamilies).toEqual([COLD_START_CREATURE_FAMILY])
+    expect(result.current.tasksRemaining(COLD_START_CREATURE_FAMILY)).toEqual([...CARE_TASKS])
+    expect(result.current.allChoresDone).toBe(false)
     expect(result.current.save.lastChoresDate).toBeNull()
+  })
+
+  it('grants starting feed', () => {
+    const { result } = setup()
+    expect(result.current.save.feed).toBeGreaterThan(0)
+    expect(result.current.save.coins).toBe(0)
   })
 
   it('introduces the anchor families in the scheduler', () => {
@@ -55,35 +71,78 @@ describe('GameProvider — cold start', () => {
   })
 })
 
-describe('GameProvider — currency comes only from graded answers', () => {
-  it('+1 pellet per correct, +1 coin per FLUENT, nothing on wrong', () => {
+const emptyLog = (over: Partial<SessionLog> = {}): SessionLog => ({
+  startedAt: Date.now(),
+  endedAt: Date.now(),
+  context: 'stall',
+  familyContext: COLD_START_CREATURE_FAMILY,
+  entries: [],
+  ...over,
+})
+
+describe('GameProvider — coins come only from graded answers', () => {
+  it('FLUENT pays more than a plain correct; a wrong answer pays nothing', () => {
     const { result } = setup()
-    expect(result.current.save.currency).toEqual({ pellets: 0, coins: 0 })
+    expect(result.current.save.coins).toBe(0)
 
     act(() => result.current.onGraded(gradeResult({ correct: true, outcome: 'FLUENT' })))
-    expect(result.current.save.currency).toEqual({ pellets: 1, coins: 1 })
+    expect(result.current.save.coins).toBe(COINS_PER_FLUENT)
 
     act(() => result.current.onGraded(gradeResult({ correct: true, outcome: 'SLOW' })))
-    expect(result.current.save.currency).toEqual({ pellets: 2, coins: 1 })
+    expect(result.current.save.coins).toBe(COINS_PER_FLUENT + COINS_PER_CORRECT)
 
+    const held = result.current.save.coins
     act(() => result.current.onGraded(gradeResult({ correct: false, outcome: 'WRONG' })))
-    expect(result.current.save.currency).toEqual({ pellets: 2, coins: 1 })
+    expect(result.current.save.coins).toBe(held)
   })
 })
 
-describe('GameProvider — daily chores', () => {
-  it('clearing the last stall stamps the date and routes to the goodnight summary', () => {
+describe('GameProvider — the feed shed economy', () => {
+  it('buyFeed spends coins for feed, and refuses when she cannot afford it', () => {
     const { result } = setup()
-    act(() =>
-      result.current.completeSession({
-        startedAt: Date.now(),
-        endedAt: Date.now(),
-        context: 'stall',
-        familyContext: COLD_START_CREATURE_FAMILY,
-        entries: [],
-      }),
-    )
-    expect(result.current.choreStalls).toEqual([])
+    // not enough coins yet
+    let bought = true
+    act(() => {
+      bought = result.current.buyFeed()
+    })
+    expect(bought).toBe(false)
+
+    // earn enough
+    for (let i = 0; i < FEED_BUNDLE_PRICE; i++) {
+      act(() => result.current.onGraded(gradeResult({ correct: true, outcome: 'SLOW' })))
+    }
+    const feedBefore = result.current.save.feed
+    const coinsBefore = result.current.save.coins
+    act(() => {
+      bought = result.current.buyFeed()
+    })
+    expect(bought).toBe(true)
+    expect(result.current.save.feed).toBe(feedBefore + FEED_BUNDLE_UNITS)
+    expect(result.current.save.coins).toBe(coinsBefore - FEED_BUNDLE_PRICE)
+  })
+})
+
+describe('GameProvider — care + daily chores', () => {
+  it('a care round marks that task done today; feeding consumes feed', () => {
+    const { result } = setup()
+    const fam = COLD_START_CREATURE_FAMILY
+    const feedBefore = result.current.save.feed
+
+    act(() => result.current.completeCare(fam, 'water', emptyLog()))
+    expect(result.current.tasksRemaining(fam)).not.toContain('water')
+    expect(result.current.save.feed).toBe(feedBefore) // watering is free
+
+    act(() => result.current.completeCare(fam, 'feed', emptyLog()))
+    expect(result.current.save.feed).toBe(feedBefore - FEED_PER_FEEDING)
+  })
+
+  it('finishing every task for every animal stamps the day and shows the goodnight summary', () => {
+    const { result } = setup()
+    const fam = COLD_START_CREATURE_FAMILY
+    for (const t of CARE_TASKS) {
+      act(() => result.current.completeCare(fam, t, emptyLog()))
+    }
+    expect(result.current.allChoresDone).toBe(true)
     expect(result.current.save.lastChoresDate).not.toBeNull()
     expect(result.current.view.screen).toBe('summary')
   })

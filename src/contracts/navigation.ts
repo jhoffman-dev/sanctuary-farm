@@ -9,6 +9,7 @@ export type Screen =
   | 'stall'
   | 'paddock'
   | 'nest'
+  | 'feedshed'
   | 'summary'
   | 'dashboard'
 
@@ -18,6 +19,7 @@ export type ScreenParams = {
   stall: { stallIndex: number }
   paddock: undefined
   nest: undefined
+  feedshed: undefined
   summary: undefined
   dashboard: undefined
 }

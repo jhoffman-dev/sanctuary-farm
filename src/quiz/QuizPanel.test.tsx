@@ -33,6 +33,9 @@ function makeTestScheduler(script: ScriptFact[]) {
       cursor += 1
       return toFact(s)
     },
+    nextInFamily() {
+      return this.next()
+    },
     grade(id, given, latencyMs) {
       grades.push({ id, given, latencyMs })
       counter += 1

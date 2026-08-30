@@ -1,45 +1,61 @@
-// A creature's care panel. Shows the creature at rest, its name and a rename
-// control, and a Feed button that mounts the quiz right here in the stall.
+// A creature's care panel: the animal, its name, four daily needs, and a round
+// of questions to tend each. Feeding also spends feed (bought in the feed shed).
 //
-// D11 — the stall does NOT filter which facts are asked. `familyContext` is
-// passed to the session log for information only; the scheduler serves whatever
-// is due across every family.
-import { useEffect, useRef, useState } from 'react'
+// D11 held — the stall does NOT filter which facts are asked. `familyContext` is
+// informational; the scheduler serves whatever is due across every family.
+import { useState } from 'react'
 import { motion } from 'motion/react'
-import type { GradeResult, HatchedCreature, Scheduler, SessionLog, CreatureMood } from '@/contracts'
-import { CHORE_QUESTIONS_PER_STALL } from '@/contracts'
+import {
+  CARE_EMOJI,
+  CARE_LABEL,
+  CARE_QUESTIONS,
+  CARE_TASKS,
+  CARE_VERB,
+  FEED_PER_FEEDING,
+  type AnimalCare,
+  type CareTask,
+  type CreatureMood,
+  type GradeResult,
+  type HatchedCreature,
+  type Scheduler,
+  type SessionLog,
+} from '@/contracts'
 import { CreatureSVG } from '@/creatures/CreatureSVG'
 import { moodVariants, MOOD_TRANSFORM_ORIGIN } from '@/creatures/animations'
 import { QuizPanel } from '@/quiz/QuizPanel'
 
 export type StallPanelProps = {
   creature: HatchedCreature
+  care: AnimalCare
+  /** today's local date (YYYY-MM-DD) — a task is "done" when done[task] === this */
+  today: string
+  feed: number
   scheduler: Scheduler
   onRename: (name: string) => void
-  onFed: (log: SessionLog) => void
+  onCareComplete: (task: CareTask, log: SessionLog) => void
   onClose: () => void
-  /** Forwarded to the embedded QuizPanel — Phase 2 uses it to persist per answer. */
   onQuestionGraded?: (result: GradeResult) => void
 }
 
 export function StallPanel({
   creature,
+  care,
+  today,
+  feed,
   scheduler,
   onRename,
-  onFed,
+  onCareComplete,
   onClose,
   onQuestionGraded,
 }: StallPanelProps) {
   const [name, setName] = useState(creature.name)
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(creature.name)
-  const [feeding, setFeeding] = useState(false)
+  const [task, setTask] = useState<CareTask | null>(null)
   const [mood, setMood] = useState<CreatureMood>('idle')
-  const restTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
-  useEffect(() => () => {
-    if (restTimer.current) clearTimeout(restTimer.current)
-  }, [])
+  const isDone = (t: CareTask) => care.done[t] === today
+  const canFeed = feed >= FEED_PER_FEEDING
 
   function commitName() {
     const next = draft.trim()
@@ -52,20 +68,31 @@ export function StallPanel({
     setEditing(false)
   }
 
-  function startFeeding() {
-    if (restTimer.current) clearTimeout(restTimer.current)
-    setMood('idle')
-    setFeeding(true)
-  }
-
-  function finishFeeding(log: SessionLog) {
-    setFeeding(false)
-    setMood('happy')
-    restTimer.current = setTimeout(() => setMood('idle'), 1600)
-    onFed(log)
-  }
-
   const anim = moodVariants[mood]
+
+  if (task) {
+    return (
+      <div className="mx-auto max-w-sm space-y-3 p-4 text-center">
+        <p className="text-sm font-semibold text-stone-500">
+          {CARE_EMOJI[task]} {CARE_LABEL[task]} {name}
+        </p>
+        <QuizPanel
+          scheduler={scheduler}
+          mode={{ kind: 'count', questions: CARE_QUESTIONS[task] }}
+          context="stall"
+          familyContext={creature.family}
+          creatureSlot={<CreatureSVG params={creature.params} mood={mood} size={96} title={name} />}
+          onMood={setMood}
+          onQuestionGraded={onQuestionGraded}
+          onComplete={(log) => {
+            setTask(null)
+            setMood('idle')
+            onCareComplete(task, log)
+          }}
+        />
+      </div>
+    )
+  }
 
   return (
     <div data-stall-panel="" className="mx-auto max-w-sm space-y-4 p-4 text-center">
@@ -116,31 +143,41 @@ export function StallPanel({
         </div>
       )}
 
-      {feeding ? (
-        <QuizPanel
-          scheduler={scheduler}
-          mode={{ kind: 'count', questions: CHORE_QUESTIONS_PER_STALL }}
-          context="stall"
-          familyContext={creature.family}
-          creatureSlot={<CreatureSVG params={creature.params} mood={mood} size={96} title={name} />}
-          onMood={setMood}
-          onQuestionGraded={onQuestionGraded}
-          onComplete={finishFeeding}
-        />
-      ) : (
-        <div className="flex items-center justify-center gap-2">
-          <button
-            type="button"
-            className="rounded bg-emerald-400 px-5 py-2 font-semibold text-emerald-950"
-            onClick={startFeeding}
-          >
-            Feed
-          </button>
-          <button type="button" className="px-3 py-2 text-sm opacity-60" onClick={onClose}>
-            Back
-          </button>
-        </div>
-      )}
+      <div className="grid grid-cols-2 gap-3">
+        {CARE_TASKS.map((t) => {
+          const done = isDone(t)
+          const disabled = done || (t === 'feed' && !canFeed)
+          return (
+            <button
+              key={t}
+              type="button"
+              aria-label={CARE_LABEL[t]}
+              disabled={disabled}
+              onClick={() => setTask(t)}
+              className={`rounded-xl border p-3 text-sm font-semibold transition ${
+                done
+                  ? 'border-emerald-300 bg-emerald-50 text-emerald-700'
+                  : disabled
+                    ? 'border-stone-200 bg-stone-100 text-stone-400'
+                    : 'border-amber-300 bg-amber-100 text-amber-900 hover:bg-amber-200'
+              }`}
+            >
+              <span className="text-xl">{CARE_EMOJI[t]}</span>
+              <br />
+              {done ? `${CARE_VERB[t]} ✓` : CARE_LABEL[t]}
+              {t === 'feed' && !done ? (
+                <span className="block text-[11px] font-normal">
+                  {canFeed ? `costs ${FEED_PER_FEEDING} feed` : 'need feed →'}
+                </span>
+              ) : null}
+            </button>
+          )
+        })}
+      </div>
+
+      <button type="button" className="text-sm text-stone-500" onClick={onClose}>
+        Back to the barn
+      </button>
     </div>
   )
 }

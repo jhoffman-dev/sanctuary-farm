@@ -1,6 +1,6 @@
 // The one place game-wide state lives. No state library — a context around a
-// ref-held Scheduler / AudioBus / SaveStore plus a little React state for the
-// view. Persists on every graded answer (sessions get interrupted).
+// Scheduler / AudioBus / SaveStore plus a little React state for the view.
+// Persists on every graded answer (sessions get interrupted).
 import {
   createContext,
   useCallback,
@@ -10,7 +10,16 @@ import {
   type ReactNode,
 } from 'react'
 import {
+  CARE_TASKS,
+  COINS_PER_CORRECT,
+  COINS_PER_FLUENT,
   COLD_START_CREATURE_FAMILY,
+  FEED_BUNDLE_PRICE,
+  FEED_BUNDLE_UNITS,
+  FEED_PER_FEEDING,
+  emptyAnimalCare,
+  type AnimalCare,
+  type CareTask,
   type GradeResult,
   type HatchedCreature,
   type HotspotId,
@@ -26,8 +35,6 @@ import { makeCreature, nextFreeStall } from './creatureFor'
 import { todayStr } from './todayStr'
 
 const TOTAL_STALLS = 12
-const PELLETS_PER_CORRECT = 1
-const COINS_PER_FLUENT = 1
 
 type View =
   | { screen: Exclude<Screen, 'stall'> }
@@ -40,25 +47,30 @@ export type GameApi = {
   view: View
   history: View[]
   creatures: HatchedCreature[]
-  /** stall indices with a hungry creature right now */
-  choreStalls: number[]
+  care: Record<number, AnimalCare>
+  /** care tasks not yet done today for a given animal */
+  tasksRemaining: (family: number) => CareTask[]
+  /** families with at least one task left today */
+  choreFamilies: number[]
+  allChoresDone: boolean
   /** family whose egg has hatched and is waiting for its ceremony at the nest */
   pendingHatch: number | null
   totalStalls: number
-  /** the hotspot she last walked into — so returning to the farmyard drops her
-   *  back there instead of at the farmhouse door */
+  /** the hotspot she last walked into — so returning drops her back there */
   lastHotspot: HotspotId | null
 
   go: (screen: Screen, params?: { stallIndex?: number }) => void
-  /** navigate from a farmyard hotspot (records it for the return trip) */
   enterHotspot: (id: HotspotId, screen: Screen) => void
   back: () => void
-  /** called by QuizPanel.onQuestionGraded — currency + hatch detection */
+  /** per graded answer — coins (correct answers only) + hatch detection */
   onGraded: (result: GradeResult) => void
-  /** called by QuizPanel.onComplete — logs the session, clears the chore */
-  completeSession: (log: SessionLog) => void
+  /** spend coins on a feed bundle. Returns false if she can't afford it. */
+  buyFeed: () => boolean
+  /** a completed care round in a stall (feed/water/clean/play) */
+  completeCare: (family: number, task: CareTask, log: SessionLog) => void
+  /** a completed free round (paddock / egg practice) */
+  completePractice: (log: SessionLog) => void
   renameCreature: (family: number, name: string) => void
-  /** run the pending hatch ceremony: add the creature (optionally named), clear the flag */
   claimHatch: (name?: string) => HatchedCreature | null
   setMuted: (muted: boolean) => void
   exportSave: () => string
@@ -67,22 +79,30 @@ export type GameApi = {
 
 const GameContext = createContext<GameApi | null>(null)
 
-/** One-time normalisation of a loaded save: cold-start creature + daily chores. */
+/** One-time normalisation of a loaded save: the cold-start gift animal. */
 function primeSave(raw: SaveData): SaveData {
   let save = raw
-  // Cold start — the anchor creature is a gift, no egg ceremony (D6).
   if (!save.creatures.some((c) => c.family === COLD_START_CREATURE_FAMILY)) {
     save = {
       ...save,
       creatures: [...save.creatures, makeCreature(COLD_START_CREATURE_FAMILY, 0)],
     }
   }
-  return save
+  // Every hatched animal needs a care record.
+  const care = { ...save.care }
+  let changed = false
+  for (const c of save.creatures) {
+    if (!care[c.family]) {
+      care[c.family] = emptyAnimalCare(c.family)
+      changed = true
+    }
+  }
+  return changed ? { ...save, care } : save
 }
 
-function choresFor(save: SaveData): number[] {
-  if (save.lastChoresDate === todayStr()) return []
-  return save.creatures.map((c) => c.stallIndex).sort((a, b) => a - b)
+function tasksRemainingFor(care: AnimalCare | undefined, today: string): CareTask[] {
+  if (!care) return [...CARE_TASKS]
+  return CARE_TASKS.filter((t) => care.done[t] !== today)
 }
 
 export function GameProvider({ children }: { children: ReactNode }) {
@@ -96,9 +116,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
     view: { screen: 'farmyard' },
     stack: [],
   })
-  const [choreStalls, setChoreStalls] = useState<number[]>(() => choresFor(save))
   const [pendingHatch, setPendingHatch] = useState<number | null>(null)
   const [lastHotspot, setLastHotspot] = useState<HotspotId | null>(null)
+
+  const today = todayStr()
 
   const persist = useCallback(
     (next: SaveData) => {
@@ -108,13 +129,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
     [store],
   )
 
-  const pushView = useCallback((view: View) => {
-    setNav((n) => ({ view, stack: [...n.stack, n.view] }))
-  }, [])
-
-  /** Fold the live scheduler snapshot back into the save and persist. */
-  const syncScheduler = useCallback(
-    (patch?: Partial<SaveData>) => {
+  /** persist, folding the live scheduler snapshot in. */
+  const persistWithScheduler = useCallback(
+    (patch: Partial<SaveData>) => {
       const snap = scheduler.snapshot()
       persist({
         ...save,
@@ -126,6 +143,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
     },
     [persist, save, scheduler],
   )
+
+  const pushView = useCallback((view: View) => {
+    setNav((n) => ({ view, stack: [...n.stack, n.view] }))
+  }, [])
 
   const go = useCallback<GameApi['go']>(
     (screen, params) => {
@@ -154,19 +175,26 @@ export function GameProvider({ children }: { children: ReactNode }) {
     )
   }, [])
 
+  const tasksRemaining = useCallback<GameApi['tasksRemaining']>(
+    (family) => tasksRemainingFor(save.care[family], today),
+    [save.care, today],
+  )
+
+  const choreFamilies = useMemo(
+    () => save.creatures.filter((c) => tasksRemainingFor(save.care[c.family], today).length > 0).map((c) => c.family),
+    [save.creatures, save.care, today],
+  )
+  const allChoresDone = choreFamilies.length === 0
+
   const onGraded = useCallback<GameApi['onGraded']>(
     (result) => {
-      // Currency — the ONLY source (exploration reveals; math advances).
-      const pellets = save.currency.pellets + (result.correct ? PELLETS_PER_CORRECT : 0)
-      const coins = save.currency.coins + (result.outcome === 'FLUENT' ? COINS_PER_FLUENT : 0)
-      const snap = scheduler.snapshot()
-      persist({
-        ...save,
-        currency: { pellets, coins },
-        scheduler: snap,
-        facts: snap.facts,
-        globalCounter: snap.globalCounter,
-      })
+      const gained =
+        result.outcome === 'FLUENT'
+          ? COINS_PER_FLUENT
+          : result.correct
+            ? COINS_PER_CORRECT
+            : 0
+      persistWithScheduler({ coins: save.coins + gained })
 
       if (
         result.familyJustMastered != null &&
@@ -176,35 +204,52 @@ export function GameProvider({ children }: { children: ReactNode }) {
         setPendingHatch(result.familyJustMastered)
       }
     },
-    [persist, save, pendingHatch, scheduler],
+    [persistWithScheduler, save.coins, save.creatures, pendingHatch],
   )
 
-  const completeSession = useCallback<GameApi['completeSession']>(
-    (log) => {
+  const buyFeed = useCallback<GameApi['buyFeed']>(() => {
+    if (save.coins < FEED_BUNDLE_PRICE) return false
+    audio.play('correct')
+    persist({
+      ...save,
+      coins: save.coins - FEED_BUNDLE_PRICE,
+      feed: save.feed + FEED_BUNDLE_UNITS,
+    })
+    return true
+  }, [persist, save, audio])
+
+  const completeCare = useCallback<GameApi['completeCare']>(
+    (family, task, log) => {
+      const prev = save.care[family] ?? emptyAnimalCare(family)
+      const care: Record<number, AnimalCare> = {
+        ...save.care,
+        [family]: { ...prev, done: { ...prev.done, [task]: today } },
+      }
+      const feed = task === 'feed' ? Math.max(0, save.feed - FEED_PER_FEEDING) : save.feed
       const sessions = [...save.sessions, log].slice(-200)
-      let lastChoresDate = save.lastChoresDate
-      let nextChores = choreStalls
 
-      if (log.context === 'stall' && log.familyContext != null) {
-        const creature = save.creatures.find((c) => c.family === log.familyContext)
-        if (creature) nextChores = choreStalls.filter((s) => s !== creature.stallIndex)
-      }
-      const choresJustFinished = choreStalls.length > 0 && nextChores.length === 0
-      if (choresJustFinished) lastChoresDate = todayStr()
+      // Are all chores now done?
+      const stillPending = save.creatures.some(
+        (c) => tasksRemainingFor(care[c.family], today).length > 0,
+      )
+      const lastChoresDate = stillPending ? save.lastChoresDate : today
 
-      setChoreStalls(nextChores)
-      syncScheduler({ sessions, lastChoresDate })
+      persistWithScheduler({ care, feed, sessions, lastChoresDate })
 
-      if (log.context === 'stall') {
-        // Return to the barn to pick the next hungry stall — or the day's
-        // summary once every stall is clear (the game says goodnight, rule 6).
-        setNav({
-          view: { screen: choresJustFinished ? 'summary' : 'barn' },
-          stack: [{ screen: 'farmyard' }],
-        })
-      }
+      // Back to the barn to pick the next task — or the goodnight summary.
+      setNav({
+        view: { screen: stillPending ? 'barn' : 'summary' },
+        stack: [{ screen: 'farmyard' }],
+      })
     },
-    [save, choreStalls, syncScheduler],
+    [persistWithScheduler, save, today],
+  )
+
+  const completePractice = useCallback<GameApi['completePractice']>(
+    (log) => {
+      persistWithScheduler({ sessions: [...save.sessions, log].slice(-200) })
+    },
+    [persistWithScheduler, save.sessions],
   )
 
   const renameCreature = useCallback<GameApi['renameCreature']>(
@@ -229,7 +274,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const creature = makeCreature(pendingHatch, nextFreeStall(save.creatures))
       if (name && name.trim()) creature.name = name.trim()
       audio.play('hatch')
-      persist({ ...save, creatures: [...save.creatures, creature] })
+      persist({
+        ...save,
+        creatures: [...save.creatures, creature],
+        care: { ...save.care, [creature.family]: emptyAnimalCare(creature.family) },
+      })
       setPendingHatch(null)
       return creature
     },
@@ -247,8 +296,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const exportSave = useCallback(() => store.exportJSON(), [store])
 
   const resetSave = useCallback(() => {
-    // The Scheduler is built once from the loaded save; a clean reload is the
-    // safe way to rebuild every singleton around a fresh save.
     store.reset()
     if (typeof location !== 'undefined') location.reload()
   }, [store])
@@ -261,7 +308,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
       view: nav.view,
       history: nav.stack,
       creatures: save.creatures,
-      choreStalls,
+      care: save.care,
+      tasksRemaining,
+      choreFamilies,
+      allChoresDone,
       pendingHatch,
       totalStalls: TOTAL_STALLS,
       lastHotspot,
@@ -269,14 +319,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
       enterHotspot,
       back,
       onGraded,
-      completeSession,
+      buyFeed,
+      completeCare,
+      completePractice,
       renameCreature,
       claimHatch,
       setMuted,
       exportSave,
       resetSave,
     }),
-    [save, scheduler, audio, nav, choreStalls, pendingHatch, lastHotspot, go, enterHotspot, back, onGraded, completeSession, renameCreature, claimHatch, setMuted, exportSave, resetSave],
+    [save, scheduler, audio, nav, tasksRemaining, choreFamilies, allChoresDone, pendingHatch, lastHotspot, go, enterHotspot, back, onGraded, buyFeed, completeCare, completePractice, renameCreature, claimHatch, setMuted, exportSave, resetSave],
   )
 
   return <GameContext value={api}>{children}</GameContext>

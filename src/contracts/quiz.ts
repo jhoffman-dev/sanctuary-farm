@@ -15,7 +15,7 @@ export type SessionEntry = {
   askedAt: number // globalCounter value when asked
 }
 
-export type SessionContext = 'stall' | 'paddock' | 'free'
+export type SessionContext = 'stall' | 'paddock' | 'free' | 'egg'
 
 export type SessionLog = {
   startedAt: number // epoch ms
@@ -36,6 +36,9 @@ export type QuizPanelProps = {
   mode: QuizMode
   context: SessionContext
   familyContext?: number | null
+  /** When set, questions are drawn from this family only (scheduler.nextInFamily),
+   *  for "tap an egg to practise these" in the nest hollow. */
+  practiceFamily?: number | null
   /** Slot for the creature art (a <CreatureSVG>). The panel positions it. */
   creatureSlot?: ReactNode
   /** The panel calls this to drive the creature's reaction. */

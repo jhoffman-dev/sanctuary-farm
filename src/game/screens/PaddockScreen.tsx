@@ -5,7 +5,7 @@ import { QuizPanel } from '@/quiz/QuizPanel'
 import { useGame } from '../gameState'
 
 export function PaddockScreen() {
-  const { scheduler, completeSession, onGraded, back, save } = useGame()
+  const { scheduler, completePractice, onGraded, back, save } = useGame()
   const [running, setRunning] = useState(false)
   const [last, setLast] = useState<{ correct: number; total: number } | null>(null)
 
@@ -15,7 +15,7 @@ export function PaddockScreen() {
     setRunning(false)
     const correct = log.entries.filter((e) => e.correct).length
     setLast({ correct, total: log.entries.length })
-    completeSession(log)
+    completePractice(log)
   }
 
   return (

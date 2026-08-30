@@ -110,11 +110,24 @@ export const CAMERA_DEADZONE = 1 / 3
 // ─── Sessions ───
 export const CHORE_QUESTIONS_PER_STALL = 5
 export const FREE_SESSION_QUESTIONS = 5
+export const EGG_PRACTICE_QUESTIONS = 5
 export const PADDOCK_DURATION_MS = 60_000
+
+// ─── Economy (coins come ONLY from graded answers; feed is bought with coins) ───
+export const COINS_PER_CORRECT = 1
+/** Total coins for a fast answer (not added on top of COINS_PER_CORRECT). */
+export const COINS_PER_FLUENT = 2
+/** Feed granted on a fresh save so day one can begin. */
+export const STARTING_FEED = 12
+/** Feed shed: this many feed units for this many coins (fixed price). */
+export const FEED_BUNDLE_UNITS = 10
+export const FEED_BUNDLE_PRICE = 6
+/** Feed consumed by one feeding. Watering / cleaning / play cost no feed. */
+export const FEED_PER_FEEDING = 3
 
 // ─── Persistence (Track E) ───
 export const SAVE_KEY = 'sanctuary-farm/save'
-export const SCHEMA_VERSION = 1 as const
+export const SCHEMA_VERSION = 2 as const
 
 // ─── Cold start (Phase 2) ───
 /** Families whose facts start `introduced` on a fresh save (the Anchors tier). */

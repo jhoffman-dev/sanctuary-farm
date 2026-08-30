@@ -38,7 +38,14 @@ export type GradeResult = {
 export interface Scheduler {
   /** The next fact to present. Never throws once at least one fact is introduced. */
   next(): Fact
-  /** Grade an answer to the fact `next()` last returned. Advances globalCounter by 1. */
+  /**
+   * The next fact to present from a specific family — for "tap an egg to practise
+   * these" in the nest hollow. Returns the introduced fact in `family` most in
+   * need of practice (lowest box, then most overdue). Falls back to `next()` if
+   * the family has no introduced facts. Does NOT introduce new facts.
+   */
+  nextInFamily(family: number): Fact
+  /** Grade an answer to the fact `next()`/`nextInFamily()` last returned. Advances globalCounter by 1. */
   grade(factId: string, given: number, latencyMs: number): GradeResult
   /** 0..1 display fraction for the family's egg. Exactly 1.0 only when isMastered. */
   familyProgress(family: number): number

@@ -40,7 +40,8 @@ describe('createSaveStore — round-trip', () => {
     const data = emptySave()
     data.globalCounter = 42
     data.settings.maxTable = 10
-    data.currency = { pellets: 3, coins: 1 }
+    data.coins = 5
+    data.feed = 3
     data.lastChoresDate = '2026-08-20'
     store.save(data)
 
@@ -86,13 +87,14 @@ describe('migrate — never throws', () => {
       out = migrate(input)
     }).not.toThrow()
     out = migrate(input)
-    expect(out.schemaVersion).toBe(1)
+    expect(out.schemaVersion).toBe(2)
     expect(out.facts).toBeTypeOf('object')
     expect(Array.isArray(out.sessions)).toBe(true)
     expect(Array.isArray(out.creatures)).toBe(true)
     expect(out.settings.maxTable).toBeTypeOf('number')
     expect(out.settings.muted).toBeTypeOf('boolean')
-    expect(out.currency.pellets).toBeTypeOf('number')
+    expect(out.coins).toBeTypeOf('number')
+    expect(out.feed).toBeTypeOf('number')
   })
 
   it('fills missing fields from emptySave()', () => {
@@ -106,7 +108,8 @@ describe('migrate — never throws', () => {
   it('preserves known fields from a current-schema blob', () => {
     const blob = emptySave()
     blob.globalCounter = 128
-    blob.currency = { pellets: 9, coins: 4 }
+    blob.coins = 9
+    blob.feed = 7
     blob.lastChoresDate = '2026-08-25'
     blob.settings = { muted: true, maxTable: 8 }
     const cloned = JSON.parse(JSON.stringify(blob)) as unknown
@@ -118,7 +121,7 @@ describe('export / import / reset', () => {
   it('exportJSON pretty-prints', () => {
     const json = createSaveStore().exportJSON()
     expect(json).toContain('\n  ')
-    expect(JSON.parse(json).schemaVersion).toBe(1)
+    expect(JSON.parse(json).schemaVersion).toBe(2)
   })
 
   it('importJSON(exportJSON()) is a no-op round-trip', () => {

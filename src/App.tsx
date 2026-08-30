@@ -6,6 +6,7 @@ import { BarnScreen } from './game/screens/BarnScreen'
 import { StallScreen } from './game/screens/StallScreen'
 import { PaddockScreen } from './game/screens/PaddockScreen'
 import { NestScreen } from './game/screens/NestScreen'
+import { FeedShedScreen } from './game/screens/FeedShedScreen'
 import { SummaryScreen } from './game/screens/SummaryScreen'
 import { DashboardScreen } from './game/screens/DashboardScreen'
 
@@ -22,6 +23,8 @@ function Screens() {
       return <PaddockScreen />
     case 'nest':
       return <NestScreen />
+    case 'feedshed':
+      return <FeedShedScreen />
     case 'summary':
       return <SummaryScreen />
     case 'dashboard':

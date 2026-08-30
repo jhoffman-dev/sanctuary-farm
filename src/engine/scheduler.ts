@@ -371,8 +371,30 @@ export function createScheduler(
     return serve(mostOverdue(pool))
   }
 
+  function nextInFamily(family: number): Fact {
+    const pool = ALL_FACTS.filter(
+      (f) => f.family === family && inRange(f) && state.facts[f.id]?.introduced,
+    )
+    if (pool.length === 0) return next()
+    const gc = state.globalCounter
+    // lowest box first, then most overdue, then worst rolling latency
+    const pick = [...pool].sort((a, b) => {
+      const fa = state.facts[a.id]
+      const fb = state.facts[b.id]
+      if (fa.box !== fb.box) return fa.box - fb.box
+      const da = gc - fa.dueAt
+      const db = gc - fb.dueAt
+      if (da !== db) return db - da
+      return (
+        rollingMean(fb.recentLatencies ?? []) - rollingMean(fa.recentLatencies ?? [])
+      )
+    })[0]
+    return serve(pick)
+  }
+
   return {
     next,
+    nextInFamily,
     grade,
     familyProgress,
     isMastered,

@@ -2,8 +2,7 @@
 // and dumps screens to "Debugging Images/". Not part of `npm test`.
 //
 // One-time:  npx playwright install chromium
-// Run:       npm run dev   (in another shell)
-//            npm run smoke
+// Run:       npm run dev   (in another shell)  ;  npm run smoke
 import { chromium } from 'playwright-core'
 import { mkdirSync } from 'node:fs'
 
@@ -26,7 +25,7 @@ page.on('pageerror', (e) => logs.push(`[pageerror] ${e.message}`))
 
 const shot = (n) => page.screenshot({ path: `${OUT}/${n}.png` })
 const txt = async () =>
-  (await page.locator('#root').innerText().catch(() => '')).replace(/\s*\n\s*/g, ' | ').slice(0, 200)
+  (await page.locator('#root').innerText().catch(() => '')).replace(/\s*\n\s*/g, ' | ').slice(0, 240)
 
 async function walkToTile(tx, ty) {
   const r = await page.locator('svg[aria-hidden="true"]').first().evaluate((el) => {
@@ -39,57 +38,62 @@ async function walkToTile(tx, ty) {
   )
 }
 async function back() {
-  const b = page.getByRole('button', { name: /← farmyard|back to the farm/i }).first()
-  if (await b.count()) { await b.click(); await page.waitForTimeout(800) }
+  const b = page.getByRole('button', { name: /← farmyard|← barn|back to the farm/i }).first()
+  if (await b.count()) { await b.click(); await page.waitForTimeout(700) }
+}
+async function answer(n) {
+  const pad = page.getByTestId('number-pad')
+  for (let q = 0; q < n; q++) {
+    await page.waitForTimeout(500)
+    const p = await page.getByTestId('prompt').innerText().catch(() => '')
+    const m = p.match(/(\d+)\s*[×x*]\s*(\d+)/)
+    if (!m) return q
+    for (const d of String(Number(m[1]) * Number(m[2]))) await pad.getByRole('button', { name: d }).click()
+    await pad.getByRole('button', { name: /confirm/i }).click()
+    await page.waitForTimeout(1100)
+  }
+  return n
 }
 
 await page.goto(URL, { waitUntil: 'networkidle' })
 await page.waitForTimeout(1000)
-console.log('boot        :', await txt())
-await shot('t0-boot')
+console.log('boot       :', await txt())
+await shot('r0-boot')
 
-await walkToTile(18, 4) // nest
-await page.waitForTimeout(3500)
-console.log('-> nest     :', await txt())
-await shot('t1-nest')
-await back()
-await page.waitForTimeout(400)
-console.log('back (@nest):', await txt())
-await shot('t2-back-at-nest')
-
-await walkToTile(18, 13) // paddock
-await page.waitForTimeout(4000)
-console.log('-> paddock  :', await txt())
-await shot('t3-paddock')
-await back()
-
-await walkToTile(4, 8) // barn
-await page.waitForTimeout(5000)
-console.log('-> barn     :', await txt())
-await shot('t4-barn')
-
-// feed the gift creature
-const tenner = page.getByRole('button', { name: 'Tenner' })
-if (await tenner.count()) {
-  await tenner.click(); await page.waitForTimeout(600)
-  await page.getByRole('button', { name: /^feed$/i }).click(); await page.waitForTimeout(700)
-  for (let q = 0; q < 6; q++) {
-    await page.waitForTimeout(500)
-    const p = await page.getByTestId('prompt').innerText().catch(() => '')
-    const m = p.match(/(\d+)\s*[×x*]\s*(\d+)/)
-    if (!m) break
-    for (const d of String(Number(m[1]) * Number(m[2]))) await page.getByRole('button', { name: d, exact: true }).click()
-    await page.getByRole('button', { name: /confirm/i }).click()
-    await page.waitForTimeout(1100)
-  }
-  await page.waitForTimeout(700)
-  console.log('-> fed      :', await txt())
-  await shot('t5-goodnight')
-  await back()
-  await page.waitForTimeout(500)
-  console.log('back (@barn):', await txt())
-  await shot('t6-back-at-barn')
+// feed shed
+await walkToTile(9, 8)
+await page.waitForTimeout(3000)
+console.log('-> feedshed:', await txt())
+await shot('r1-feedshed')
+const buy = page.getByRole('button', { name: /buy for/i })
+if ((await buy.count()) && !(await buy.isDisabled())) {
+  await buy.click(); await page.waitForTimeout(400)
+  console.log('   bought  :', await txt())
+} else {
+  console.log('   (buy disabled — no coins yet, as expected)')
 }
+await back()
+
+// barn -> stall -> all four care tasks
+await walkToTile(4, 8)
+await page.waitForTimeout(3500)
+console.log('-> barn    :', await txt())
+await shot('r2-barn')
+for (const task of ['Water', 'Clean', 'Play', 'Feed']) {
+  const tenner = page.getByRole('button', { name: 'Tenner' })
+  if (!(await tenner.count())) { console.log('   (no more stalls to open — chores done?)'); break }
+  await tenner.click()
+  await page.waitForTimeout(500)
+  if (task === 'Water') await shot('r3-stall')
+  const btn = page.getByRole('button', { name: task, exact: true })
+  if (!(await btn.count()) || (await btn.isDisabled())) { console.log(`   ${task}: n/a`); await back(); continue }
+  await btn.click()
+  const got = await answer(6)
+  console.log(`   ${task}: answered ${got} · ${(await txt()).slice(0, 90)}`)
+  await page.waitForTimeout(700)
+}
+console.log('after care :', await txt())
+await shot('r4-after-care')
 
 console.log('\n--- console ---')
 console.log(logs.filter((l) => !/DevTools|\[vite\]/.test(l)).join('\n') || '(clean)')

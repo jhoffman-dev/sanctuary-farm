@@ -33,6 +33,7 @@ export function QuizPanel({
   mode,
   context,
   familyContext = null,
+  practiceFamily = null,
   creatureSlot,
   onMood,
   onQuestionGraded,
@@ -42,8 +43,13 @@ export function QuizPanel({
   const [sessionStartedAt] = useState(() => Date.now())
   const doneRef = useRef(false)
 
+  const pickFact = useCallback(
+    () => (practiceFamily != null ? scheduler.nextInFamily(practiceFamily) : scheduler.next()),
+    [scheduler, practiceFamily],
+  )
+
   const [qIndex, setQIndex] = useState(0)
-  const [fact, setFact] = useState<Fact>(() => scheduler.next())
+  const [fact, setFact] = useState<Fact>(pickFact)
   const [value, setValue] = useState('')
   const [phase, setPhase] = useState<Phase>('entering')
   const [entries, setEntries] = useState<SessionEntry[]>([])
@@ -85,10 +91,10 @@ export function QuizPanel({
       setLastResult(null)
       setValue('')
       setPhase('entering')
-      setFact(scheduler.next())
+      setFact(pickFact())
       setQIndex((i) => i + 1)
     },
-    [finish, mode, scheduler, sessionStartedAt],
+    [finish, mode, pickFact, sessionStartedAt],
   )
 
   const beginTimer = useCallback(() => {

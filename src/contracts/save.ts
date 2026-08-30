@@ -1,22 +1,27 @@
-// Persistence contract. Implementation owned by Track E (src/save/store.ts).
-// Phase 0 ships a STUB there.
+// Persistence contract. Implementation in src/save/store.ts.
 
 import type { FactState } from './facts'
 import type { SchedulerState } from './scheduler'
 import type { HatchedCreature } from './creature'
+import type { AnimalCare } from './care'
 import type { SessionLog } from './quiz'
 
 export type SaveData = {
-  schemaVersion: 1
+  schemaVersion: 2
   /** Denormalised copy of scheduler fact states — kept so the dashboard can read
    *  without constructing a Scheduler. The Scheduler's snapshot() is the source
-   *  of truth; Phase 2 keeps them in sync on every graded answer. */
+   *  of truth; the game keeps them in sync on every graded answer. */
   facts: Record<string, FactState>
   /** Authoritative scheduler state. */
   scheduler: SchedulerState
   globalCounter: number
   creatures: HatchedCreature[]
-  currency: { pellets: number; coins: number }
+  /** Per-animal daily care, keyed by family. */
+  care: Record<number, AnimalCare>
+  /** Earned from correct answers only. Spent in the feed shed. */
+  coins: number
+  /** Bought with coins. Consumed by feeding. */
+  feed: number
   sessions: SessionLog[]
   settings: { muted: boolean; maxTable: number }
   lastChoresDate: string | null // YYYY-MM-DD (local)
@@ -34,5 +39,5 @@ export interface SaveStore {
   reset(): void
 }
 
-/** A brand-new, internally consistent save. Track E implements; Phase 0 stubs. */
+/** A brand-new, internally consistent save. */
 export type EmptySave = () => SaveData

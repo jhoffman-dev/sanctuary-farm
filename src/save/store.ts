@@ -1,8 +1,9 @@
 // Versioned localStorage save store for Sanctuary Farm.
 // One key (`SAVE_KEY`), value is `JSON.stringify(SaveData)`. `migrate()` best-effort
 // upgrades any blob to the current schema and never throws.
-import { MAX_TABLE_DEFAULT, SAVE_KEY, SCHEMA_VERSION } from '@/contracts'
+import { MAX_TABLE_DEFAULT, SAVE_KEY, SCHEMA_VERSION, STARTING_FEED } from '@/contracts'
 import type {
+  AnimalCare,
   EmptySave,
   FactState,
   HatchedCreature,
@@ -21,7 +22,9 @@ export const emptySave: EmptySave = () => {
     scheduler,
     globalCounter: 0,
     creatures: [],
-    currency: { pellets: 0, coins: 0 },
+    care: {},
+    coins: 0,
+    feed: STARTING_FEED,
     sessions: [],
     settings: { muted: false, maxTable: MAX_TABLE_DEFAULT },
     lastChoresDate: null,
@@ -41,6 +44,20 @@ function isSchedulerState(v: unknown): v is SchedulerState {
     Array.isArray(v.recentFamilies) &&
     typeof v.maxTable === 'number'
   )
+}
+
+function isAnimalCare(v: unknown): v is AnimalCare {
+  return isRecord(v) && typeof v.family === 'number' && isRecord(v.done)
+}
+
+function coerceCare(v: unknown): Record<number, AnimalCare> {
+  if (!isRecord(v)) return {}
+  const out: Record<number, AnimalCare> = {}
+  for (const [k, val] of Object.entries(v)) {
+    const fam = Number(k)
+    if (Number.isFinite(fam) && isAnimalCare(val)) out[fam] = val as AnimalCare
+  }
+  return out
 }
 
 /**
@@ -65,11 +82,20 @@ export function migrate(raw: unknown): SaveData {
     // ── Forward migrations, one schema version at a time. ──
     let working: Record<string, unknown> = value
     if (rawVersion < 1) {
-      // v0 -> v1: the pre-versioned blob simply had no `schemaVersion` field.
+      // v0 -> v1: the pre-versioned blob simply had no `schemaVersion`.
       working = { ...working, schemaVersion: 1 }
     }
-    // v1 -> v2 seam: when SCHEMA_VERSION becomes 2, add here —
-    //   if (rawVersion < 2) working = { ...working, /* transformed fields */, schemaVersion: 2 }
+    if (rawVersion < 2) {
+      // v1 -> v2: currency:{pellets,coins} -> coins + feed; add `care`.
+      const currency = isRecord(working.currency) ? working.currency : {}
+      working = {
+        ...working,
+        coins: typeof currency.coins === 'number' ? currency.coins : 0,
+        feed: STARTING_FEED,
+        care: {},
+        schemaVersion: 2,
+      }
+    }
 
     const base = emptySave()
     const scheduler = isSchedulerState(working.scheduler) ? working.scheduler : base.scheduler
@@ -77,7 +103,6 @@ export function migrate(raw: unknown): SaveData {
       ? (working.facts as Record<string, FactState>)
       : scheduler.facts
     const settings = isRecord(working.settings) ? working.settings : {}
-    const currency = isRecord(working.currency) ? working.currency : {}
 
     return {
       schemaVersion: SCHEMA_VERSION,
@@ -88,10 +113,9 @@ export function migrate(raw: unknown): SaveData {
       creatures: Array.isArray(working.creatures)
         ? (working.creatures as HatchedCreature[])
         : base.creatures,
-      currency: {
-        pellets: typeof currency.pellets === 'number' ? currency.pellets : base.currency.pellets,
-        coins: typeof currency.coins === 'number' ? currency.coins : base.currency.coins,
-      },
+      care: coerceCare(working.care),
+      coins: typeof working.coins === 'number' ? working.coins : base.coins,
+      feed: typeof working.feed === 'number' ? working.feed : base.feed,
       sessions: Array.isArray(working.sessions)
         ? (working.sessions as SessionLog[])
         : base.sessions,

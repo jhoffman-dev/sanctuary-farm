@@ -27,6 +27,7 @@ function QuizDevRoute() {
     const base = createScheduler(initialSchedulerState())
     return {
       next: () => base.next(),
+      nextInFamily: (f) => base.nextInFamily(f),
       grade: (id, given, latencyMs) => {
         const result = base.grade(id, given, latencyMs)
         setRows((rs) => [

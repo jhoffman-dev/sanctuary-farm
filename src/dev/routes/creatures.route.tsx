@@ -3,7 +3,8 @@
 import { useMemo, useState } from 'react'
 import { motion } from 'motion/react'
 import type { CreatureMood, HatchedCreature } from '@/contracts'
-import { DEFAULT_CREATURE_NAMES } from '@/contracts'
+import { DEFAULT_CREATURE_NAMES, emptyAnimalCare } from '@/contracts'
+import { todayStr } from '@/game/todayStr'
 import { CreatureSVG } from '@/creatures/CreatureSVG'
 import { ALL_CREATURE_PARAMS, defaultCreatureParams } from '@/creatures/definitions'
 import { moodVariants, MOOD_TRANSFORM_ORIGIN } from '@/creatures/animations'
@@ -124,11 +125,16 @@ function BarnView() {
           <StallPanel
             key={current.stallIndex}
             creature={{ ...current, name: names[current.stallIndex] ?? current.name }}
+            care={emptyAnimalCare(current.family)}
+            today={todayStr()}
+            feed={20}
             scheduler={scheduler}
             onRename={(name) =>
               setNames((prev) => ({ ...prev, [current.stallIndex]: name }))
             }
-            onFed={(l) => setLog(`fed ${current.name}: ${l.entries.length} answers`)}
+            onCareComplete={(task, l) =>
+              setLog(`${task} ${current.name}: ${l.entries.length} answers`)
+            }
             onClose={() => setSelected(null)}
           />
         </div>

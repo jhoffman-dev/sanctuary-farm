@@ -7,13 +7,11 @@ import { ParentGate } from '../ParentGate'
 import { MuteButton } from './MuteButton'
 
 export function FarmyardScreen() {
-  const { go, enterHotspot, choreStalls, pendingHatch, lastHotspot, save } = useGame()
-  const [showShed, setShowShed] = useState(false)
+  const { go, enterHotspot, choreFamilies, allChoresDone, pendingHatch, lastHotspot, save } =
+    useGame()
   const [gate, setGate] = useState(false)
   const pressTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
-  // Return the keeper to whichever hotspot she last stepped into, not the
-  // farmhouse door, so screen changes don't teleport her across the farm.
   const spawnAt: Vec2 | undefined = useMemo(() => {
     if (!lastHotspot) return undefined
     return tilemap.hotspots.find((h) => h.id === lastHotspot)?.tile
@@ -23,8 +21,8 @@ export function FarmyardScreen() {
     if (id === 'barn') enterHotspot(id, 'barn')
     else if (id === 'nest') enterHotspot(id, 'nest')
     else if (id === 'paddock') enterHotspot(id, 'paddock')
+    else if (id === 'feedshed') enterHotspot(id, 'feedshed')
     else if (id === 'farmhouse') enterHotspot(id, 'summary')
-    else if (id === 'feedshed') setShowShed(true)
   }
 
   const holdStart = () => {
@@ -36,20 +34,20 @@ export function FarmyardScreen() {
     <div className="relative h-dvh w-full overflow-hidden">
       <Farmyard
         spawnAt={spawnAt}
-        badges={{ barn: choreStalls.length > 0, nest: pendingHatch != null }}
+        badges={{ barn: !allChoresDone, nest: pendingHatch != null }}
         onHotspot={onHotspot}
       />
 
       <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-3">
-        <div className="pointer-events-auto rounded-full bg-white/80 px-3 py-1 text-sm shadow">
-          🌾 {save.currency.pellets} · 🪙 {save.currency.coins}
+        <div className="pointer-events-auto rounded-full bg-white/85 px-3 py-1 text-sm shadow">
+          🪙 {save.coins} &nbsp;·&nbsp; 🌾 {save.feed}
         </div>
         <div className="pointer-events-auto flex gap-2">
           <MuteButton />
           <button
             type="button"
             aria-label="Farmhouse sign"
-            className="rounded-full bg-white/80 px-3 py-1 text-sm shadow"
+            className="rounded-full bg-white/85 px-3 py-1 text-sm shadow"
             onPointerDown={holdStart}
             onPointerUp={holdEnd}
             onPointerLeave={holdEnd}
@@ -59,27 +57,17 @@ export function FarmyardScreen() {
         </div>
       </div>
 
-      {choreStalls.length > 0 ? (
-        <p className="absolute inset-x-0 bottom-3 text-center text-sm text-stone-600">
-          The animals are hungry — walk to the barn.
+      {!allChoresDone ? (
+        <p className="absolute inset-x-0 bottom-3 text-center text-sm text-stone-700">
+          {choreFamilies.length === 1
+            ? 'An animal still needs care — walk to the barn.'
+            : `${choreFamilies.length} animals still need care — walk to the barn.`}
         </p>
-      ) : null}
-
-      {showShed ? (
-        <div className="absolute inset-0 grid place-items-center bg-stone-900/30 p-6">
-          <div className="max-w-xs rounded-xl bg-white p-6 text-center shadow-xl">
-            <p className="text-lg font-semibold">Feed shed</p>
-            <p className="mt-2 text-4xl">🌾 {save.currency.pellets}</p>
-            <p className="text-4xl">🪙 {save.currency.coins}</p>
-            <p className="mt-2 text-xs text-stone-500">
-              Pellets and coins come only from answering questions.
-            </p>
-            <button type="button" className="mt-4 rounded-lg bg-stone-200 px-4 py-2" onClick={() => setShowShed(false)}>
-              Close
-            </button>
-          </div>
-        </div>
-      ) : null}
+      ) : (
+        <p className="absolute inset-x-0 bottom-3 text-center text-sm text-stone-600">
+          Everyone is cared for today. 🌙
+        </p>
+      )}
 
       {gate ? (
         <ParentGate
