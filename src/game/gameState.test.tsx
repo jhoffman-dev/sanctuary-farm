@@ -118,4 +118,16 @@ describe('GameProvider — navigation', () => {
     act(() => result.current.back())
     expect(result.current.view.screen).toBe('farmyard')
   })
+
+  it('enterHotspot records the hotspot so the return trip spawns her there', () => {
+    const { result } = setup()
+    expect(result.current.lastHotspot).toBeNull()
+    act(() => result.current.enterHotspot('nest', 'nest'))
+    expect(result.current.view.screen).toBe('nest')
+    expect(result.current.lastHotspot).toBe('nest')
+    act(() => result.current.back())
+    expect(result.current.view.screen).toBe('farmyard')
+    // lastHotspot stays 'nest' — FarmyardScreen uses it to place the keeper
+    expect(result.current.lastHotspot).toBe('nest')
+  })
 })

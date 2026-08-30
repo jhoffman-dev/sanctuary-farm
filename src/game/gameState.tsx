@@ -13,6 +13,7 @@ import {
   COLD_START_CREATURE_FAMILY,
   type GradeResult,
   type HatchedCreature,
+  type HotspotId,
   type SaveData,
   type Screen,
   type SessionLog,
@@ -44,8 +45,13 @@ export type GameApi = {
   /** family whose egg has hatched and is waiting for its ceremony at the nest */
   pendingHatch: number | null
   totalStalls: number
+  /** the hotspot she last walked into — so returning to the farmyard drops her
+   *  back there instead of at the farmhouse door */
+  lastHotspot: HotspotId | null
 
   go: (screen: Screen, params?: { stallIndex?: number }) => void
+  /** navigate from a farmyard hotspot (records it for the return trip) */
+  enterHotspot: (id: HotspotId, screen: Screen) => void
   back: () => void
   /** called by QuizPanel.onQuestionGraded — currency + hatch detection */
   onGraded: (result: GradeResult) => void
@@ -92,6 +98,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   })
   const [choreStalls, setChoreStalls] = useState<number[]>(() => choresFor(save))
   const [pendingHatch, setPendingHatch] = useState<number | null>(null)
+  const [lastHotspot, setLastHotspot] = useState<HotspotId | null>(null)
 
   const persist = useCallback(
     (next: SaveData) => {
@@ -127,6 +134,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
           ? { screen: 'stall', stallIndex: params?.stallIndex ?? 0 }
           : { screen },
       )
+    },
+    [pushView],
+  )
+
+  const enterHotspot = useCallback<GameApi['enterHotspot']>(
+    (id, screen) => {
+      setLastHotspot(id)
+      pushView({ screen } as View)
     },
     [pushView],
   )
@@ -249,7 +264,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
       choreStalls,
       pendingHatch,
       totalStalls: TOTAL_STALLS,
+      lastHotspot,
       go,
+      enterHotspot,
       back,
       onGraded,
       completeSession,
@@ -259,7 +276,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       exportSave,
       resetSave,
     }),
-    [save, scheduler, audio, nav, choreStalls, pendingHatch, go, back, onGraded, completeSession, renameCreature, claimHatch, setMuted, exportSave, resetSave],
+    [save, scheduler, audio, nav, choreStalls, pendingHatch, lastHotspot, go, enterHotspot, back, onGraded, completeSession, renameCreature, claimHatch, setMuted, exportSave, resetSave],
   )
 
   return <GameContext value={api}>{children}</GameContext>

@@ -1,7 +1,8 @@
-// The walkable farmyard. Tap/click a tile to path there (A*); tapping again
-// mid-walk re-paths instantly. Arrow keys / WASD are a secondary continuous
-// input. No d-pad. Walking fully onto a hotspot tile fires onHotspot(id) once,
-// re-armed only after leaving. A dead-zone follow camera tracks the keeper.
+// The walkable farmyard. The whole farm is scaled to fit the viewport (no
+// scrolling camera) so every hotspot is always on screen. Tap/click a tile to
+// path there (A*); tapping again mid-walk re-paths instantly. Arrow keys / WASD
+// are a secondary continuous input. No d-pad. Walking fully onto a hotspot tile
+// fires onHotspot(id) once, re-armed only after leaving.
 import {
   type PointerEvent as ReactPointerEvent,
   useCallback,
@@ -25,12 +26,22 @@ import type {
   Tilemap,
   Vec2,
 } from '@/contracts'
-import { cameraOffset } from './camera'
 import { Character } from './Character'
 import { findPath } from './pathfind'
 import { tilemap } from './tilemap'
 
-type Props = FarmyardProps & { debug?: boolean }
+type Props = FarmyardProps & {
+  debug?: boolean
+  /** Where the keeper appears on mount. Defaults to the farmhouse door
+   *  (map.playerStart). Phase 2 passes the last hotspot she left from so she
+   *  doesn't teleport back across the farm on every screen change. */
+  spawnAt?: Vec2
+}
+
+/** Chebyshev distance in tiles. */
+const chebyshev = (a: Vec2, b: Vec2) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y))
+/** Taps within this many tiles of a hotspot snap to it. */
+const HOTSPOT_SNAP_RADIUS = 2
 
 const TILE_FILL: Record<TileType, string> = {
   grass: '#8bc24a',
@@ -38,6 +49,17 @@ const TILE_FILL: Record<TileType, string> = {
   fence: '#6f5038',
   water: '#57b0e4',
   building: '#c05a44',
+}
+
+type Fit = { scale: number; ox: number; oy: number }
+
+function fitFor(vw: number, vh: number): Fit {
+  const scale = Math.min(vw / MAP_PX_W, vh / MAP_PX_H) || 1
+  return {
+    scale,
+    ox: (vw - MAP_PX_W * scale) / 2,
+    oy: (vh - MAP_PX_H * scale) / 2,
+  }
 }
 
 const tileCentre = (t: Vec2): Vec2 => ({
@@ -84,10 +106,9 @@ function hotspotAt(map: Tilemap, tile: Vec2): HotspotId | null {
   return map.hotspots.find((h) => h.tile.x === tile.x && h.tile.y === tile.y)?.id ?? null
 }
 
-export function Farmyard({ map = tilemap, onHotspot, badges, debug }: Props) {
-  const start = tileCentre(map.playerStart)
-
-  const initialCam = cameraOffset(start, { w: MAP_PX_W, h: MAP_PX_H })
+export function Farmyard({ map = tilemap, onHotspot, badges, debug, spawnAt }: Props) {
+  const spawnTile = spawnAt ?? map.playerStart
+  const start = tileCentre(spawnTile)
 
   const posRef = useRef<Vec2>(start)
   const pathRef = useRef<Vec2[]>([])
@@ -96,9 +117,8 @@ export function Farmyard({ map = tilemap, onHotspot, badges, debug }: Props) {
   // If the player spawns on a hotspot tile (the farmhouse door often is one),
   // treat it as already "occupied" so we don't fire onHotspot for simply
   // standing there — it only fires when she *walks onto* it (see loop below).
-  const occupiedRef = useRef<HotspotId | null>(hotspotAt(map, map.playerStart))
-  const camRef = useRef<Vec2>(initialCam)
-  const viewportRef = useRef({ w: MAP_PX_W, h: MAP_PX_H })
+  const occupiedRef = useRef<HotspotId | null>(hotspotAt(map, spawnTile))
+  const fitRef = useRef<Fit>(fitFor(MAP_PX_W, MAP_PX_H))
   const onHotspotRef = useRef(onHotspot)
 
   const containerRef = useRef<HTMLDivElement>(null)
@@ -106,15 +126,14 @@ export function Farmyard({ map = tilemap, onHotspot, badges, debug }: Props) {
   const [pos, setPos] = useState<Vec2>(start)
   const [facing, setFacing] = useState<CharacterFacing>('down')
   const [moving, setMoving] = useState(false)
-  const [cam, setCam] = useState<Vec2>(initialCam)
+  const [fit, setFit] = useState<Fit>(fitRef.current)
   const [pathView, setPathView] = useState<Vec2[]>([])
-  const [hud, setHud] = useState({ fps: 0, tile: map.playerStart })
+  const [hud, setHud] = useState({ fps: 0, tile: spawnTile })
 
   const appliedRef = useRef({
     pos: start,
     facing: 'down' as CharacterFacing,
     moving: false,
-    cam: initialCam,
     pathLen: 0,
   })
 
@@ -122,13 +141,14 @@ export function Farmyard({ map = tilemap, onHotspot, badges, debug }: Props) {
     onHotspotRef.current = onHotspot
   }, [onHotspot])
 
-  // Reset to the farmhouse door when a different map is supplied (D12).
+  // Reset the keeper's position when a different map is supplied (D12 — position
+  // is not persisted; on a fresh mount she starts at `spawnTile`).
   const mountedRef = useRef(false)
   useEffect(() => {
-    const s = tileCentre(map.playerStart)
+    const s = tileCentre(spawnTile)
     posRef.current = s
     pathRef.current = []
-    occupiedRef.current = hotspotAt(map, map.playerStart)
+    occupiedRef.current = hotspotAt(map, spawnTile)
     facingRef.current = 'down'
     if (!mountedRef.current) {
       mountedRef.current = true
@@ -136,14 +156,20 @@ export function Farmyard({ map = tilemap, onHotspot, badges, debug }: Props) {
     }
     setPos(s)
     setPathView([])
+    // Depend on `map` only: `spawnTile` is read once here and a navigation change
+    // remounts this component (fresh mount branch), so it never needs to re-run
+    // for a spawn change alone.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map])
 
-  // Measure the viewport for the camera.
+  // Keep the whole farm scaled to fit the container.
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
     const measure = () => {
-      viewportRef.current = { w: el.clientWidth || MAP_PX_W, h: el.clientHeight || MAP_PX_H }
+      const next = fitFor(el.clientWidth || MAP_PX_W, el.clientHeight || MAP_PX_H)
+      fitRef.current = next
+      setFit(next)
     }
     measure()
     if (typeof ResizeObserver === 'undefined') return
@@ -170,7 +196,7 @@ export function Farmyard({ map = tilemap, onHotspot, badges, debug }: Props) {
     }
   }, [])
 
-  // The movement / camera / hotspot loop.
+  // The movement / hotspot loop.
   useEffect(() => {
     let raf = 0
     let last = performance.now()
@@ -224,20 +250,16 @@ export function Farmyard({ map = tilemap, onHotspot, badges, debug }: Props) {
       }
 
       posRef.current = p
-      const nextCam = cameraOffset(p, viewportRef.current, camRef.current)
-      camRef.current = nextCam
 
       const applied = appliedRef.current
       if (p.x !== applied.pos.x || p.y !== applied.pos.y) setPos(p)
       if (isMoving !== applied.moving) setMoving(isMoving)
       if (facingRef.current !== applied.facing) setFacing(facingRef.current)
-      if (nextCam.x !== applied.cam.x || nextCam.y !== applied.cam.y) setCam(nextCam)
       if (pathRef.current.length !== applied.pathLen) setPathView(pathRef.current.slice())
       appliedRef.current = {
         pos: p,
         facing: facingRef.current,
         moving: isMoving,
-        cam: nextCam,
         pathLen: pathRef.current.length,
       }
 
@@ -271,10 +293,19 @@ export function Farmyard({ map = tilemap, onHotspot, badges, debug }: Props) {
       const el = containerRef.current
       if (!el) return
       const rect = el.getBoundingClientRect()
-      const target = pxToTile({
-        x: clientX - rect.left + camRef.current.x,
-        y: clientY - rect.top + camRef.current.y,
+      const { scale, ox, oy } = fitRef.current
+      const tapped = pxToTile({
+        x: (clientX - rect.left - ox) / scale,
+        y: (clientY - rect.top - oy) / scale,
       })
+      // Tapping on or near a hotspot means "take me there" — snap the
+      // destination to the hotspot tile so a slightly-off tap still triggers it.
+      const nearHotspot = map.hotspots
+        .map((h) => ({ h, d: chebyshev(h.tile, tapped) }))
+        .filter((x) => x.d <= HOTSPOT_SNAP_RADIUS)
+        .sort((a, b) => a.d - b.d)[0]
+      const target = nearHotspot ? nearHotspot.h.tile : tapped
+
       const from = pxToTile(posRef.current)
       const path = findPath(map, from, target)
       if (path === null) return // unreachable — do nothing, no throw
@@ -290,14 +321,15 @@ export function Farmyard({ map = tilemap, onHotspot, badges, debug }: Props) {
     <div
       ref={containerRef}
       onPointerDown={onPointerDown}
-      className="relative h-full w-full touch-none select-none overflow-hidden bg-[#6ba43a]"
+      className="relative h-full w-full touch-none select-none overflow-hidden bg-[#8bc24a]"
       style={{ cursor: 'pointer' }}
     >
       <svg
-        width={MAP_PX_W}
-        height={MAP_PX_H}
-        className="absolute left-0 top-0"
-        style={{ transform: `translate(${-cam.x}px, ${-cam.y}px)` }}
+        viewBox={`0 0 ${MAP_PX_W} ${MAP_PX_H}`}
+        width={MAP_PX_W * fit.scale}
+        height={MAP_PX_H * fit.scale}
+        className="absolute"
+        style={{ left: fit.ox, top: fit.oy }}
         aria-hidden
       >
         {map.tiles.map((t, i) => (
@@ -327,17 +359,20 @@ export function Farmyard({ map = tilemap, onHotspot, badges, debug }: Props) {
             transform={`translate(${h.tile.x * TILE_PX + TILE_PX / 2} ${h.tile.y * TILE_PX + TILE_PX / 2})`}
           >
             <circle
-              r={TILE_PX * 0.44}
-              fill="rgba(255,255,255,0.22)"
-              stroke="rgba(255,255,255,0.75)"
+              r={TILE_PX * 0.5}
+              fill="rgba(255,255,255,0.28)"
+              stroke="rgba(255,255,255,0.85)"
               strokeWidth={2}
             />
             <text
-              y={-TILE_PX * 0.72}
+              y={-TILE_PX * 0.78}
               textAnchor="middle"
-              fontSize={12}
+              fontSize={13}
               fontWeight={700}
-              fill="#2b3a12"
+              fill="#26331a"
+              stroke="#ffffffcc"
+              strokeWidth={3}
+              paintOrder="stroke"
             >
               {h.label}
             </text>
@@ -354,7 +389,7 @@ export function Farmyard({ map = tilemap, onHotspot, badges, debug }: Props) {
 
       {debug ? (
         <div className="absolute bottom-2 left-2 rounded bg-black/55 px-2 py-1 font-mono text-[11px] text-white">
-          {hud.fps} fps · tile {hud.tile.x},{hud.tile.y}
+          {hud.fps} fps · tile {hud.tile.x},{hud.tile.y} · scale {fit.scale.toFixed(2)}
         </div>
       ) : null}
     </div>

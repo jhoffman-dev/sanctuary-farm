@@ -18,8 +18,8 @@ const ROWS: readonly string[] = [
   'FFFFFFFFFFFFFFFFFFFFFFFFF', //  0
   'F.......................F', //  1
   'F..........-............F', //  2
-  'F..........-....F...F...F', //  3  nest hollow flanked by fence
-  'F..BBBB.BBB-....F...F...F', //  4  barn (x3-6) · feed shed (x8-10) · nest (18,4)
+  'F..........-....F.-.F...F', //  3  nest hollow flanked by fence
+  'F..BBBB.BBB-....F.-.F...F', //  4  barn (x3-6) · feed shed (x8-10) · nest (18,4) on-path
   'F..BBBB.BBB-....F.-.F...F', //  5  nest spur down x18
   'F..BBBB.BBB-......-.....F', //  6
   'F..BBBB.BBB-......-.....F', //  7
@@ -28,7 +28,7 @@ const ROWS: readonly string[] = [
   'F..........-......-.....F', // 10
   'F..........-...FFF-FFF..F', // 11  farmhouse door (11,11) · paddock gate (18,11)
   'F..WWW....BBBB.F..-..F..F', // 12  pond (x3-5) · farmhouse (x10-13) · paddock
-  'F..WWW....BBBB.F.....F..F', // 13  paddock hotspot (18,13)
+  'F..WWW....BBBB.F..-..F..F', // 13  paddock hotspot (18,13) on-path
   'F..WWW....BBBB.F.....F..F', // 14
   'F.........BBBB.FFFFFFF..F', // 15  paddock south wall
   'F.......................F', // 16

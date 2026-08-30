@@ -2,7 +2,7 @@
 // afterwards a Skip appears. Ends by letting her name the new creature.
 import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
-import { DEFAULT_CREATURE_NAMES, TIER_NAMES, tierOf } from '@/contracts'
+import { DEFAULT_CREATURE_NAMES } from '@/contracts'
 import type { HatchedCreature } from '@/contracts'
 import { CreatureSVG } from '@/creatures/CreatureSVG'
 
@@ -15,7 +15,7 @@ export type HatchCeremonyProps = {
 export function HatchCeremony({ creature, first, onName }: HatchCeremonyProps) {
   const [phase, setPhase] = useState<'shake' | 'reveal' | 'name'>('shake')
   const [draft, setDraft] = useState(DEFAULT_CREATURE_NAMES[creature.family] ?? creature.name)
-  const familyLabel = TIER_NAMES[tierOf(creature.family, creature.family)]
+  const familyLabel = `${creature.family}s`
 
   useEffect(() => {
     if (phase !== 'shake') return

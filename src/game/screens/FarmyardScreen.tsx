@@ -1,21 +1,29 @@
-import { useRef, useState } from 'react'
-import type { HotspotId } from '@/contracts'
+import { useMemo, useRef, useState } from 'react'
+import type { HotspotId, Vec2 } from '@/contracts'
 import { Farmyard } from '@/world/Farmyard'
+import { tilemap } from '@/world/tilemap'
 import { useGame } from '../gameState'
 import { ParentGate } from '../ParentGate'
 import { MuteButton } from './MuteButton'
 
 export function FarmyardScreen() {
-  const { go, choreStalls, pendingHatch, save } = useGame()
+  const { go, enterHotspot, choreStalls, pendingHatch, lastHotspot, save } = useGame()
   const [showShed, setShowShed] = useState(false)
   const [gate, setGate] = useState(false)
   const pressTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
+  // Return the keeper to whichever hotspot she last stepped into, not the
+  // farmhouse door, so screen changes don't teleport her across the farm.
+  const spawnAt: Vec2 | undefined = useMemo(() => {
+    if (!lastHotspot) return undefined
+    return tilemap.hotspots.find((h) => h.id === lastHotspot)?.tile
+  }, [lastHotspot])
+
   function onHotspot(id: HotspotId) {
-    if (id === 'barn') go('barn')
-    else if (id === 'nest') go('nest')
-    else if (id === 'paddock') go('paddock')
-    else if (id === 'farmhouse') go('summary')
+    if (id === 'barn') enterHotspot(id, 'barn')
+    else if (id === 'nest') enterHotspot(id, 'nest')
+    else if (id === 'paddock') enterHotspot(id, 'paddock')
+    else if (id === 'farmhouse') enterHotspot(id, 'summary')
     else if (id === 'feedshed') setShowShed(true)
   }
 
@@ -27,6 +35,7 @@ export function FarmyardScreen() {
   return (
     <div className="relative h-dvh w-full overflow-hidden">
       <Farmyard
+        spawnAt={spawnAt}
         badges={{ barn: choreStalls.length > 0, nest: pendingHatch != null }}
         onHotspot={onHotspot}
       />

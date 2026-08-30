@@ -1,4 +1,4 @@
-import { ALL_FAMILIES, COLD_START_CREATURE_FAMILY, TIER_NAMES, tierOf } from '@/contracts'
+import { ALL_FAMILIES, COLD_START_CREATURE_FAMILY } from '@/contracts'
 import { useGame } from '../gameState'
 import { Egg } from '../Egg'
 import { HatchCeremony } from '../HatchCeremony'
@@ -56,7 +56,7 @@ export function NestScreen() {
             return (
               <div key={fam} className="flex flex-col items-center gap-1">
                 <Egg family={fam} progress={progress} size={110} />
-                <p className="text-sm font-medium">{TIER_NAMES[tierOf(fam, fam)]}</p>
+                <p className="text-sm font-medium">The {fam}s</p>
                 <p className="text-xs text-stone-500">{Math.round(progress * 100)}% ready</p>
               </div>
             )
