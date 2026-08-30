@@ -2,2831 +2,1973 @@
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-1 1`] = `
 <svg
-  data-body="round"
-  data-creature=""
+  aria-label="chick"
+  data-animal="chick"
   data-mood="idle"
+  data-testid="creature"
   height="200"
   role="img"
   viewBox="0 0 100 100"
   width="200"
-  xmlns="http://www.w3.org/2000/svg"
 >
-  <defs>
-    <clippath
-      id="crro-body"
-    >
-      <ellipse
-        cx="50"
-        cy="57"
-        rx="30"
-        ry="30"
-      />
-    </clippath>
-    <filter
-      height="140%"
-      id="crro-soft"
-      width="140%"
-      x="-20%"
-      y="-20%"
-    >
-      <fedropshadow
-        dx="0"
-        dy="2.5"
-        flood-color="#3a2f2a"
-        flood-opacity="0.18"
-        stdDeviation="2.5"
-      />
-    </filter>
-  </defs>
   <ellipse
     cx="50"
-    cy="90"
-    fill="#3a2f2a"
-    opacity="0.12"
-    rx="24.6"
-    ry="4"
-  />
-  <circle
-    cx="76"
-    cy="70"
-    data-part="tail"
-    fill="#F6D365"
-    r="8"
-    stroke="#C98A2E"
-    stroke-width="1.6"
-  />
-  <ellipse
-    cx="37.4"
-    cy="85"
-    fill="#C98A2E"
-    rx="7"
-    ry="4.5"
-  />
-  <ellipse
-    cx="62.6"
-    cy="85"
-    fill="#C98A2E"
-    rx="7"
-    ry="4.5"
+    cy="92"
+    fill="#00000018"
+    rx="26"
+    ry="6"
   />
   <g
-    filter="url(#crro-soft)"
+    transform="translate(0 0)"
   >
+    <path
+      d="M65 76 q10 2 8 10 q-5 2 -9 -2 Z"
+      fill="#FFF3C4"
+    />
+    <ellipse
+      cx="40"
+      cy="90"
+      fill="#FFD54F"
+      rx="7"
+      ry="5"
+    />
+    <ellipse
+      cx="60"
+      cy="90"
+      fill="#FFD54F"
+      rx="7"
+      ry="5"
+    />
     <ellipse
       cx="50"
-      cy="57"
-      fill="#F6D365"
-      rx="30"
-      ry="30"
+      cy="76"
+      fill="#FFD54F"
+      rx="19"
+      ry="15"
+    />
+    <ellipse
+      cx="50"
+      cy="79"
+      fill="#FFF3C4"
+      rx="11.78"
+      ry="9.3"
+    />
+    <circle
+      cx="50"
+      cy="43"
+      fill="#FFD54F"
+      r="27"
+    />
+    <ellipse
+      cx="50"
+      cy="52"
+      fill="#FFF3C4"
+      opacity="0.55"
+      rx="19.439999999999998"
+      ry="16.74"
     />
     <g
-      clip-path="url(#crro-body)"
+      transform="translate(50 16)"
     >
-      <ellipse
-        cx="50"
-        cy="66.6"
-        fill="#FFF3D6"
-        opacity="0.9"
-        rx="18"
-        ry="17.4"
+      <path
+        d="M-5 4 Q-6 -8 -1 -3 Q0 -12 4 -3 Q9 -9 6 4 Z"
+        fill="#C98A2E"
+        opacity="0.85"
       />
     </g>
     <ellipse
-      cx="50"
-      cy="57"
+      cx="38"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
+    />
+    <ellipse
+      cx="62"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
+    />
+    <g
+      data-eyes="big"
+      data-part="eyes"
+    >
+      <g
+        transform="translate(40 45) "
+      >
+        <ellipse
+          fill="#C98A2E"
+          rx="4.2"
+          ry="4.2"
+        />
+        <circle
+          cx="-1.6800000000000002"
+          cy="-1.6800000000000002"
+          fill="#fff"
+          r="1.6800000000000002"
+        />
+      </g>
+      <g
+        transform="translate(60 45) "
+      >
+        <ellipse
+          fill="#C98A2E"
+          rx="4.2"
+          ry="4.2"
+        />
+        <circle
+          cx="-1.6800000000000002"
+          cy="-1.6800000000000002"
+          fill="#fff"
+          r="1.6800000000000002"
+        />
+      </g>
+    </g>
+    <path
+      d="M44 50 L56 50 L50 58 Z"
+      fill="#F5A623"
+    />
+    <path
+      d="M46.5 58 q3.5 3.5 7 0"
+      data-part="mouth-idle"
       fill="none"
-      opacity="0.35"
-      rx="30"
-      ry="30"
       stroke="#C98A2E"
-      stroke-width="2"
+      stroke-linecap="round"
+      stroke-width="2.2"
     />
   </g>
-  <g
-    data-part="ears"
-  >
-    <circle
-      cx="32.6"
-      cy="29"
-      fill="#F6D365"
-      r="9"
-      stroke="#C98A2E"
-      stroke-width="1.6"
-    />
-    <circle
-      cx="67.4"
-      cy="29"
-      fill="#F6D365"
-      r="9"
-      stroke="#C98A2E"
-      stroke-width="1.6"
-    />
-  </g>
-  <g
-    data-eyes="big"
-    data-part="eyes"
-  >
-    <g>
-      <circle
-        cx="39.2"
-        cy="52.8"
-        fill="#fff"
-        r="8"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <circle
-        cx="39.8"
-        cy="53.8"
-        fill="#3a2f2a"
-        r="4"
-      />
-      <circle
-        cx="37.6"
-        cy="51.2"
-        fill="#fff"
-        r="1.5"
-      />
-    </g>
-    <g>
-      <circle
-        cx="60.8"
-        cy="52.8"
-        fill="#fff"
-        r="8"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <circle
-        cx="61.4"
-        cy="53.8"
-        fill="#3a2f2a"
-        r="4"
-      />
-      <circle
-        cx="59.2"
-        cy="51.2"
-        fill="#fff"
-        r="1.5"
-      />
-    </g>
-  </g>
-  <ellipse
-    cx="35.2"
-    cy="59.8"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="64.8"
-    cy="59.8"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="50"
-    cy="58.2"
-    fill="#C98A2E"
-    rx="2.6"
-    ry="2"
-  />
-  <path
-    d="M43,64.2 Q50,70.2 57,64.2"
-    data-part="mouth-idle"
-    fill="none"
-    stroke="#3a2f2a"
-    stroke-linecap="round"
-    stroke-width="2"
-  />
 </svg>
 `;
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-2 1`] = `
 <svg
-  data-body="tall"
-  data-creature=""
+  aria-label="duckling"
+  data-animal="duckling"
   data-mood="idle"
+  data-testid="creature"
   height="200"
   role="img"
   viewBox="0 0 100 100"
   width="200"
-  xmlns="http://www.w3.org/2000/svg"
 >
-  <defs>
-    <clippath
-      id="crrp-body"
-    >
-      <ellipse
-        cx="50"
-        cy="55"
-        rx="23"
-        ry="33"
-      />
-    </clippath>
-    <filter
-      height="140%"
-      id="crrp-soft"
-      width="140%"
-      x="-20%"
-      y="-20%"
-    >
-      <fedropshadow
-        dx="0"
-        dy="2.5"
-        flood-color="#3a2f2a"
-        flood-opacity="0.18"
-        stdDeviation="2.5"
-      />
-    </filter>
-  </defs>
   <ellipse
     cx="50"
-    cy="90"
-    fill="#3a2f2a"
-    opacity="0.12"
-    rx="18.86"
-    ry="4"
-  />
-  <path
-    d="M67,64.9 Q83,58.9 81,78.9"
-    data-part="tail"
-    fill="none"
-    stroke="#7FD1C1"
-    stroke-linecap="round"
-    stroke-width="6"
-  />
-  <ellipse
-    cx="40.34"
-    cy="86"
-    fill="#3E8C7C"
-    rx="7"
-    ry="4.5"
-  />
-  <ellipse
-    cx="59.66"
-    cy="86"
-    fill="#3E8C7C"
-    rx="7"
-    ry="4.5"
+    cy="92"
+    fill="#00000018"
+    rx="26"
+    ry="6"
   />
   <g
-    filter="url(#crrp-soft)"
+    transform="translate(0 0)"
   >
+    <path
+      d="M65 76 q10 2 8 10 q-5 2 -9 -2 Z"
+      fill="#FFF8E1"
+    />
+    <ellipse
+      cx="40"
+      cy="90"
+      fill="#FFE082"
+      rx="7"
+      ry="5"
+    />
+    <ellipse
+      cx="60"
+      cy="90"
+      fill="#FFE082"
+      rx="7"
+      ry="5"
+    />
     <ellipse
       cx="50"
-      cy="55"
-      fill="#7FD1C1"
-      rx="23"
-      ry="33"
+      cy="76"
+      fill="#FFE082"
+      rx="19"
+      ry="15"
+    />
+    <ellipse
+      cx="50"
+      cy="79"
+      fill="#FFF8E1"
+      rx="11.78"
+      ry="9.3"
+    />
+    <circle
+      cx="50"
+      cy="43"
+      fill="#FFE082"
+      r="27"
+    />
+    <ellipse
+      cx="50"
+      cy="52"
+      fill="#FFF8E1"
+      opacity="0.55"
+      rx="19.439999999999998"
+      ry="16.74"
+    />
+    <ellipse
+      cx="38"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
+    />
+    <ellipse
+      cx="62"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
     />
     <g
-      clip-path="url(#crrp-body)"
+      data-eyes="sparkly"
+      data-part="eyes"
     >
-      <ellipse
-        cx="50"
-        cy="65.56"
-        fill="#E8F7F2"
-        opacity="0.9"
-        rx="13.8"
-        ry="19.14"
-      />
-      <circle
-        cx="37"
-        cy="60"
-        fill="#3E8C7C"
-        opacity="0.5"
-        r="4.4"
-      />
-      <circle
-        cx="61"
-        cy="66"
-        fill="#3E8C7C"
-        opacity="0.5"
-        r="4.4"
-      />
-      <circle
-        cx="46"
-        cy="46"
-        fill="#3E8C7C"
-        opacity="0.5"
-        r="4.4"
-      />
-      <circle
-        cx="65"
-        cy="52"
-        fill="#3E8C7C"
-        opacity="0.5"
-        r="4.4"
-      />
-      <circle
-        cx="53"
-        cy="74"
-        fill="#3E8C7C"
-        opacity="0.5"
-        r="4.4"
-      />
+      <g
+        transform="translate(40 45) "
+      >
+        <ellipse
+          fill="#E0912F"
+          rx="4.2"
+          ry="4.2"
+        />
+        <circle
+          cx="-1.6800000000000002"
+          cy="-1.6800000000000002"
+          fill="#fff"
+          r="1.6800000000000002"
+        />
+      </g>
+      <g
+        transform="translate(60 45) "
+      >
+        <ellipse
+          fill="#E0912F"
+          rx="4.2"
+          ry="4.2"
+        />
+        <circle
+          cx="-1.6800000000000002"
+          cy="-1.6800000000000002"
+          fill="#fff"
+          r="1.6800000000000002"
+        />
+      </g>
     </g>
-    <ellipse
-      cx="50"
-      cy="55"
+    <path
+      d="M44 50 L56 50 L50 58 Z"
+      fill="#F5A623"
+    />
+    <path
+      d="M46.5 58 q3.5 3.5 7 0"
+      data-part="mouth-idle"
       fill="none"
-      opacity="0.35"
-      rx="23"
-      ry="33"
-      stroke="#3E8C7C"
-      stroke-width="2"
+      stroke="#E0912F"
+      stroke-linecap="round"
+      stroke-width="2.2"
     />
   </g>
-  <g
-    data-part="ears"
-  >
-    <ellipse
-      cx="38.66"
-      cy="34"
-      fill="#7FD1C1"
-      rx="7"
-      ry="15"
-      stroke="#3E8C7C"
-      stroke-width="1.6"
-      transform="rotate(-24 38.66 34)"
-    />
-    <ellipse
-      cx="61.34"
-      cy="34"
-      fill="#7FD1C1"
-      rx="7"
-      ry="15"
-      stroke="#3E8C7C"
-      stroke-width="1.6"
-      transform="rotate(24 61.34 34)"
-    />
-  </g>
-  <g
-    data-eyes="wide"
-    data-part="eyes"
-  >
-    <g>
-      <circle
-        cx="41"
-        cy="50.38"
-        fill="#fff"
-        r="9"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <circle
-        cx="41.6"
-        cy="51.38"
-        fill="#3a2f2a"
-        r="3.1"
-      />
-      <circle
-        cx="39.4"
-        cy="48.78"
-        fill="#fff"
-        r="1.5"
-      />
-    </g>
-    <g>
-      <circle
-        cx="59"
-        cy="50.38"
-        fill="#fff"
-        r="9"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <circle
-        cx="59.6"
-        cy="51.38"
-        fill="#3a2f2a"
-        r="3.1"
-      />
-      <circle
-        cx="57.4"
-        cy="48.78"
-        fill="#fff"
-        r="1.5"
-      />
-    </g>
-  </g>
-  <ellipse
-    cx="37"
-    cy="57.38"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="63"
-    cy="57.38"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="50"
-    cy="56.92"
-    fill="#3E8C7C"
-    rx="2.6"
-    ry="2"
-  />
-  <path
-    d="M43,62.92 Q50,68.92 57,62.92"
-    data-part="mouth-idle"
-    fill="none"
-    stroke="#3a2f2a"
-    stroke-linecap="round"
-    stroke-width="2"
-  />
 </svg>
 `;
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-3 1`] = `
 <svg
-  data-body="wide"
-  data-creature=""
+  aria-label="bunny"
+  data-animal="bunny"
   data-mood="idle"
+  data-testid="creature"
   height="200"
   role="img"
   viewBox="0 0 100 100"
   width="200"
-  xmlns="http://www.w3.org/2000/svg"
 >
-  <defs>
-    <clippath
-      id="crrq-body"
-    >
-      <ellipse
-        cx="50"
-        cy="62"
-        rx="35"
-        ry="25"
-      />
-    </clippath>
-    <filter
-      height="140%"
-      id="crrq-soft"
-      width="140%"
-      x="-20%"
-      y="-20%"
-    >
-      <fedropshadow
-        dx="0"
-        dy="2.5"
-        flood-color="#3a2f2a"
-        flood-opacity="0.18"
-        stdDeviation="2.5"
-      />
-    </filter>
-  </defs>
   <ellipse
     cx="50"
-    cy="90"
-    fill="#3a2f2a"
-    opacity="0.12"
-    rx="28.7"
-    ry="4"
-  />
-  <path
-    d="M72,71.5 q11,-3 11,6 q0,9 -9,9 q-6,0 -5,-7"
-    data-part="tail"
-    fill="none"
-    stroke="#9CCC7A"
-    stroke-linecap="round"
-    stroke-width="5"
-  />
-  <ellipse
-    cx="35.3"
-    cy="85"
-    fill="#4E8B3D"
-    rx="7"
-    ry="4.5"
-  />
-  <ellipse
-    cx="64.7"
-    cy="85"
-    fill="#4E8B3D"
-    rx="7"
-    ry="4.5"
+    cy="92"
+    fill="#00000018"
+    rx="26"
+    ry="6"
   />
   <g
-    filter="url(#crrq-soft)"
+    transform="translate(0 0)"
   >
+    <circle
+      cx="71"
+      cy="78"
+      fill="#FBEFEA"
+      r="6"
+    />
+    <ellipse
+      cx="40"
+      cy="90"
+      fill="#D7CCC8"
+      rx="7"
+      ry="5"
+    />
+    <ellipse
+      cx="60"
+      cy="90"
+      fill="#D7CCC8"
+      rx="7"
+      ry="5"
+    />
     <ellipse
       cx="50"
-      cy="62"
-      fill="#9CCC7A"
-      rx="35"
-      ry="25"
+      cy="76"
+      fill="#D7CCC8"
+      rx="19"
+      ry="15"
+    />
+    <ellipse
+      cx="50"
+      cy="79"
+      fill="#FBEFEA"
+      rx="11.78"
+      ry="9.3"
+    />
+    <g>
+      <g
+        transform="translate(32 23)"
+      >
+        <g
+          transform="rotate(-12)"
+        >
+          <ellipse
+            cx="0"
+            cy="-14"
+            fill="#D7CCC8"
+            rx="6"
+            ry="16"
+          />
+          <ellipse
+            cx="0"
+            cy="-14"
+            fill="#FBEFEA"
+            rx="2.6"
+            ry="11"
+          />
+        </g>
+      </g>
+      <g
+        transform="translate(68 23)"
+      >
+        <g
+          transform="rotate(12)"
+        >
+          <ellipse
+            cx="0"
+            cy="-14"
+            fill="#D7CCC8"
+            rx="6"
+            ry="16"
+          />
+          <ellipse
+            cx="0"
+            cy="-14"
+            fill="#FBEFEA"
+            rx="2.6"
+            ry="11"
+          />
+        </g>
+      </g>
+    </g>
+    <circle
+      cx="50"
+      cy="43"
+      fill="#D7CCC8"
+      r="27"
+    />
+    <ellipse
+      cx="50"
+      cy="52"
+      fill="#FBEFEA"
+      opacity="0.55"
+      rx="19.439999999999998"
+      ry="16.74"
+    />
+    <ellipse
+      cx="38"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
+    />
+    <ellipse
+      cx="62"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
     />
     <g
-      clip-path="url(#crrq-body)"
+      data-eyes="wide"
+      data-part="eyes"
     >
-      <ellipse
-        cx="50"
-        cy="70"
-        fill="#EAF6DF"
-        opacity="0.9"
-        rx="21"
-        ry="14.5"
-      />
-      <path
-        d="M50,59L52.7,66.28L60.46,66.6L54.37,71.42L56.47,78.9L50,74.6L43.53,78.9L45.63,71.42L39.54,66.6L47.3,66.28Z"
-        fill="#4E8B3D"
-        opacity="0.7"
-      />
+      <g
+        transform="translate(40 45) "
+      >
+        <ellipse
+          fill="#7C6A63"
+          rx="5"
+          ry="5"
+        />
+      </g>
+      <g
+        transform="translate(60 45) "
+      >
+        <ellipse
+          fill="#7C6A63"
+          rx="5"
+          ry="5"
+        />
+      </g>
     </g>
-    <ellipse
-      cx="50"
-      cy="62"
-      fill="none"
-      opacity="0.35"
-      rx="35"
-      ry="25"
-      stroke="#4E8B3D"
+    <path
+      d="M47 52 h6"
+      stroke="#7C6A63"
+      stroke-linecap="round"
       stroke-width="2"
     />
-  </g>
-  <g
-    data-part="ears"
-  >
     <path
-      d="M22.7,44 Q28.7,24 37.7,39 Z"
-      fill="#9CCC7A"
-      stroke="#4E8B3D"
-      stroke-linejoin="round"
-      stroke-width="1.6"
+      d="M50 52 v3"
+      stroke="#7C6A63"
+      stroke-linecap="round"
+      stroke-width="2"
     />
     <path
-      d="M62.3,39 Q71.3,24 77.3,44 Z"
-      fill="#9CCC7A"
-      stroke="#4E8B3D"
-      stroke-linejoin="round"
-      stroke-width="1.6"
+      d="M46.5 58 q3.5 3.5 7 0"
+      data-part="mouth-idle"
+      fill="none"
+      stroke="#7C6A63"
+      stroke-linecap="round"
+      stroke-width="2.2"
     />
   </g>
-  <g
-    data-eyes="sparkly"
-    data-part="eyes"
-  >
-    <g>
-      <circle
-        cx="37.4"
-        cy="58.5"
-        fill="#fff"
-        r="7.4"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <circle
-        cx="38"
-        cy="59.5"
-        fill="#3a2f2a"
-        r="3.6"
-      />
-      <circle
-        cx="35.8"
-        cy="56.9"
-        fill="#fff"
-        r="1.5"
-      />
-      <circle
-        cx="39.8"
-        cy="61.1"
-        fill="#fff"
-        r="1"
-      />
-      <path
-        d="M42.58,51.12L43.11,52.59L44.67,52.64L43.44,53.6L43.87,55.1L42.58,54.22L41.29,55.1L41.72,53.6L40.49,52.64L42.05,52.59Z"
-        fill="#fff"
-      />
-    </g>
-    <g>
-      <circle
-        cx="62.6"
-        cy="58.5"
-        fill="#fff"
-        r="7.4"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <circle
-        cx="63.2"
-        cy="59.5"
-        fill="#3a2f2a"
-        r="3.6"
-      />
-      <circle
-        cx="61"
-        cy="56.9"
-        fill="#fff"
-        r="1.5"
-      />
-      <circle
-        cx="65"
-        cy="61.1"
-        fill="#fff"
-        r="1"
-      />
-      <path
-        d="M67.78,51.12L68.31,52.59L69.87,52.64L68.64,53.6L69.07,55.1L67.78,54.22L66.49,55.1L66.92,53.6L65.69,52.64L67.25,52.59Z"
-        fill="#fff"
-      />
-    </g>
-  </g>
-  <ellipse
-    cx="33.4"
-    cy="65.5"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="66.6"
-    cy="65.5"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="50"
-    cy="62"
-    fill="#4E8B3D"
-    rx="2.6"
-    ry="2"
-  />
-  <path
-    d="M43,68 Q50,74 57,68"
-    data-part="mouth-idle"
-    fill="none"
-    stroke="#3a2f2a"
-    stroke-linecap="round"
-    stroke-width="2"
-  />
 </svg>
 `;
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-4 1`] = `
 <svg
-  data-body="lumpy"
-  data-creature=""
+  aria-label="lamb"
+  data-animal="lamb"
   data-mood="idle"
+  data-testid="creature"
   height="200"
   role="img"
   viewBox="0 0 100 100"
   width="200"
-  xmlns="http://www.w3.org/2000/svg"
 >
-  <defs>
-    <clippath
-      id="crrr-body"
-    >
-      <ellipse
-        cx="50"
-        cy="58"
-        rx="31"
-        ry="28"
-      />
-    </clippath>
-    <filter
-      height="140%"
-      id="crrr-soft"
-      width="140%"
-      x="-20%"
-      y="-20%"
-    >
-      <fedropshadow
-        dx="0"
-        dy="2.5"
-        flood-color="#3a2f2a"
-        flood-opacity="0.18"
-        stdDeviation="2.5"
-      />
-    </filter>
-  </defs>
   <ellipse
     cx="50"
-    cy="90"
-    fill="#3a2f2a"
-    opacity="0.12"
-    rx="25.42"
-    ry="4"
-  />
-  <ellipse
-    cx="36.98"
-    cy="84"
-    fill="#B5632C"
-    rx="7"
-    ry="4.5"
-  />
-  <ellipse
-    cx="63.02"
-    cy="84"
-    fill="#B5632C"
-    rx="7"
-    ry="4.5"
+    cy="92"
+    fill="#00000018"
+    rx="26"
+    ry="6"
   />
   <g
-    filter="url(#crrr-soft)"
+    transform="translate(0 0)"
   >
+    <circle
+      cx="71"
+      cy="78"
+      fill="#FFFFFF"
+      r="6"
+    />
+    <ellipse
+      cx="40"
+      cy="90"
+      fill="#F5F0E6"
+      rx="7"
+      ry="5"
+    />
+    <ellipse
+      cx="60"
+      cy="90"
+      fill="#F5F0E6"
+      rx="7"
+      ry="5"
+    />
     <ellipse
       cx="50"
-      cy="58"
-      fill="#F0A868"
-      rx="31"
-      ry="28"
+      cy="76"
+      fill="#F5F0E6"
+      rx="19"
+      ry="15"
     />
-    <circle
-      cx="38"
-      cy="37"
-      fill="#F0A868"
-      r="10"
+    <ellipse
+      cx="50"
+      cy="79"
+      fill="#FFFFFF"
+      rx="11.78"
+      ry="9.3"
     />
+    <g>
+      <g
+        transform="translate(32 23)"
+      >
+        <ellipse
+          cx="-3"
+          cy="6"
+          fill="#F5F0E6"
+          rx="7"
+          ry="11"
+        />
+      </g>
+      <g
+        transform="translate(68 23)"
+      >
+        <ellipse
+          cx="3"
+          cy="6"
+          fill="#F5F0E6"
+          rx="7"
+          ry="11"
+        />
+      </g>
+    </g>
     <circle
-      cx="63"
-      cy="34"
-      fill="#F0A868"
-      r="8"
+      cx="50"
+      cy="43"
+      fill="#F5F0E6"
+      r="27"
     />
-    <circle
-      cx="77"
-      cy="62"
-      fill="#F0A868"
-      r="9"
+    <ellipse
+      cx="50"
+      cy="52"
+      fill="#FFFFFF"
+      opacity="0.55"
+      rx="19.439999999999998"
+      ry="16.74"
     />
     <g
-      clip-path="url(#crrr-body)"
+      transform="translate(50 20)"
     >
-      <ellipse
-        cx="50"
-        cy="66.96"
-        fill="#FCE8D6"
-        opacity="0.9"
-        rx="18.6"
-        ry="16.24"
+      <path
+        d="M-8 0 Q-14 -8 -8 -12"
+        fill="none"
+        stroke="#8D7B66"
+        stroke-linecap="round"
+        stroke-width="3"
       />
       <path
-        d="M33,28 q7,28 0,60"
+        d="M8 0 Q14 -8 8 -12"
         fill="none"
-        opacity="0.38"
-        stroke="#B5632C"
-        stroke-width="5"
-      />
-      <path
-        d="M44,28 q7,28 0,60"
-        fill="none"
-        opacity="0.38"
-        stroke="#B5632C"
-        stroke-width="5"
-      />
-      <path
-        d="M56,28 q7,28 0,60"
-        fill="none"
-        opacity="0.38"
-        stroke="#B5632C"
-        stroke-width="5"
-      />
-      <path
-        d="M67,28 q7,28 0,60"
-        fill="none"
-        opacity="0.38"
-        stroke="#B5632C"
-        stroke-width="5"
+        stroke="#8D7B66"
+        stroke-linecap="round"
+        stroke-width="3"
       />
     </g>
     <ellipse
-      cx="50"
-      cy="58"
+      cx="38"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
+    />
+    <ellipse
+      cx="62"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
+    />
+    <g
+      data-eyes="big"
+      data-part="eyes"
+    >
+      <g
+        transform="translate(40 45) "
+      >
+        <ellipse
+          fill="#8D7B66"
+          rx="4.2"
+          ry="4.2"
+        />
+        <circle
+          cx="-1.6800000000000002"
+          cy="-1.6800000000000002"
+          fill="#fff"
+          r="1.6800000000000002"
+        />
+      </g>
+      <g
+        transform="translate(60 45) "
+      >
+        <ellipse
+          fill="#8D7B66"
+          rx="4.2"
+          ry="4.2"
+        />
+        <circle
+          cx="-1.6800000000000002"
+          cy="-1.6800000000000002"
+          fill="#fff"
+          r="1.6800000000000002"
+        />
+      </g>
+    </g>
+    <g>
+      <ellipse
+        cx="50"
+        cy="54"
+        fill="#FFFFFF"
+        rx="9"
+        ry="7"
+      />
+      <ellipse
+        cx="50"
+        cy="52"
+        fill="#8D7B66"
+        rx="3"
+        ry="2.4"
+      />
+    </g>
+    <path
+      d="M46.5 58 q3.5 3.5 7 0"
+      data-part="mouth-idle"
       fill="none"
-      opacity="0.35"
-      rx="31"
-      ry="28"
-      stroke="#B5632C"
-      stroke-width="2"
+      stroke="#8D7B66"
+      stroke-linecap="round"
+      stroke-width="2.2"
     />
   </g>
-  <g
-    data-part="ears"
-    stroke="#B5632C"
-    stroke-linecap="round"
-    stroke-width="2.2"
-  >
-    <line
-      x1="41"
-      x2="37"
-      y1="33"
-      y2="18"
-    />
-    <line
-      x1="59"
-      x2="63"
-      y1="33"
-      y2="18"
-    />
-    <circle
-      cx="37"
-      cy="18"
-      fill="#F0A868"
-      r="3.4"
-      stroke-width="1.4"
-    />
-    <circle
-      cx="63"
-      cy="18"
-      fill="#F0A868"
-      r="3.4"
-      stroke-width="1.4"
-    />
-  </g>
-  <g
-    data-eyes="big"
-    data-part="eyes"
-  >
-    <g>
-      <circle
-        cx="38.84"
-        cy="54.08"
-        fill="#fff"
-        r="8"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <circle
-        cx="39.44"
-        cy="55.08"
-        fill="#3a2f2a"
-        r="4"
-      />
-      <circle
-        cx="37.24"
-        cy="52.48"
-        fill="#fff"
-        r="1.5"
-      />
-    </g>
-    <g>
-      <circle
-        cx="61.16"
-        cy="54.08"
-        fill="#fff"
-        r="8"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <circle
-        cx="61.76"
-        cy="55.08"
-        fill="#3a2f2a"
-        r="4"
-      />
-      <circle
-        cx="59.56"
-        cy="52.48"
-        fill="#fff"
-        r="1.5"
-      />
-    </g>
-  </g>
-  <ellipse
-    cx="34.84"
-    cy="61.08"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="65.16"
-    cy="61.08"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="50"
-    cy="58.72"
-    fill="#B5632C"
-    rx="2.6"
-    ry="2"
-  />
-  <path
-    d="M43,64.72 Q50,70.72 57,64.72"
-    data-part="mouth-idle"
-    fill="none"
-    stroke="#3a2f2a"
-    stroke-linecap="round"
-    stroke-width="2"
-  />
 </svg>
 `;
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-5 1`] = `
 <svg
-  data-body="round"
-  data-creature=""
+  aria-label="piglet"
+  data-animal="piglet"
   data-mood="idle"
+  data-testid="creature"
   height="200"
   role="img"
   viewBox="0 0 100 100"
   width="200"
-  xmlns="http://www.w3.org/2000/svg"
 >
-  <defs>
-    <clippath
-      id="crrs-body"
-    >
-      <ellipse
-        cx="50"
-        cy="57"
-        rx="30"
-        ry="30"
-      />
-    </clippath>
-    <filter
-      height="140%"
-      id="crrs-soft"
-      width="140%"
-      x="-20%"
-      y="-20%"
-    >
-      <fedropshadow
-        dx="0"
-        dy="2.5"
-        flood-color="#3a2f2a"
-        flood-opacity="0.18"
-        stdDeviation="2.5"
-      />
-    </filter>
-  </defs>
   <ellipse
     cx="50"
-    cy="90"
-    fill="#3a2f2a"
-    opacity="0.12"
-    rx="24.6"
-    ry="4"
-  />
-  <path
-    d="M72,68 q11,-3 11,6 q0,9 -9,9 q-6,0 -5,-7"
-    data-part="tail"
-    fill="none"
-    stroke="#C3A6E0"
-    stroke-linecap="round"
-    stroke-width="5"
-  />
-  <ellipse
-    cx="37.4"
-    cy="85"
-    fill="#7B5AA6"
-    rx="7"
-    ry="4.5"
-  />
-  <ellipse
-    cx="62.6"
-    cy="85"
-    fill="#7B5AA6"
-    rx="7"
-    ry="4.5"
+    cy="92"
+    fill="#00000018"
+    rx="26"
+    ry="6"
   />
   <g
-    filter="url(#crrs-soft)"
+    transform="translate(0 0)"
   >
+    <path
+      d="M67 78 q10 -2 6 6 q-3 6 3 5"
+      fill="none"
+      stroke="#F8BBD0"
+      stroke-linecap="round"
+      stroke-width="3"
+    />
+    <ellipse
+      cx="40"
+      cy="90"
+      fill="#F8BBD0"
+      rx="7"
+      ry="5"
+    />
+    <ellipse
+      cx="60"
+      cy="90"
+      fill="#F8BBD0"
+      rx="7"
+      ry="5"
+    />
     <ellipse
       cx="50"
-      cy="57"
-      fill="#C3A6E0"
-      rx="30"
-      ry="30"
+      cy="76"
+      fill="#F8BBD0"
+      rx="19"
+      ry="15"
+    />
+    <ellipse
+      cx="50"
+      cy="79"
+      fill="#FCE4EC"
+      rx="11.78"
+      ry="9.3"
+    />
+    <g>
+      <g
+        transform="translate(32 23)"
+      >
+        <path
+          d="M0 4 L-9 -8 L1 -6 Z"
+          fill="#F8BBD0"
+        />
+      </g>
+      <g
+        transform="translate(68 23)"
+      >
+        <path
+          d="M0 4 L9 -8 L-1 -6 Z"
+          fill="#F8BBD0"
+        />
+      </g>
+    </g>
+    <circle
+      cx="50"
+      cy="43"
+      fill="#F8BBD0"
+      r="27"
+    />
+    <ellipse
+      cx="50"
+      cy="52"
+      fill="#FCE4EC"
+      opacity="0.55"
+      rx="19.439999999999998"
+      ry="16.74"
+    />
+    <ellipse
+      cx="38"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
+    />
+    <ellipse
+      cx="62"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
     />
     <g
-      clip-path="url(#crrs-body)"
+      data-eyes="sparkly"
+      data-part="eyes"
     >
+      <g
+        transform="translate(40 45) "
+      >
+        <ellipse
+          fill="#C2185B"
+          rx="4.2"
+          ry="4.2"
+        />
+        <circle
+          cx="-1.6800000000000002"
+          cy="-1.6800000000000002"
+          fill="#fff"
+          r="1.6800000000000002"
+        />
+      </g>
+      <g
+        transform="translate(60 45) "
+      >
+        <ellipse
+          fill="#C2185B"
+          rx="4.2"
+          ry="4.2"
+        />
+        <circle
+          cx="-1.6800000000000002"
+          cy="-1.6800000000000002"
+          fill="#fff"
+          r="1.6800000000000002"
+        />
+      </g>
+    </g>
+    <g>
       <ellipse
         cx="50"
-        cy="66.6"
-        fill="#F2E9FB"
-        opacity="0.9"
-        rx="18"
-        ry="17.4"
+        cy="53"
+        fill="#FCE4EC"
+        rx="9"
+        ry="7"
       />
-      <path
-        d="M50,55.6L52.7,62.88L60.46,63.2L54.37,68.02L56.47,75.5L50,71.2L43.53,75.5L45.63,68.02L39.54,63.2L47.3,62.88Z"
-        fill="#7B5AA6"
-        opacity="0.7"
+      <circle
+        cx="47"
+        cy="53"
+        fill="#C2185B"
+        r="1.6"
+      />
+      <circle
+        cx="53"
+        cy="53"
+        fill="#C2185B"
+        r="1.6"
       />
     </g>
-    <ellipse
-      cx="50"
-      cy="57"
+    <path
+      d="M46.5 58 q3.5 3.5 7 0"
+      data-part="mouth-idle"
       fill="none"
-      opacity="0.35"
-      rx="30"
-      ry="30"
-      stroke="#7B5AA6"
-      stroke-width="2"
+      stroke="#C2185B"
+      stroke-linecap="round"
+      stroke-width="2.2"
     />
   </g>
-  <g
-    data-part="ears"
-  >
-    <circle
-      cx="32.6"
-      cy="29"
-      fill="#C3A6E0"
-      r="9"
-      stroke="#7B5AA6"
-      stroke-width="1.6"
-    />
-    <circle
-      cx="67.4"
-      cy="29"
-      fill="#C3A6E0"
-      r="9"
-      stroke="#7B5AA6"
-      stroke-width="1.6"
-    />
-  </g>
-  <g
-    data-eyes="sleepy"
-    data-part="eyes"
-  >
-    <g>
-      <circle
-        cx="39.2"
-        cy="52.8"
-        fill="#fff"
-        r="7.4"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <path
-        d="M31.8,51.8 A7.4 7.4 0 0 1 46.6,51.8 Z"
-        fill="#C3A6E0"
-      />
-      <circle
-        cx="39.8"
-        cy="54.8"
-        fill="#3a2f2a"
-        r="3.6"
-      />
-      <circle
-        cx="37.6"
-        cy="51.2"
-        fill="#fff"
-        r="1.5"
-      />
-    </g>
-    <g>
-      <circle
-        cx="60.8"
-        cy="52.8"
-        fill="#fff"
-        r="7.4"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <path
-        d="M53.4,51.8 A7.4 7.4 0 0 1 68.2,51.8 Z"
-        fill="#C3A6E0"
-      />
-      <circle
-        cx="61.4"
-        cy="54.8"
-        fill="#3a2f2a"
-        r="3.6"
-      />
-      <circle
-        cx="59.2"
-        cy="51.2"
-        fill="#fff"
-        r="1.5"
-      />
-    </g>
-  </g>
-  <ellipse
-    cx="35.2"
-    cy="59.8"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="64.8"
-    cy="59.8"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="50"
-    cy="58.2"
-    fill="#7B5AA6"
-    rx="2.6"
-    ry="2"
-  />
-  <path
-    d="M43,64.2 Q50,70.2 57,64.2"
-    data-part="mouth-idle"
-    fill="none"
-    stroke="#3a2f2a"
-    stroke-linecap="round"
-    stroke-width="2"
-  />
 </svg>
 `;
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-6 1`] = `
 <svg
-  data-body="wide"
-  data-creature=""
+  aria-label="kitten"
+  data-animal="kitten"
   data-mood="idle"
+  data-testid="creature"
   height="200"
   role="img"
   viewBox="0 0 100 100"
   width="200"
-  xmlns="http://www.w3.org/2000/svg"
 >
-  <defs>
-    <clippath
-      id="crrt-body"
-    >
-      <ellipse
-        cx="50"
-        cy="62"
-        rx="35"
-        ry="25"
-      />
-    </clippath>
-    <filter
-      height="140%"
-      id="crrt-soft"
-      width="140%"
-      x="-20%"
-      y="-20%"
-    >
-      <fedropshadow
-        dx="0"
-        dy="2.5"
-        flood-color="#3a2f2a"
-        flood-opacity="0.18"
-        stdDeviation="2.5"
-      />
-    </filter>
-  </defs>
   <ellipse
     cx="50"
-    cy="90"
-    fill="#3a2f2a"
-    opacity="0.12"
-    rx="28.7"
-    ry="4"
-  />
-  <circle
-    cx="76"
-    cy="73.5"
-    data-part="tail"
-    fill="#D98E7A"
-    r="8"
-    stroke="#9C4F3C"
-    stroke-width="1.6"
-  />
-  <ellipse
-    cx="35.3"
-    cy="85"
-    fill="#9C4F3C"
-    rx="7"
-    ry="4.5"
-  />
-  <ellipse
-    cx="64.7"
-    cy="85"
-    fill="#9C4F3C"
-    rx="7"
-    ry="4.5"
+    cy="92"
+    fill="#00000018"
+    rx="26"
+    ry="6"
   />
   <g
-    filter="url(#crrt-soft)"
+    transform="translate(0 0)"
   >
+    <path
+      d="M67 78 q12 0 12 -14"
+      fill="none"
+      stroke="#FFCC80"
+      stroke-linecap="round"
+      stroke-width="5"
+    />
+    <ellipse
+      cx="40"
+      cy="90"
+      fill="#FFCC80"
+      rx="7"
+      ry="5"
+    />
+    <ellipse
+      cx="60"
+      cy="90"
+      fill="#FFCC80"
+      rx="7"
+      ry="5"
+    />
     <ellipse
       cx="50"
-      cy="62"
-      fill="#D98E7A"
-      rx="35"
-      ry="25"
+      cy="76"
+      fill="#FFCC80"
+      rx="19"
+      ry="15"
+    />
+    <ellipse
+      cx="50"
+      cy="79"
+      fill="#FFF3E0"
+      rx="11.78"
+      ry="9.3"
+    />
+    <g>
+      <g
+        transform="translate(32 23)"
+      >
+        <path
+          d="M0 6 L-11 -12 L-2 -4 Z"
+          fill="#FFCC80"
+          stroke="#8D5524"
+          stroke-width="1"
+        />
+      </g>
+      <g
+        transform="translate(68 23)"
+      >
+        <path
+          d="M0 6 L11 -12 L2 -4 Z"
+          fill="#FFCC80"
+          stroke="#8D5524"
+          stroke-width="1"
+        />
+      </g>
+    </g>
+    <circle
+      cx="50"
+      cy="43"
+      fill="#FFCC80"
+      r="27"
+    />
+    <ellipse
+      cx="50"
+      cy="52"
+      fill="#FFF3E0"
+      opacity="0.55"
+      rx="19.439999999999998"
+      ry="16.74"
+    />
+    <ellipse
+      cx="38"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
+    />
+    <ellipse
+      cx="62"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
     />
     <g
-      clip-path="url(#crrt-body)"
+      data-eyes="sleepy"
+      data-part="eyes"
     >
+      <g
+        transform="translate(40 45) "
+      >
+        <ellipse
+          fill="#8D5524"
+          rx="3"
+          ry="2.0999999999999996"
+        />
+      </g>
+      <g
+        transform="translate(60 45) "
+      >
+        <ellipse
+          fill="#8D5524"
+          rx="3"
+          ry="2.0999999999999996"
+        />
+      </g>
+    </g>
+    <g>
       <ellipse
         cx="50"
-        cy="70"
-        fill="#FBE6DF"
-        opacity="0.9"
-        rx="21"
-        ry="14.5"
+        cy="54"
+        fill="#FFF3E0"
+        rx="9"
+        ry="7"
       />
-      <circle
-        cx="37"
-        cy="67"
-        fill="#9C4F3C"
-        opacity="0.5"
-        r="4.4"
-      />
-      <circle
-        cx="61"
-        cy="73"
-        fill="#9C4F3C"
-        opacity="0.5"
-        r="4.4"
-      />
-      <circle
-        cx="46"
-        cy="53"
-        fill="#9C4F3C"
-        opacity="0.5"
-        r="4.4"
-      />
-      <circle
-        cx="65"
-        cy="59"
-        fill="#9C4F3C"
-        opacity="0.5"
-        r="4.4"
-      />
-      <circle
-        cx="53"
-        cy="81"
-        fill="#9C4F3C"
-        opacity="0.5"
-        r="4.4"
+      <ellipse
+        cx="50"
+        cy="52"
+        fill="#8D5524"
+        rx="3"
+        ry="2.4"
       />
     </g>
-    <ellipse
-      cx="50"
-      cy="62"
+    <path
+      d="M46.5 58 q3.5 3.5 7 0"
+      data-part="mouth-idle"
       fill="none"
-      opacity="0.35"
-      rx="35"
-      ry="25"
-      stroke="#9C4F3C"
-      stroke-width="2"
+      stroke="#8D5524"
+      stroke-linecap="round"
+      stroke-width="2.2"
     />
   </g>
-  <g
-    data-part="ears"
-  >
-    <path
-      d="M22.7,44 Q28.7,24 37.7,39 Z"
-      fill="#D98E7A"
-      stroke="#9C4F3C"
-      stroke-linejoin="round"
-      stroke-width="1.6"
-    />
-    <path
-      d="M62.3,39 Q71.3,24 77.3,44 Z"
-      fill="#D98E7A"
-      stroke="#9C4F3C"
-      stroke-linejoin="round"
-      stroke-width="1.6"
-    />
-  </g>
-  <g
-    data-eyes="wide"
-    data-part="eyes"
-  >
-    <g>
-      <circle
-        cx="37.4"
-        cy="58.5"
-        fill="#fff"
-        r="9"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <circle
-        cx="38"
-        cy="59.5"
-        fill="#3a2f2a"
-        r="3.1"
-      />
-      <circle
-        cx="35.8"
-        cy="56.9"
-        fill="#fff"
-        r="1.5"
-      />
-    </g>
-    <g>
-      <circle
-        cx="62.6"
-        cy="58.5"
-        fill="#fff"
-        r="9"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <circle
-        cx="63.2"
-        cy="59.5"
-        fill="#3a2f2a"
-        r="3.1"
-      />
-      <circle
-        cx="61"
-        cy="56.9"
-        fill="#fff"
-        r="1.5"
-      />
-    </g>
-  </g>
-  <ellipse
-    cx="33.4"
-    cy="65.5"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="66.6"
-    cy="65.5"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="50"
-    cy="62"
-    fill="#9C4F3C"
-    rx="2.6"
-    ry="2"
-  />
-  <path
-    d="M43,68 Q50,74 57,68"
-    data-part="mouth-idle"
-    fill="none"
-    stroke="#3a2f2a"
-    stroke-linecap="round"
-    stroke-width="2"
-  />
 </svg>
 `;
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-7 1`] = `
 <svg
-  data-body="tall"
-  data-creature=""
+  aria-label="puppy"
+  data-animal="puppy"
   data-mood="idle"
+  data-testid="creature"
   height="200"
   role="img"
   viewBox="0 0 100 100"
   width="200"
-  xmlns="http://www.w3.org/2000/svg"
 >
-  <defs>
-    <clippath
-      id="crru-body"
-    >
-      <ellipse
-        cx="50"
-        cy="55"
-        rx="23"
-        ry="33"
-      />
-    </clippath>
-    <filter
-      height="140%"
-      id="crru-soft"
-      width="140%"
-      x="-20%"
-      y="-20%"
-    >
-      <fedropshadow
-        dx="0"
-        dy="2.5"
-        flood-color="#3a2f2a"
-        flood-opacity="0.18"
-        stdDeviation="2.5"
-      />
-    </filter>
-  </defs>
   <ellipse
     cx="50"
-    cy="90"
-    fill="#3a2f2a"
-    opacity="0.12"
-    rx="18.86"
-    ry="4"
-  />
-  <path
-    d="M67,64.9 Q83,58.9 81,78.9"
-    data-part="tail"
-    fill="none"
-    stroke="#8FB3D9"
-    stroke-linecap="round"
-    stroke-width="6"
-  />
-  <ellipse
-    cx="40.34"
-    cy="86"
-    fill="#4A6E96"
-    rx="7"
-    ry="4.5"
-  />
-  <ellipse
-    cx="59.66"
-    cy="86"
-    fill="#4A6E96"
-    rx="7"
-    ry="4.5"
+    cy="92"
+    fill="#00000018"
+    rx="26"
+    ry="6"
   />
   <g
-    filter="url(#crru-soft)"
+    transform="translate(0 0)"
   >
+    <path
+      d="M67 78 q10 -6 4 -14"
+      fill="none"
+      stroke="#BCAAA4"
+      stroke-linecap="round"
+      stroke-width="5"
+    />
+    <ellipse
+      cx="40"
+      cy="90"
+      fill="#BCAAA4"
+      rx="7"
+      ry="5"
+    />
+    <ellipse
+      cx="60"
+      cy="90"
+      fill="#BCAAA4"
+      rx="7"
+      ry="5"
+    />
     <ellipse
       cx="50"
-      cy="55"
-      fill="#8FB3D9"
-      rx="23"
-      ry="33"
+      cy="76"
+      fill="#BCAAA4"
+      rx="19"
+      ry="15"
+    />
+    <ellipse
+      cx="50"
+      cy="79"
+      fill="#EFEBE9"
+      rx="11.78"
+      ry="9.3"
+    />
+    <g>
+      <g
+        transform="translate(32 23)"
+      >
+        <ellipse
+          cx="-3"
+          cy="6"
+          fill="#BCAAA4"
+          rx="7"
+          ry="11"
+        />
+      </g>
+      <g
+        transform="translate(68 23)"
+      >
+        <ellipse
+          cx="3"
+          cy="6"
+          fill="#BCAAA4"
+          rx="7"
+          ry="11"
+        />
+      </g>
+    </g>
+    <circle
+      cx="50"
+      cy="43"
+      fill="#BCAAA4"
+      r="27"
+    />
+    <ellipse
+      cx="50"
+      cy="52"
+      fill="#EFEBE9"
+      opacity="0.55"
+      rx="19.439999999999998"
+      ry="16.74"
+    />
+    <ellipse
+      cx="38"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
+    />
+    <ellipse
+      cx="62"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
     />
     <g
-      clip-path="url(#crru-body)"
+      data-eyes="big"
+      data-part="eyes"
     >
+      <g
+        transform="translate(40 45) "
+      >
+        <ellipse
+          fill="#5D4037"
+          rx="4.2"
+          ry="4.2"
+        />
+        <circle
+          cx="-1.6800000000000002"
+          cy="-1.6800000000000002"
+          fill="#fff"
+          r="1.6800000000000002"
+        />
+      </g>
+      <g
+        transform="translate(60 45) "
+      >
+        <ellipse
+          fill="#5D4037"
+          rx="4.2"
+          ry="4.2"
+        />
+        <circle
+          cx="-1.6800000000000002"
+          cy="-1.6800000000000002"
+          fill="#fff"
+          r="1.6800000000000002"
+        />
+      </g>
+    </g>
+    <g>
       <ellipse
         cx="50"
-        cy="65.56"
-        fill="#E6EFF8"
-        opacity="0.9"
-        rx="13.8"
-        ry="19.14"
+        cy="54"
+        fill="#EFEBE9"
+        rx="9"
+        ry="7"
       />
-      <path
-        d="M33,20 q7,33 0,70"
-        fill="none"
-        opacity="0.38"
-        stroke="#4A6E96"
-        stroke-width="5"
-      />
-      <path
-        d="M44,20 q7,33 0,70"
-        fill="none"
-        opacity="0.38"
-        stroke="#4A6E96"
-        stroke-width="5"
-      />
-      <path
-        d="M56,20 q7,33 0,70"
-        fill="none"
-        opacity="0.38"
-        stroke="#4A6E96"
-        stroke-width="5"
-      />
-      <path
-        d="M67,20 q7,33 0,70"
-        fill="none"
-        opacity="0.38"
-        stroke="#4A6E96"
-        stroke-width="5"
+      <ellipse
+        cx="50"
+        cy="52"
+        fill="#5D4037"
+        rx="3"
+        ry="2.4"
       />
     </g>
-    <ellipse
-      cx="50"
-      cy="55"
+    <path
+      d="M46.5 58 q3.5 3.5 7 0"
+      data-part="mouth-idle"
       fill="none"
-      opacity="0.35"
-      rx="23"
-      ry="33"
-      stroke="#4A6E96"
-      stroke-width="2"
+      stroke="#5D4037"
+      stroke-linecap="round"
+      stroke-width="2.2"
     />
   </g>
-  <g
-    data-part="ears"
-  >
-    <ellipse
-      cx="38.66"
-      cy="34"
-      fill="#8FB3D9"
-      rx="7"
-      ry="15"
-      stroke="#4A6E96"
-      stroke-width="1.6"
-      transform="rotate(-24 38.66 34)"
-    />
-    <ellipse
-      cx="61.34"
-      cy="34"
-      fill="#8FB3D9"
-      rx="7"
-      ry="15"
-      stroke="#4A6E96"
-      stroke-width="1.6"
-      transform="rotate(24 61.34 34)"
-    />
-  </g>
-  <g
-    data-eyes="sparkly"
-    data-part="eyes"
-  >
-    <g>
-      <circle
-        cx="41"
-        cy="50.38"
-        fill="#fff"
-        r="7.4"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <circle
-        cx="41.6"
-        cy="51.38"
-        fill="#3a2f2a"
-        r="3.6"
-      />
-      <circle
-        cx="39.4"
-        cy="48.78"
-        fill="#fff"
-        r="1.5"
-      />
-      <circle
-        cx="43.4"
-        cy="52.98"
-        fill="#fff"
-        r="1"
-      />
-      <path
-        d="M46.18,43L46.71,44.47L48.27,44.52L47.04,45.48L47.47,46.98L46.18,46.1L44.89,46.98L45.32,45.48L44.09,44.52L45.65,44.47Z"
-        fill="#fff"
-      />
-    </g>
-    <g>
-      <circle
-        cx="59"
-        cy="50.38"
-        fill="#fff"
-        r="7.4"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <circle
-        cx="59.6"
-        cy="51.38"
-        fill="#3a2f2a"
-        r="3.6"
-      />
-      <circle
-        cx="57.4"
-        cy="48.78"
-        fill="#fff"
-        r="1.5"
-      />
-      <circle
-        cx="61.4"
-        cy="52.98"
-        fill="#fff"
-        r="1"
-      />
-      <path
-        d="M64.18,43L64.71,44.47L66.27,44.52L65.04,45.48L65.47,46.98L64.18,46.1L62.89,46.98L63.32,45.48L62.09,44.52L63.65,44.47Z"
-        fill="#fff"
-      />
-    </g>
-  </g>
-  <ellipse
-    cx="37"
-    cy="57.38"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="63"
-    cy="57.38"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="50"
-    cy="56.92"
-    fill="#4A6E96"
-    rx="2.6"
-    ry="2"
-  />
-  <path
-    d="M43,62.92 Q50,68.92 57,62.92"
-    data-part="mouth-idle"
-    fill="none"
-    stroke="#3a2f2a"
-    stroke-linecap="round"
-    stroke-width="2"
-  />
 </svg>
 `;
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-8 1`] = `
 <svg
-  data-body="lumpy"
-  data-creature=""
+  aria-label="foal"
+  data-animal="foal"
   data-mood="idle"
+  data-testid="creature"
   height="200"
   role="img"
   viewBox="0 0 100 100"
   width="200"
-  xmlns="http://www.w3.org/2000/svg"
 >
-  <defs>
-    <clippath
-      id="crrv-body"
-    >
-      <ellipse
-        cx="50"
-        cy="58"
-        rx="31"
-        ry="28"
-      />
-    </clippath>
-    <filter
-      height="140%"
-      id="crrv-soft"
-      width="140%"
-      x="-20%"
-      y="-20%"
-    >
-      <fedropshadow
-        dx="0"
-        dy="2.5"
-        flood-color="#3a2f2a"
-        flood-opacity="0.18"
-        stdDeviation="2.5"
-      />
-    </filter>
-  </defs>
   <ellipse
     cx="50"
-    cy="90"
-    fill="#3a2f2a"
-    opacity="0.12"
-    rx="25.42"
-    ry="4"
-  />
-  <path
-    d="M72,68.4 q11,-3 11,6 q0,9 -9,9 q-6,0 -5,-7"
-    data-part="tail"
-    fill="none"
-    stroke="#F2A0A0"
-    stroke-linecap="round"
-    stroke-width="5"
-  />
-  <ellipse
-    cx="36.98"
-    cy="84"
-    fill="#B85C5C"
-    rx="7"
-    ry="4.5"
-  />
-  <ellipse
-    cx="63.02"
-    cy="84"
-    fill="#B85C5C"
-    rx="7"
-    ry="4.5"
+    cy="92"
+    fill="#00000018"
+    rx="26"
+    ry="6"
   />
   <g
-    filter="url(#crrv-soft)"
+    transform="translate(0 0)"
   >
+    <path
+      d="M67 78 q12 0 12 -14"
+      fill="none"
+      stroke="#A1887F"
+      stroke-linecap="round"
+      stroke-width="5"
+    />
+    <ellipse
+      cx="40"
+      cy="90"
+      fill="#A1887F"
+      rx="7"
+      ry="5"
+    />
+    <ellipse
+      cx="60"
+      cy="90"
+      fill="#A1887F"
+      rx="7"
+      ry="5"
+    />
     <ellipse
       cx="50"
-      cy="58"
-      fill="#F2A0A0"
-      rx="31"
-      ry="28"
+      cy="76"
+      fill="#A1887F"
+      rx="19"
+      ry="15"
     />
+    <ellipse
+      cx="50"
+      cy="79"
+      fill="#D7CCC8"
+      rx="11.78"
+      ry="9.3"
+    />
+    <g>
+      <g
+        transform="translate(32 23)"
+      >
+        <path
+          d="M0 6 L-11 -12 L-2 -4 Z"
+          fill="#A1887F"
+          stroke="#4E342E"
+          stroke-width="1"
+        />
+      </g>
+      <g
+        transform="translate(68 23)"
+      >
+        <path
+          d="M0 6 L11 -12 L2 -4 Z"
+          fill="#A1887F"
+          stroke="#4E342E"
+          stroke-width="1"
+        />
+      </g>
+    </g>
     <circle
+      cx="50"
+      cy="43"
+      fill="#A1887F"
+      r="27"
+    />
+    <ellipse
+      cx="50"
+      cy="52"
+      fill="#D7CCC8"
+      opacity="0.55"
+      rx="19.439999999999998"
+      ry="16.74"
+    />
+    <ellipse
       cx="38"
-      cy="37"
-      fill="#F2A0A0"
-      r="10"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
     />
-    <circle
-      cx="63"
-      cy="34"
-      fill="#F2A0A0"
-      r="8"
-    />
-    <circle
-      cx="77"
-      cy="62"
-      fill="#F2A0A0"
-      r="9"
+    <ellipse
+      cx="62"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
     />
     <g
-      clip-path="url(#crrv-body)"
+      data-eyes="wide"
+      data-part="eyes"
     >
+      <g
+        transform="translate(40 45) "
+      >
+        <ellipse
+          fill="#4E342E"
+          rx="5"
+          ry="5"
+        />
+      </g>
+      <g
+        transform="translate(60 45) "
+      >
+        <ellipse
+          fill="#4E342E"
+          rx="5"
+          ry="5"
+        />
+      </g>
+    </g>
+    <g>
       <ellipse
         cx="50"
-        cy="66.96"
-        fill="#FCE4E4"
-        opacity="0.9"
-        rx="18.6"
-        ry="16.24"
+        cy="54"
+        fill="#D7CCC8"
+        rx="9"
+        ry="7"
       />
-      <circle
-        cx="37"
-        cy="63"
-        fill="#B85C5C"
-        opacity="0.5"
-        r="4.4"
-      />
-      <circle
-        cx="61"
-        cy="69"
-        fill="#B85C5C"
-        opacity="0.5"
-        r="4.4"
-      />
-      <circle
-        cx="46"
-        cy="49"
-        fill="#B85C5C"
-        opacity="0.5"
-        r="4.4"
-      />
-      <circle
-        cx="65"
-        cy="55"
-        fill="#B85C5C"
-        opacity="0.5"
-        r="4.4"
-      />
-      <circle
-        cx="53"
-        cy="77"
-        fill="#B85C5C"
-        opacity="0.5"
-        r="4.4"
+      <ellipse
+        cx="50"
+        cy="52"
+        fill="#4E342E"
+        rx="3"
+        ry="2.4"
       />
     </g>
-    <ellipse
-      cx="50"
-      cy="58"
+    <path
+      d="M46.5 58 q3.5 3.5 7 0"
+      data-part="mouth-idle"
       fill="none"
-      opacity="0.35"
-      rx="31"
-      ry="28"
-      stroke="#B85C5C"
-      stroke-width="2"
+      stroke="#4E342E"
+      stroke-linecap="round"
+      stroke-width="2.2"
     />
   </g>
-  <g
-    data-part="ears"
-  >
-    <circle
-      cx="32.02"
-      cy="32"
-      fill="#F2A0A0"
-      r="9"
-      stroke="#B85C5C"
-      stroke-width="1.6"
-    />
-    <circle
-      cx="67.98"
-      cy="32"
-      fill="#F2A0A0"
-      r="9"
-      stroke="#B85C5C"
-      stroke-width="1.6"
-    />
-  </g>
-  <g
-    data-eyes="big"
-    data-part="eyes"
-  >
-    <g>
-      <circle
-        cx="38.84"
-        cy="54.08"
-        fill="#fff"
-        r="8"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <circle
-        cx="39.44"
-        cy="55.08"
-        fill="#3a2f2a"
-        r="4"
-      />
-      <circle
-        cx="37.24"
-        cy="52.48"
-        fill="#fff"
-        r="1.5"
-      />
-    </g>
-    <g>
-      <circle
-        cx="61.16"
-        cy="54.08"
-        fill="#fff"
-        r="8"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <circle
-        cx="61.76"
-        cy="55.08"
-        fill="#3a2f2a"
-        r="4"
-      />
-      <circle
-        cx="59.56"
-        cy="52.48"
-        fill="#fff"
-        r="1.5"
-      />
-    </g>
-  </g>
-  <ellipse
-    cx="34.84"
-    cy="61.08"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="65.16"
-    cy="61.08"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="50"
-    cy="58.72"
-    fill="#B85C5C"
-    rx="2.6"
-    ry="2"
-  />
-  <path
-    d="M43,64.72 Q50,70.72 57,64.72"
-    data-part="mouth-idle"
-    fill="none"
-    stroke="#3a2f2a"
-    stroke-linecap="round"
-    stroke-width="2"
-  />
 </svg>
 `;
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-9 1`] = `
 <svg
-  data-body="round"
-  data-creature=""
+  aria-label="fawn"
+  data-animal="fawn"
   data-mood="idle"
+  data-testid="creature"
   height="200"
   role="img"
   viewBox="0 0 100 100"
   width="200"
-  xmlns="http://www.w3.org/2000/svg"
 >
-  <defs>
-    <clippath
-      id="crr10-body"
-    >
-      <ellipse
-        cx="50"
-        cy="57"
-        rx="30"
-        ry="30"
-      />
-    </clippath>
-    <filter
-      height="140%"
-      id="crr10-soft"
-      width="140%"
-      x="-20%"
-      y="-20%"
-    >
-      <fedropshadow
-        dx="0"
-        dy="2.5"
-        flood-color="#3a2f2a"
-        flood-opacity="0.18"
-        stdDeviation="2.5"
-      />
-    </filter>
-  </defs>
   <ellipse
     cx="50"
-    cy="90"
-    fill="#3a2f2a"
-    opacity="0.12"
-    rx="24.6"
-    ry="4"
-  />
-  <path
-    d="M72,66 Q88,60 86,80"
-    data-part="tail"
-    fill="none"
-    stroke="#A5A8E0"
-    stroke-linecap="round"
-    stroke-width="6"
-  />
-  <ellipse
-    cx="37.4"
-    cy="85"
-    fill="#5A5EA6"
-    rx="7"
-    ry="4.5"
-  />
-  <ellipse
-    cx="62.6"
-    cy="85"
-    fill="#5A5EA6"
-    rx="7"
-    ry="4.5"
+    cy="92"
+    fill="#00000018"
+    rx="26"
+    ry="6"
   />
   <g
-    filter="url(#crr10-soft)"
+    transform="translate(0 0)"
   >
+    <path
+      d="M67 78 q12 0 12 -14"
+      fill="none"
+      stroke="#D2A679"
+      stroke-linecap="round"
+      stroke-width="5"
+    />
+    <ellipse
+      cx="40"
+      cy="90"
+      fill="#D2A679"
+      rx="7"
+      ry="5"
+    />
+    <ellipse
+      cx="60"
+      cy="90"
+      fill="#D2A679"
+      rx="7"
+      ry="5"
+    />
     <ellipse
       cx="50"
-      cy="57"
-      fill="#A5A8E0"
-      rx="30"
-      ry="30"
+      cy="76"
+      fill="#D2A679"
+      rx="19"
+      ry="15"
+    />
+    <ellipse
+      cx="50"
+      cy="79"
+      fill="#F0E0CC"
+      rx="11.78"
+      ry="9.3"
+    />
+    <g>
+      <g
+        transform="translate(32 23)"
+      >
+        <path
+          d="M0 6 L-11 -12 L-2 -4 Z"
+          fill="#D2A679"
+          stroke="#6D4C33"
+          stroke-width="1"
+        />
+      </g>
+      <g
+        transform="translate(68 23)"
+      >
+        <path
+          d="M0 6 L11 -12 L2 -4 Z"
+          fill="#D2A679"
+          stroke="#6D4C33"
+          stroke-width="1"
+        />
+      </g>
+    </g>
+    <circle
+      cx="50"
+      cy="43"
+      fill="#D2A679"
+      r="27"
+    />
+    <ellipse
+      cx="50"
+      cy="52"
+      fill="#F0E0CC"
+      opacity="0.55"
+      rx="19.439999999999998"
+      ry="16.74"
+    />
+    <ellipse
+      cx="38"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
+    />
+    <ellipse
+      cx="62"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
     />
     <g
-      clip-path="url(#crr10-body)"
+      data-eyes="sparkly"
+      data-part="eyes"
     >
+      <g
+        transform="translate(40 45) "
+      >
+        <ellipse
+          fill="#6D4C33"
+          rx="4.2"
+          ry="4.2"
+        />
+        <circle
+          cx="-1.6800000000000002"
+          cy="-1.6800000000000002"
+          fill="#fff"
+          r="1.6800000000000002"
+        />
+      </g>
+      <g
+        transform="translate(60 45) "
+      >
+        <ellipse
+          fill="#6D4C33"
+          rx="4.2"
+          ry="4.2"
+        />
+        <circle
+          cx="-1.6800000000000002"
+          cy="-1.6800000000000002"
+          fill="#fff"
+          r="1.6800000000000002"
+        />
+      </g>
+    </g>
+    <g>
       <ellipse
         cx="50"
-        cy="66.6"
-        fill="#E9EAFB"
-        opacity="0.9"
-        rx="18"
-        ry="17.4"
+        cy="54"
+        fill="#F0E0CC"
+        rx="9"
+        ry="7"
       />
-      <path
-        d="M50,55.6L52.7,62.88L60.46,63.2L54.37,68.02L56.47,75.5L50,71.2L43.53,75.5L45.63,68.02L39.54,63.2L47.3,62.88Z"
-        fill="#5A5EA6"
-        opacity="0.7"
+      <ellipse
+        cx="50"
+        cy="52"
+        fill="#6D4C33"
+        rx="3"
+        ry="2.4"
       />
     </g>
-    <ellipse
-      cx="50"
-      cy="57"
+    <path
+      d="M46.5 58 q3.5 3.5 7 0"
+      data-part="mouth-idle"
       fill="none"
-      opacity="0.35"
-      rx="30"
-      ry="30"
-      stroke="#5A5EA6"
-      stroke-width="2"
+      stroke="#6D4C33"
+      stroke-linecap="round"
+      stroke-width="2.2"
     />
   </g>
-  <g
-    data-part="ears"
-    stroke="#5A5EA6"
-    stroke-linecap="round"
-    stroke-width="2.2"
-  >
-    <line
-      x1="41"
-      x2="37"
-      y1="30"
-      y2="15"
-    />
-    <line
-      x1="59"
-      x2="63"
-      y1="30"
-      y2="15"
-    />
-    <circle
-      cx="37"
-      cy="15"
-      fill="#A5A8E0"
-      r="3.4"
-      stroke-width="1.4"
-    />
-    <circle
-      cx="63"
-      cy="15"
-      fill="#A5A8E0"
-      r="3.4"
-      stroke-width="1.4"
-    />
-  </g>
-  <g
-    data-eyes="sparkly"
-    data-part="eyes"
-  >
-    <g>
-      <circle
-        cx="39.2"
-        cy="52.8"
-        fill="#fff"
-        r="7.4"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <circle
-        cx="39.8"
-        cy="53.8"
-        fill="#3a2f2a"
-        r="3.6"
-      />
-      <circle
-        cx="37.6"
-        cy="51.2"
-        fill="#fff"
-        r="1.5"
-      />
-      <circle
-        cx="41.6"
-        cy="55.4"
-        fill="#fff"
-        r="1"
-      />
-      <path
-        d="M44.38,45.42L44.91,46.89L46.47,46.94L45.24,47.9L45.67,49.4L44.38,48.52L43.09,49.4L43.52,47.9L42.29,46.94L43.85,46.89Z"
-        fill="#fff"
-      />
-    </g>
-    <g>
-      <circle
-        cx="60.8"
-        cy="52.8"
-        fill="#fff"
-        r="7.4"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <circle
-        cx="61.4"
-        cy="53.8"
-        fill="#3a2f2a"
-        r="3.6"
-      />
-      <circle
-        cx="59.2"
-        cy="51.2"
-        fill="#fff"
-        r="1.5"
-      />
-      <circle
-        cx="63.2"
-        cy="55.4"
-        fill="#fff"
-        r="1"
-      />
-      <path
-        d="M65.98,45.42L66.51,46.89L68.07,46.94L66.84,47.9L67.27,49.4L65.98,48.52L64.69,49.4L65.12,47.9L63.89,46.94L65.45,46.89Z"
-        fill="#fff"
-      />
-    </g>
-  </g>
-  <ellipse
-    cx="35.2"
-    cy="59.8"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="64.8"
-    cy="59.8"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="50"
-    cy="58.2"
-    fill="#5A5EA6"
-    rx="2.6"
-    ry="2"
-  />
-  <path
-    d="M43,64.2 Q50,70.2 57,64.2"
-    data-part="mouth-idle"
-    fill="none"
-    stroke="#3a2f2a"
-    stroke-linecap="round"
-    stroke-width="2"
-  />
 </svg>
 `;
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-10 1`] = `
 <svg
-  data-body="round"
-  data-creature=""
+  aria-label="calf"
+  data-animal="calf"
   data-mood="idle"
+  data-testid="creature"
   height="200"
   role="img"
   viewBox="0 0 100 100"
   width="200"
-  xmlns="http://www.w3.org/2000/svg"
 >
-  <defs>
-    <clippath
-      id="crr11-body"
-    >
-      <ellipse
-        cx="50"
-        cy="57"
-        rx="30"
-        ry="30"
-      />
-    </clippath>
-    <filter
-      height="140%"
-      id="crr11-soft"
-      width="140%"
-      x="-20%"
-      y="-20%"
-    >
-      <fedropshadow
-        dx="0"
-        dy="2.5"
-        flood-color="#3a2f2a"
-        flood-opacity="0.18"
-        stdDeviation="2.5"
-      />
-    </filter>
-  </defs>
   <ellipse
     cx="50"
-    cy="90"
-    fill="#3a2f2a"
-    opacity="0.12"
-    rx="24.6"
-    ry="4"
-  />
-  <circle
-    cx="76"
-    cy="70"
-    data-part="tail"
-    fill="#F7C873"
-    r="8"
-    stroke="#C77E3A"
-    stroke-width="1.6"
-  />
-  <ellipse
-    cx="37.4"
-    cy="85"
-    fill="#C77E3A"
-    rx="7"
-    ry="4.5"
-  />
-  <ellipse
-    cx="62.6"
-    cy="85"
-    fill="#C77E3A"
-    rx="7"
-    ry="4.5"
+    cy="92"
+    fill="#00000018"
+    rx="26"
+    ry="6"
   />
   <g
-    filter="url(#crr11-soft)"
+    transform="translate(0 0)"
   >
+    <path
+      d="M67 78 q12 0 12 -14"
+      fill="none"
+      stroke="#FFE0A3"
+      stroke-linecap="round"
+      stroke-width="5"
+    />
+    <ellipse
+      cx="40"
+      cy="90"
+      fill="#FFE0A3"
+      rx="7"
+      ry="5"
+    />
+    <ellipse
+      cx="60"
+      cy="90"
+      fill="#FFE0A3"
+      rx="7"
+      ry="5"
+    />
     <ellipse
       cx="50"
-      cy="57"
-      fill="#F7C873"
-      rx="30"
-      ry="30"
+      cy="76"
+      fill="#FFE0A3"
+      rx="19"
+      ry="15"
+    />
+    <ellipse
+      cx="50"
+      cy="79"
+      fill="#FFF6E5"
+      rx="11.78"
+      ry="9.3"
+    />
+    <g>
+      <g
+        transform="translate(32 23)"
+      >
+        <ellipse
+          cx="-4"
+          cy="2"
+          fill="#FFE0A3"
+          rx="9"
+          ry="6"
+        />
+      </g>
+      <g
+        transform="translate(68 23)"
+      >
+        <ellipse
+          cx="4"
+          cy="2"
+          fill="#FFE0A3"
+          rx="9"
+          ry="6"
+        />
+      </g>
+    </g>
+    <circle
+      cx="50"
+      cy="43"
+      fill="#FFE0A3"
+      r="27"
+    />
+    <ellipse
+      cx="50"
+      cy="52"
+      fill="#FFF6E5"
+      opacity="0.55"
+      rx="19.439999999999998"
+      ry="16.74"
     />
     <g
-      clip-path="url(#crr11-body)"
+      transform="translate(50 18)"
     >
-      <ellipse
-        cx="50"
-        cy="66.6"
-        fill="#FFF6E4"
-        opacity="0.9"
-        rx="18"
-        ry="17.4"
+      <path
+        d="M-9 2 q-3 -6 1 -8"
+        fill="none"
+        stroke="#FFF6E5"
+        stroke-linecap="round"
+        stroke-width="3.5"
       />
       <path
-        d="M50,55.6L52.7,62.88L60.46,63.2L54.37,68.02L56.47,75.5L50,71.2L43.53,75.5L45.63,68.02L39.54,63.2L47.3,62.88Z"
-        fill="#C77E3A"
-        opacity="0.7"
+        d="M9 2 q3 -6 -1 -8"
+        fill="none"
+        stroke="#FFF6E5"
+        stroke-linecap="round"
+        stroke-width="3.5"
+      />
+      <ellipse
+        cx="0"
+        cy="-4"
+        fill="#FFE0A3"
+        rx="9"
+        ry="6"
       />
     </g>
     <ellipse
-      cx="50"
-      cy="57"
+      cx="38"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
+    />
+    <ellipse
+      cx="62"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
+    />
+    <g
+      data-eyes="big"
+      data-part="eyes"
+    >
+      <g
+        transform="translate(40 45) "
+      >
+        <ellipse
+          fill="#8D6E3A"
+          rx="4.2"
+          ry="4.2"
+        />
+        <circle
+          cx="-1.6800000000000002"
+          cy="-1.6800000000000002"
+          fill="#fff"
+          r="1.6800000000000002"
+        />
+      </g>
+      <g
+        transform="translate(60 45) "
+      >
+        <ellipse
+          fill="#8D6E3A"
+          rx="4.2"
+          ry="4.2"
+        />
+        <circle
+          cx="-1.6800000000000002"
+          cy="-1.6800000000000002"
+          fill="#fff"
+          r="1.6800000000000002"
+        />
+      </g>
+    </g>
+    <g>
+      <ellipse
+        cx="50"
+        cy="54"
+        fill="#FFF6E5"
+        rx="9"
+        ry="7"
+      />
+      <ellipse
+        cx="50"
+        cy="52"
+        fill="#8D6E3A"
+        rx="3"
+        ry="2.4"
+      />
+    </g>
+    <path
+      d="M46.5 58 q3.5 3.5 7 0"
+      data-part="mouth-idle"
       fill="none"
-      opacity="0.35"
-      rx="30"
-      ry="30"
-      stroke="#C77E3A"
-      stroke-width="2"
+      stroke="#8D6E3A"
+      stroke-linecap="round"
+      stroke-width="2.2"
     />
   </g>
-  <g
-    data-part="ears"
-  >
-    <ellipse
-      cx="34.6"
-      cy="39"
-      fill="#F7C873"
-      rx="7"
-      ry="15"
-      stroke="#C77E3A"
-      stroke-width="1.6"
-      transform="rotate(-24 34.6 39)"
-    />
-    <ellipse
-      cx="65.4"
-      cy="39"
-      fill="#F7C873"
-      rx="7"
-      ry="15"
-      stroke="#C77E3A"
-      stroke-width="1.6"
-      transform="rotate(24 65.4 39)"
-    />
-  </g>
-  <g
-    data-eyes="big"
-    data-part="eyes"
-  >
-    <g>
-      <circle
-        cx="39.2"
-        cy="52.8"
-        fill="#fff"
-        r="8"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <circle
-        cx="39.8"
-        cy="53.8"
-        fill="#3a2f2a"
-        r="4"
-      />
-      <circle
-        cx="37.6"
-        cy="51.2"
-        fill="#fff"
-        r="1.5"
-      />
-    </g>
-    <g>
-      <circle
-        cx="60.8"
-        cy="52.8"
-        fill="#fff"
-        r="8"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <circle
-        cx="61.4"
-        cy="53.8"
-        fill="#3a2f2a"
-        r="4"
-      />
-      <circle
-        cx="59.2"
-        cy="51.2"
-        fill="#fff"
-        r="1.5"
-      />
-    </g>
-  </g>
-  <ellipse
-    cx="35.2"
-    cy="59.8"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="64.8"
-    cy="59.8"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="50"
-    cy="58.2"
-    fill="#C77E3A"
-    rx="2.6"
-    ry="2"
-  />
-  <path
-    d="M43,64.2 Q50,70.2 57,64.2"
-    data-part="mouth-idle"
-    fill="none"
-    stroke="#3a2f2a"
-    stroke-linecap="round"
-    stroke-width="2"
-  />
 </svg>
 `;
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-11 1`] = `
 <svg
-  data-body="tall"
-  data-creature=""
+  aria-label="gosling"
+  data-animal="gosling"
   data-mood="idle"
+  data-testid="creature"
   height="200"
   role="img"
   viewBox="0 0 100 100"
   width="200"
-  xmlns="http://www.w3.org/2000/svg"
 >
-  <defs>
-    <clippath
-      id="crr12-body"
-    >
-      <ellipse
-        cx="50"
-        cy="55"
-        rx="23"
-        ry="33"
-      />
-    </clippath>
-    <filter
-      height="140%"
-      id="crr12-soft"
-      width="140%"
-      x="-20%"
-      y="-20%"
-    >
-      <fedropshadow
-        dx="0"
-        dy="2.5"
-        flood-color="#3a2f2a"
-        flood-opacity="0.18"
-        stdDeviation="2.5"
-      />
-    </filter>
-  </defs>
   <ellipse
     cx="50"
-    cy="90"
-    fill="#3a2f2a"
-    opacity="0.12"
-    rx="18.86"
-    ry="4"
-  />
-  <path
-    d="M67,66.9 q11,-3 11,6 q0,9 -9,9 q-6,0 -5,-7"
-    data-part="tail"
-    fill="none"
-    stroke="#B7C98A"
-    stroke-linecap="round"
-    stroke-width="5"
-  />
-  <ellipse
-    cx="40.34"
-    cy="86"
-    fill="#6E8248"
-    rx="7"
-    ry="4.5"
-  />
-  <ellipse
-    cx="59.66"
-    cy="86"
-    fill="#6E8248"
-    rx="7"
-    ry="4.5"
+    cy="92"
+    fill="#00000018"
+    rx="26"
+    ry="6"
   />
   <g
-    filter="url(#crr12-soft)"
+    transform="translate(0 0)"
   >
+    <path
+      d="M65 76 q10 2 8 10 q-5 2 -9 -2 Z"
+      fill="#F9FBE7"
+    />
+    <ellipse
+      cx="40"
+      cy="90"
+      fill="#DCE775"
+      rx="7"
+      ry="5"
+    />
+    <ellipse
+      cx="60"
+      cy="90"
+      fill="#DCE775"
+      rx="7"
+      ry="5"
+    />
     <ellipse
       cx="50"
-      cy="55"
-      fill="#B7C98A"
-      rx="23"
-      ry="33"
+      cy="76"
+      fill="#DCE775"
+      rx="19"
+      ry="15"
+    />
+    <ellipse
+      cx="50"
+      cy="79"
+      fill="#F9FBE7"
+      rx="11.78"
+      ry="9.3"
+    />
+    <circle
+      cx="50"
+      cy="43"
+      fill="#DCE775"
+      r="27"
+    />
+    <ellipse
+      cx="50"
+      cy="52"
+      fill="#F9FBE7"
+      opacity="0.55"
+      rx="19.439999999999998"
+      ry="16.74"
+    />
+    <ellipse
+      cx="38"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
+    />
+    <ellipse
+      cx="62"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
     />
     <g
-      clip-path="url(#crr12-body)"
+      data-eyes="wide"
+      data-part="eyes"
     >
-      <ellipse
-        cx="50"
-        cy="65.56"
-        fill="#EEF3DE"
-        opacity="0.9"
-        rx="13.8"
-        ry="19.14"
-      />
-      <path
-        d="M33,20 q7,33 0,70"
-        fill="none"
-        opacity="0.38"
-        stroke="#6E8248"
-        stroke-width="5"
-      />
-      <path
-        d="M44,20 q7,33 0,70"
-        fill="none"
-        opacity="0.38"
-        stroke="#6E8248"
-        stroke-width="5"
-      />
-      <path
-        d="M56,20 q7,33 0,70"
-        fill="none"
-        opacity="0.38"
-        stroke="#6E8248"
-        stroke-width="5"
-      />
-      <path
-        d="M67,20 q7,33 0,70"
-        fill="none"
-        opacity="0.38"
-        stroke="#6E8248"
-        stroke-width="5"
-      />
+      <g
+        transform="translate(40 45) "
+      >
+        <ellipse
+          fill="#827717"
+          rx="5"
+          ry="5"
+        />
+      </g>
+      <g
+        transform="translate(60 45) "
+      >
+        <ellipse
+          fill="#827717"
+          rx="5"
+          ry="5"
+        />
+      </g>
     </g>
-    <ellipse
-      cx="50"
-      cy="55"
+    <path
+      d="M44 50 L56 50 L50 58 Z"
+      fill="#F5A623"
+    />
+    <path
+      d="M46.5 58 q3.5 3.5 7 0"
+      data-part="mouth-idle"
       fill="none"
-      opacity="0.35"
-      rx="23"
-      ry="33"
-      stroke="#6E8248"
-      stroke-width="2"
+      stroke="#827717"
+      stroke-linecap="round"
+      stroke-width="2.2"
     />
   </g>
-  <g
-    data-part="ears"
-  >
-    <path
-      d="M29.66,29 Q35.66,9 44.66,24 Z"
-      fill="#B7C98A"
-      stroke="#6E8248"
-      stroke-linejoin="round"
-      stroke-width="1.6"
-    />
-    <path
-      d="M55.34,24 Q64.34,9 70.34,29 Z"
-      fill="#B7C98A"
-      stroke="#6E8248"
-      stroke-linejoin="round"
-      stroke-width="1.6"
-    />
-  </g>
-  <g
-    data-eyes="wide"
-    data-part="eyes"
-  >
-    <g>
-      <circle
-        cx="41"
-        cy="50.38"
-        fill="#fff"
-        r="9"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <circle
-        cx="41.6"
-        cy="51.38"
-        fill="#3a2f2a"
-        r="3.1"
-      />
-      <circle
-        cx="39.4"
-        cy="48.78"
-        fill="#fff"
-        r="1.5"
-      />
-    </g>
-    <g>
-      <circle
-        cx="59"
-        cy="50.38"
-        fill="#fff"
-        r="9"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <circle
-        cx="59.6"
-        cy="51.38"
-        fill="#3a2f2a"
-        r="3.1"
-      />
-      <circle
-        cx="57.4"
-        cy="48.78"
-        fill="#fff"
-        r="1.5"
-      />
-    </g>
-  </g>
-  <ellipse
-    cx="37"
-    cy="57.38"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="63"
-    cy="57.38"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="50"
-    cy="56.92"
-    fill="#6E8248"
-    rx="2.6"
-    ry="2"
-  />
-  <path
-    d="M43,62.92 Q50,68.92 57,62.92"
-    data-part="mouth-idle"
-    fill="none"
-    stroke="#3a2f2a"
-    stroke-linecap="round"
-    stroke-width="2"
-  />
 </svg>
 `;
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-12 1`] = `
 <svg
-  data-body="wide"
-  data-creature=""
+  aria-label="kid"
+  data-animal="kid"
   data-mood="idle"
+  data-testid="creature"
   height="200"
   role="img"
   viewBox="0 0 100 100"
   width="200"
-  xmlns="http://www.w3.org/2000/svg"
 >
-  <defs>
-    <clippath
-      id="crr13-body"
-    >
-      <ellipse
-        cx="50"
-        cy="62"
-        rx="35"
-        ry="25"
-      />
-    </clippath>
-    <filter
-      height="140%"
-      id="crr13-soft"
-      width="140%"
-      x="-20%"
-      y="-20%"
-    >
-      <fedropshadow
-        dx="0"
-        dy="2.5"
-        flood-color="#3a2f2a"
-        flood-opacity="0.18"
-        stdDeviation="2.5"
-      />
-    </filter>
-  </defs>
   <ellipse
     cx="50"
-    cy="90"
-    fill="#3a2f2a"
-    opacity="0.12"
-    rx="28.7"
-    ry="4"
-  />
-  <path
-    d="M72,69.5 Q88,63.5 86,83.5"
-    data-part="tail"
-    fill="none"
-    stroke="#D98452"
-    stroke-linecap="round"
-    stroke-width="6"
-  />
-  <ellipse
-    cx="35.3"
-    cy="85"
-    fill="#8F4A28"
-    rx="7"
-    ry="4.5"
-  />
-  <ellipse
-    cx="64.7"
-    cy="85"
-    fill="#8F4A28"
-    rx="7"
-    ry="4.5"
+    cy="92"
+    fill="#00000018"
+    rx="26"
+    ry="6"
   />
   <g
-    filter="url(#crr13-soft)"
+    transform="translate(0 0)"
   >
+    <path
+      d="M65 76 q10 2 8 10 q-5 2 -9 -2 Z"
+      fill="#ECEFF1"
+    />
+    <ellipse
+      cx="40"
+      cy="90"
+      fill="#B0BEC5"
+      rx="7"
+      ry="5"
+    />
+    <ellipse
+      cx="60"
+      cy="90"
+      fill="#B0BEC5"
+      rx="7"
+      ry="5"
+    />
     <ellipse
       cx="50"
-      cy="62"
-      fill="#D98452"
-      rx="35"
-      ry="25"
+      cy="76"
+      fill="#B0BEC5"
+      rx="19"
+      ry="15"
+    />
+    <ellipse
+      cx="50"
+      cy="79"
+      fill="#ECEFF1"
+      rx="11.78"
+      ry="9.3"
+    />
+    <g>
+      <g
+        transform="translate(32 23)"
+      >
+        <path
+          d="M0 6 L-11 -12 L-2 -4 Z"
+          fill="#B0BEC5"
+          stroke="#455A64"
+          stroke-width="1"
+        />
+      </g>
+      <g
+        transform="translate(68 23)"
+      >
+        <path
+          d="M0 6 L11 -12 L2 -4 Z"
+          fill="#B0BEC5"
+          stroke="#455A64"
+          stroke-width="1"
+        />
+      </g>
+    </g>
+    <circle
+      cx="50"
+      cy="43"
+      fill="#B0BEC5"
+      r="27"
+    />
+    <ellipse
+      cx="50"
+      cy="52"
+      fill="#ECEFF1"
+      opacity="0.55"
+      rx="19.439999999999998"
+      ry="16.74"
     />
     <g
-      clip-path="url(#crr13-body)"
+      transform="translate(50 20)"
     >
-      <ellipse
-        cx="50"
-        cy="70"
-        fill="#F6DEC9"
-        opacity="0.9"
-        rx="21"
-        ry="14.5"
+      <path
+        d="M-8 0 Q-14 -8 -8 -12"
+        fill="none"
+        stroke="#455A64"
+        stroke-linecap="round"
+        stroke-width="3"
       />
-      <circle
-        cx="37"
-        cy="67"
-        fill="#8F4A28"
-        opacity="0.5"
-        r="4.4"
-      />
-      <circle
-        cx="61"
-        cy="73"
-        fill="#8F4A28"
-        opacity="0.5"
-        r="4.4"
-      />
-      <circle
-        cx="46"
-        cy="53"
-        fill="#8F4A28"
-        opacity="0.5"
-        r="4.4"
-      />
-      <circle
-        cx="65"
-        cy="59"
-        fill="#8F4A28"
-        opacity="0.5"
-        r="4.4"
-      />
-      <circle
-        cx="53"
-        cy="81"
-        fill="#8F4A28"
-        opacity="0.5"
-        r="4.4"
+      <path
+        d="M8 0 Q14 -8 8 -12"
+        fill="none"
+        stroke="#455A64"
+        stroke-linecap="round"
+        stroke-width="3"
       />
     </g>
     <ellipse
-      cx="50"
-      cy="62"
+      cx="38"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
+    />
+    <ellipse
+      cx="62"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.5"
+      rx="4"
+      ry="3"
+    />
+    <g
+      data-eyes="sleepy"
+      data-part="eyes"
+    >
+      <g
+        transform="translate(40 45) "
+      >
+        <ellipse
+          fill="#455A64"
+          rx="3"
+          ry="2.0999999999999996"
+        />
+      </g>
+      <g
+        transform="translate(60 45) "
+      >
+        <ellipse
+          fill="#455A64"
+          rx="3"
+          ry="2.0999999999999996"
+        />
+      </g>
+    </g>
+    <g>
+      <ellipse
+        cx="50"
+        cy="54"
+        fill="#ECEFF1"
+        rx="9"
+        ry="7"
+      />
+      <ellipse
+        cx="50"
+        cy="52"
+        fill="#455A64"
+        rx="3"
+        ry="2.4"
+      />
+    </g>
+    <path
+      d="M46.5 58 q3.5 3.5 7 0"
+      data-part="mouth-idle"
       fill="none"
-      opacity="0.35"
-      rx="35"
-      ry="25"
-      stroke="#8F4A28"
-      stroke-width="2"
+      stroke="#455A64"
+      stroke-linecap="round"
+      stroke-width="2.2"
     />
   </g>
-  <g
-    data-part="ears"
-  >
-    <circle
-      cx="29.7"
-      cy="39"
-      fill="#D98452"
-      r="9"
-      stroke="#8F4A28"
-      stroke-width="1.6"
-    />
-    <circle
-      cx="70.3"
-      cy="39"
-      fill="#D98452"
-      r="9"
-      stroke="#8F4A28"
-      stroke-width="1.6"
-    />
-  </g>
-  <g
-    data-eyes="sleepy"
-    data-part="eyes"
-  >
-    <g>
-      <circle
-        cx="37.4"
-        cy="58.5"
-        fill="#fff"
-        r="7.4"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <path
-        d="M30,57.5 A7.4 7.4 0 0 1 44.8,57.5 Z"
-        fill="#D98452"
-      />
-      <circle
-        cx="38"
-        cy="60.5"
-        fill="#3a2f2a"
-        r="3.6"
-      />
-      <circle
-        cx="35.8"
-        cy="56.9"
-        fill="#fff"
-        r="1.5"
-      />
-    </g>
-    <g>
-      <circle
-        cx="62.6"
-        cy="58.5"
-        fill="#fff"
-        r="7.4"
-        stroke="#3a2f2a"
-        stroke-width="1.2"
-      />
-      <path
-        d="M55.2,57.5 A7.4 7.4 0 0 1 70,57.5 Z"
-        fill="#D98452"
-      />
-      <circle
-        cx="63.2"
-        cy="60.5"
-        fill="#3a2f2a"
-        r="3.6"
-      />
-      <circle
-        cx="61"
-        cy="56.9"
-        fill="#fff"
-        r="1.5"
-      />
-    </g>
-  </g>
-  <ellipse
-    cx="33.4"
-    cy="65.5"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="66.6"
-    cy="65.5"
-    fill="#F49CA0"
-    opacity="0.5"
-    rx="4"
-    ry="2.6"
-  />
-  <ellipse
-    cx="50"
-    cy="62"
-    fill="#8F4A28"
-    rx="2.6"
-    ry="2"
-  />
-  <path
-    d="M43,68 Q50,74 57,68"
-    data-part="mouth-idle"
-    fill="none"
-    stroke="#3a2f2a"
-    stroke-linecap="round"
-    stroke-width="2"
-  />
 </svg>
 `;

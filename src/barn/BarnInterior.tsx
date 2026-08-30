@@ -56,10 +56,10 @@ function Stall({
           data-testid="stall"
           data-stall={index}
           data-occupied="false"
-          className={`${common} from-stone-100 to-stone-200`}
+          className={`${common} from-amber-50 to-amber-100/70`}
         >
-          <div className="mb-2 h-3 w-10 rounded-full bg-amber-300/60" aria-hidden />
-          <span className="text-[10px] uppercase tracking-wide text-stone-400">open stall</span>
+          <div className="mb-2 h-4 w-11 rounded-md bg-yellow-400/70 shadow-inner" aria-hidden />
+          <span className="text-[10px] uppercase tracking-wide text-amber-700/60">open stall</span>
         </div>
       )}
     </div>

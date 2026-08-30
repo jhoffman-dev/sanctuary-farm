@@ -22,11 +22,11 @@ import type {
   CharacterFacing,
   FarmyardProps,
   HotspotId,
-  TileType,
   Tilemap,
   Vec2,
 } from '@/contracts'
 import { Character } from './Character'
+import { FarmScene } from './FarmScene'
 import { findPath } from './pathfind'
 import { tilemap } from './tilemap'
 
@@ -42,14 +42,6 @@ type Props = FarmyardProps & {
 const chebyshev = (a: Vec2, b: Vec2) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y))
 /** Taps within this many tiles of a hotspot snap to it. */
 const HOTSPOT_SNAP_RADIUS = 2
-
-const TILE_FILL: Record<TileType, string> = {
-  grass: '#8bc24a',
-  path: '#d8b477',
-  fence: '#6f5038',
-  water: '#57b0e4',
-  building: '#c05a44',
-}
 
 type Fit = { scale: number; ox: number; oy: number }
 
@@ -321,7 +313,7 @@ export function Farmyard({ map = tilemap, onHotspot, badges, debug, spawnAt }: P
     <div
       ref={containerRef}
       onPointerDown={onPointerDown}
-      className="relative h-full w-full touch-none select-none overflow-hidden bg-[#8bc24a]"
+      className="relative h-full w-full touch-none select-none overflow-hidden"
       style={{ cursor: 'pointer' }}
     >
       <svg
@@ -329,19 +321,10 @@ export function Farmyard({ map = tilemap, onHotspot, badges, debug, spawnAt }: P
         width={MAP_PX_W * fit.scale}
         height={MAP_PX_H * fit.scale}
         className="absolute"
-        style={{ left: fit.ox, top: fit.oy }}
+        style={{ left: fit.ox, top: fit.oy, filter: 'drop-shadow(0 10px 30px rgba(30,50,10,0.25))' }}
         aria-hidden
       >
-        {map.tiles.map((t, i) => (
-          <rect
-            key={i}
-            x={(i % map.width) * TILE_PX}
-            y={Math.floor(i / map.width) * TILE_PX}
-            width={TILE_PX}
-            height={TILE_PX}
-            fill={TILE_FILL[t]}
-          />
-        ))}
+        <FarmScene map={map} />
 
         {pathView.map((wp, i) => (
           <circle
@@ -349,38 +332,29 @@ export function Farmyard({ map = tilemap, onHotspot, badges, debug, spawnAt }: P
             cx={wp.x * TILE_PX + TILE_PX / 2}
             cy={wp.y * TILE_PX + TILE_PX / 2}
             r={4}
-            fill="rgba(255,255,255,0.55)"
+            fill="rgba(255,255,255,0.6)"
           />
         ))}
 
-        {map.hotspots.map((h) => (
-          <g
-            key={h.id}
-            transform={`translate(${h.tile.x * TILE_PX + TILE_PX / 2} ${h.tile.y * TILE_PX + TILE_PX / 2})`}
-          >
-            <circle
-              r={TILE_PX * 0.5}
-              fill="rgba(255,255,255,0.28)"
-              stroke="rgba(255,255,255,0.85)"
-              strokeWidth={2}
-            />
-            <text
-              y={-TILE_PX * 0.78}
-              textAnchor="middle"
-              fontSize={13}
-              fontWeight={700}
-              fill="#26331a"
-              stroke="#ffffffcc"
-              strokeWidth={3}
-              paintOrder="stroke"
-            >
-              {h.label}
-            </text>
-            {badges?.[h.id] ? (
-              <circle cx={TILE_PX * 0.42} cy={-TILE_PX * 0.42} r={7} fill="#ef5350" stroke="#fff" strokeWidth={2} />
-            ) : null}
-          </g>
-        ))}
+        {map.hotspots.map((h) => {
+          const cx = h.tile.x * TILE_PX + TILE_PX / 2
+          const cy = h.tile.y * TILE_PX + TILE_PX / 2
+          return (
+            <g key={h.id} transform={`translate(${cx} ${cy})`}>
+              {/* a little wooden signpost */}
+              <rect x={-2.5} y={-4} width={5} height={22} rx={2} fill="#8d6e63" />
+              <g transform="translate(0 -16)">
+                <rect x={-38} y={-11} width={76} height={20} rx={5} fill="#fffdf5" stroke="#8d6e63" strokeWidth={2} />
+                <text textAnchor="middle" y={3} fontSize={11} fontWeight={800} fill="#5d4037">
+                  {h.label}
+                </text>
+                {badges?.[h.id] ? (
+                  <circle cx={34} cy={-9} r={6} fill="#ef5350" stroke="#fff" strokeWidth={2} />
+                ) : null}
+              </g>
+            </g>
+          )
+        })}
 
         <g transform={`translate(${pos.x - TILE_PX / 2} ${pos.y - TILE_PX + 6})`}>
           <Character facing={facing} moving={moving} />

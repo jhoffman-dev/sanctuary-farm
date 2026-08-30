@@ -3,13 +3,26 @@
 
 import type { ReactNode } from 'react'
 
+/** The baby animal a family hatches into. */
+export type AnimalKind =
+  | 'chick'
+  | 'duckling'
+  | 'bunny'
+  | 'lamb'
+  | 'piglet'
+  | 'kitten'
+  | 'puppy'
+  | 'foal'
+  | 'fawn'
+  | 'calf'
+  | 'gosling'
+  | 'kid'
+
 export type CreatureParams = {
-  bodyShape: 'round' | 'tall' | 'wide' | 'lumpy'
+  animal: AnimalKind
+  /** [body, belly/accent, ink] — warm, readable, high-contrast enough for eyes. */
   palette: [string, string, string]
-  earType: 'none' | 'pointy' | 'floppy' | 'round' | 'antenna'
   eyeStyle: 'big' | 'sleepy' | 'sparkly' | 'wide'
-  pattern: 'none' | 'spots' | 'stripes' | 'star'
-  tail: 'none' | 'puff' | 'long' | 'curl'
 }
 
 export type CreatureMood = 'idle' | 'happy' | 'eating' | 'puzzled' | 'sleeping'

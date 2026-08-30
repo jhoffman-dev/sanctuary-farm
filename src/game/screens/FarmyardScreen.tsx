@@ -31,7 +31,12 @@ export function FarmyardScreen() {
   const holdEnd = () => clearTimeout(pressTimer.current)
 
   return (
-    <div className="relative h-dvh w-full overflow-hidden">
+    <div className="relative h-dvh w-full overflow-hidden bg-gradient-to-b from-sky-300 via-sky-100 to-lime-200">
+      {/* drifting clouds in the sky band above/around the farm */}
+      <div className="pointer-events-none absolute left-[8%] top-[6%] h-10 w-28 rounded-full bg-white/80 blur-[1px]" />
+      <div className="pointer-events-none absolute right-[14%] top-[12%] h-8 w-20 rounded-full bg-white/70 blur-[1px]" />
+      <div className="pointer-events-none absolute left-[38%] top-[3%] h-7 w-24 rounded-full bg-white/60 blur-[1px]" />
+
       <Farmyard
         spawnAt={spawnAt}
         badges={{ barn: !allChoresDone, nest: pendingHatch != null }}

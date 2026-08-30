@@ -1,14 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import type { CreatureParams } from '@/contracts'
+import type { AnimalKind, CreatureParams } from '@/contracts'
 import { COLD_START_CREATURE_FAMILY } from '@/contracts'
 import { ALL_CREATURE_PARAMS, defaultCreatureParams } from './definitions'
 
-const BODY: CreatureParams['bodyShape'][] = ['round', 'tall', 'wide', 'lumpy']
-const EAR: CreatureParams['earType'][] = ['none', 'pointy', 'floppy', 'round', 'antenna']
+const KINDS: AnimalKind[] = [
+  'chick', 'duckling', 'bunny', 'lamb', 'piglet', 'kitten',
+  'puppy', 'foal', 'fawn', 'calf', 'gosling', 'kid',
+]
 const EYE: CreatureParams['eyeStyle'][] = ['big', 'sleepy', 'sparkly', 'wide']
-const PAT: CreatureParams['pattern'][] = ['none', 'spots', 'stripes', 'star']
-const TAIL: CreatureParams['tail'][] = ['none', 'puff', 'long', 'curl']
-
 const FAMILIES = Array.from({ length: 12 }, (_, i) => i + 1)
 
 describe('creature definitions', () => {
@@ -21,14 +20,16 @@ describe('creature definitions', () => {
   it('produces a valid, complete param set for every family', () => {
     for (const f of FAMILIES) {
       const p = defaultCreatureParams(f)
-      expect(BODY).toContain(p.bodyShape)
-      expect(EAR).toContain(p.earType)
+      expect(KINDS).toContain(p.animal)
       expect(EYE).toContain(p.eyeStyle)
-      expect(PAT).toContain(p.pattern)
-      expect(TAIL).toContain(p.tail)
       expect(p.palette).toHaveLength(3)
       for (const c of p.palette) expect(typeof c).toBe('string')
     }
+  })
+
+  it('gives every family a distinct animal', () => {
+    const animals = FAMILIES.map((f) => defaultCreatureParams(f).animal)
+    expect(new Set(animals).size).toBe(12)
   })
 
   it('makes every family visually distinct', () => {
@@ -36,24 +37,19 @@ describe('creature definitions', () => {
     expect(seen.size).toBe(12)
   })
 
-  it('varies each visual axis across the set (no single-value axis)', () => {
-    const axis = (key: keyof CreatureParams) =>
-      new Set(FAMILIES.map((f) => JSON.stringify(defaultCreatureParams(f)[key])))
-    expect(axis('bodyShape').size).toBeGreaterThan(2)
-    expect(axis('earType').size).toBeGreaterThan(2)
-    expect(axis('eyeStyle').size).toBeGreaterThan(2)
-    expect(axis('pattern').size).toBeGreaterThan(2)
-    expect(axis('tail').size).toBeGreaterThan(2)
-  })
-
-  it('gives the cold-start gift family a friendly, patterned look', () => {
+  it('gives the cold-start gift family a friendly calf', () => {
     const gift = defaultCreatureParams(COLD_START_CREATURE_FAMILY)
-    expect(gift.pattern).not.toBe('none')
+    expect(gift.animal).toBe('calf')
     expect(gift.eyeStyle).toBe('big')
     expect(ALL_CREATURE_PARAMS[COLD_START_CREATURE_FAMILY]).toEqual(gift)
   })
 
   it('exposes all 12 in ALL_CREATURE_PARAMS', () => {
     expect(Object.keys(ALL_CREATURE_PARAMS).map(Number).sort((a, b) => a - b)).toEqual(FAMILIES)
+  })
+
+  it('resolves a deterministic animal for families outside 1..12', () => {
+    expect(defaultCreatureParams(99)).toEqual(defaultCreatureParams(99))
+    expect(KINDS).toContain(defaultCreatureParams(99).animal)
   })
 })

@@ -37,7 +37,7 @@ function Screens() {
 export function App() {
   return (
     <GameProvider>
-      <div className="min-h-dvh bg-[#f3efe4] text-stone-800">
+      <div className="min-h-dvh bg-[#fbf4e6] text-stone-800 [background-image:radial-gradient(circle_at_50%_-10%,#fff8ec,transparent_55%)]">
         <Screens />
       </div>
     </GameProvider>

@@ -29,9 +29,10 @@ function assertClean(svg: SVGElement, size: number) {
       if (raw == null || raw.endsWith('%')) continue
       const v = Number(raw)
       expect(Number.isFinite(v), `${el.tagName}.${attr}=${raw}`).toBe(true)
-      // viewBox is 0..100; allow a small margin for stroke width / clamps.
-      expect(v, `${el.tagName}.${attr}=${raw}`).toBeGreaterThan(-10)
-      expect(v, `${el.tagName}.${attr}=${raw}`).toBeLessThan(110)
+      // ears / horns are drawn in local (translated) coords, so allow a generous
+      // margin — the real guard here is "finite, not NaN/undefined".
+      expect(v, `${el.tagName}.${attr}=${raw}`).toBeGreaterThan(-50)
+      expect(v, `${el.tagName}.${attr}=${raw}`).toBeLessThan(150)
     }
     const d = el.getAttribute('d')
     if (d) {
