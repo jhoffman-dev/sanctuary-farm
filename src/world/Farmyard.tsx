@@ -79,6 +79,11 @@ function slide(map: Tilemap, from: Vec2, nx: number, ny: number): Vec2 {
   return from
 }
 
+/** The hotspot occupying a given tile, if any. */
+function hotspotAt(map: Tilemap, tile: Vec2): HotspotId | null {
+  return map.hotspots.find((h) => h.tile.x === tile.x && h.tile.y === tile.y)?.id ?? null
+}
+
 export function Farmyard({ map = tilemap, onHotspot, badges, debug }: Props) {
   const start = tileCentre(map.playerStart)
 
@@ -88,7 +93,10 @@ export function Farmyard({ map = tilemap, onHotspot, badges, debug }: Props) {
   const pathRef = useRef<Vec2[]>([])
   const keysRef = useRef<Set<string>>(new Set())
   const facingRef = useRef<CharacterFacing>('down')
-  const occupiedRef = useRef<HotspotId | null>(null)
+  // If the player spawns on a hotspot tile (the farmhouse door often is one),
+  // treat it as already "occupied" so we don't fire onHotspot for simply
+  // standing there — it only fires when she *walks onto* it (see loop below).
+  const occupiedRef = useRef<HotspotId | null>(hotspotAt(map, map.playerStart))
   const camRef = useRef<Vec2>(initialCam)
   const viewportRef = useRef({ w: MAP_PX_W, h: MAP_PX_H })
   const onHotspotRef = useRef(onHotspot)
@@ -120,7 +128,7 @@ export function Farmyard({ map = tilemap, onHotspot, badges, debug }: Props) {
     const s = tileCentre(map.playerStart)
     posRef.current = s
     pathRef.current = []
-    occupiedRef.current = null
+    occupiedRef.current = hotspotAt(map, map.playerStart)
     facingRef.current = 'down'
     if (!mountedRef.current) {
       mountedRef.current = true
