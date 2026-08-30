@@ -125,22 +125,46 @@ function Pond({ x, y, w, h }: { x: number; y: number; w: number; h: number }) {
   )
 }
 
+const POST = '#7d5c3f'
+const RAIL_HI = '#cfa070'
+const RAIL_LO = '#b1855c'
+
+/** A post-and-rail fence segment running east–west (rails horizontal). */
+function fenceEW(key: string, cx: number, cy: number) {
+  return (
+    <g key={key} transform={`translate(${cx} ${cy})`}>
+      <rect x={-3} y={-16} width={6} height={26} rx={2} fill={POST} />
+      <rect x={T / 2 - 3} y={-16} width={6} height={26} rx={2} fill={POST} />
+      <rect x={-T / 2} y={-12} width={T + 6} height={5} rx={2} fill={RAIL_HI} />
+      <rect x={-T / 2} y={-3} width={T + 6} height={5} rx={2} fill={RAIL_LO} />
+    </g>
+  )
+}
+
+/** A post-and-rail fence segment running north–south (rails vertical). */
+function fenceNS(key: string, cx: number, cy: number) {
+  return (
+    <g key={key} transform={`translate(${cx} ${cy})`}>
+      <rect x={-16} y={-3} width={26} height={6} rx={2} fill={POST} />
+      <rect x={-16} y={T / 2 - 3} width={26} height={6} rx={2} fill={POST} />
+      <rect x={-12} y={-T / 2} width={5} height={T + 6} rx={2} fill={RAIL_HI} />
+      <rect x={-3} y={-T / 2} width={5} height={T + 6} rx={2} fill={RAIL_LO} />
+    </g>
+  )
+}
+
 function fenceRailsFor(map: Tilemap) {
   const rails: ReactNode[] = []
-  for (let y = 0; y < map.height; y++) {
-    for (let x = 0; x < map.width; x++) {
-      if (map.at(x, y) !== 'fence') continue
-      // skip the outer border — it reads as the frame
-      if (x === 0 || y === 0 || x === map.width - 1 || y === map.height - 1) continue
+  const isFence = (x: number, y: number) => map.at(x, y) === 'fence'
+  for (let y = 1; y < map.height - 1; y++) {
+    for (let x = 1; x < map.width - 1; x++) {
+      if (!isFence(x, y)) continue
       const cx = px(x) + T / 2
       const cy = px(y) + T / 2
+      // Orient by how the run continues. Vertical run → vertical rails.
+      const vertical = (isFence(x, y - 1) || isFence(x, y + 1)) && !(isFence(x - 1, y) || isFence(x + 1, y))
       rails.push(
-        <g key={`fn${x}-${y}`} transform={`translate(${cx} ${cy})`}>
-          <rect x={-T / 2} y={-3} width={T} height={6} rx={2} fill="#b98a5a" />
-          <rect x={-T / 2} y={-13} width={T} height={6} rx={2} fill="#cfa070" />
-          <rect x={-T / 2 - 2} y={-16} width={6} height={26} rx={2} fill="#8d6e63" />
-          <rect x={T / 2 - 4} y={-16} width={6} height={26} rx={2} fill="#8d6e63" />
-        </g>,
+        vertical ? fenceNS(`fn${x}-${y}`, cx, cy) : fenceEW(`fn${x}-${y}`, cx, cy),
       )
     }
   }

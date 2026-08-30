@@ -285,7 +285,6 @@ describe('nextInFamily — egg practice can drive a family to mastery', () => {
 
   it('only serves facts from the requested family', () => {
     const state = initialSchedulerState()
-    // introduce just two of the 3s
     setFact(state, '2x3', { box: 1 })
     setFact(state, '3x2', { box: 1 })
     const s = createScheduler(state, { rng: createRng(1) })
@@ -294,6 +293,20 @@ describe('nextInFamily — egg practice can drive a family to mastery', () => {
       expect(f.family).toBe(FAMILY)
       s.grade(f.id, f.answer, 1200)
     }
+  })
+
+  it('a single round has variety — several distinct facts, never twice in a row', () => {
+    const state = initialSchedulerState()
+    setFact(state, '1x3', { box: 1 })
+    const s = createScheduler(state, { rng: createRng(3) })
+    const round: string[] = []
+    for (let q = 0; q < 5; q++) {
+      const f = s.nextInFamily(FAMILY)
+      round.push(f.id)
+      s.grade(f.id, f.answer, 900)
+    }
+    expect(new Set(round).size).toBeGreaterThanOrEqual(3)
+    for (let i = 1; i < round.length; i++) expect(round[i]).not.toBe(round[i - 1])
   })
 
   it('introduces the rest of the family once the known ones are mastered, then hatches', () => {

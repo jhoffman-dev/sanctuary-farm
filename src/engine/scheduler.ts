@@ -371,6 +371,9 @@ export function createScheduler(
     return serve(mostOverdue(pool))
   }
 
+  /** How many of a family's facts to keep in active rotation during egg practice. */
+  const EGG_ROTATION = 4
+
   function nextInFamily(family: number): Fact {
     const famFacts = ALL_FACTS.filter((f) => f.family === family && inRange(f))
     if (famFacts.length === 0) return next()
@@ -386,24 +389,27 @@ export function createScheduler(
       return rollingMean(fb.recentLatencies ?? []) - rollingMean(fa.recentLatencies ?? [])
     }
 
-    const introduced = famFacts.filter((f) => st(f.id)?.introduced)
-    // Introduced facts that still need work (not yet mastered).
-    const needsWork = introduced.filter((f) => !isFactMastered(state.facts[f.id]))
-    if (needsWork.length > 0) return serve([...needsWork].sort(byNeed)[0])
+    const unintroducedSorted = () =>
+      famFacts.filter((f) => !st(f.id)?.introduced).sort((a, b) => a.a - b.a || a.b - b.b)
 
-    // Every introduced fact in the family is mastered — introduce a new one so
-    // the family can actually be completed and the egg can hatch. (Practising an
-    // egg is a deliberate choice to drive that family to mastery.)
-    const unintroduced = famFacts
-      .filter((f) => !st(f.id)?.introduced)
-      .sort((a, b) => a.a - b.a || a.b - b.b)
-    if (unintroduced.length > 0) {
-      doIntroduce(unintroduced[0])
-      return serve(unintroduced[0])
+    // Practising an egg is a deliberate push to hatch that family. Keep a handful
+    // of its facts in rotation (introducing new ones as needed) so a round has
+    // variety AND the family can be driven all the way to mastery.
+    const needsWork = () =>
+      famFacts.filter((f) => st(f.id)?.introduced && !isFactMastered(state.facts[f.id]))
+
+    if (needsWork().length < EGG_ROTATION) {
+      const toIntro = unintroducedSorted()[0]
+      if (toIntro) doIntroduce(toIntro)
     }
 
-    // All introduced and mastered — keep the least-recently-seen one sharp.
-    return serve([...famFacts].sort((a, b) => gc - state.facts[b.id].dueAt - (gc - state.facts[a.id].dueAt))[0])
+    const work = needsWork()
+    const pool = work.length > 0 ? work : famFacts.filter((f) => st(f.id)?.introduced)
+    if (pool.length === 0) return serve(famFacts[0])
+
+    // Don't serve the fact we just served twice in a row.
+    const fresh = pool.length > 1 ? pool.filter((f) => f.id !== lastServed.id) : pool
+    return serve([...(fresh.length > 0 ? fresh : pool)].sort(byNeed)[0])
   }
 
   return {

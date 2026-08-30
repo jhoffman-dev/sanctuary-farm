@@ -255,11 +255,14 @@ export function Farmyard({ map = tilemap, onHotspot, badges, debug, spawnAt }: P
         pathLen: pathRef.current.length,
       }
 
-      // Hotspot: fire once on full arrival, re-arm after leaving the tile.
+      // Hotspot: fire once she has actually *arrived* on it — not while merely
+      // passing over it on the way somewhere else (pathRef still has waypoints).
+      // Re-arms after she leaves the tile.
       const tile = pxToTile(p)
       const hs = map.hotspots.find((h) => h.tile.x === tile.x && h.tile.y === tile.y)
       if (hs) {
-        if (occupiedRef.current !== hs.id) {
+        const arrived = pathRef.current.length === 0
+        if (occupiedRef.current !== hs.id && arrived) {
           occupiedRef.current = hs.id
           onHotspotRef.current(hs.id)
         }
