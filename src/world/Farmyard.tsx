@@ -356,8 +356,9 @@ export function Farmyard({ map = tilemap, onHotspot, badges, debug, spawnAt }: P
           )
         })}
 
-        <g transform={`translate(${pos.x - TILE_PX / 2} ${pos.y - TILE_PX + 6})`}>
-          <Character facing={facing} moving={moving} />
+        {/* the keeper — drawn at 2× tile size, feet anchored just below the tile centre */}
+        <g transform={`translate(${pos.x - TILE_PX} ${pos.y - TILE_PX * 2 + 14})`}>
+          <Character facing={facing} moving={moving} size={TILE_PX * 2} />
         </g>
       </svg>
 

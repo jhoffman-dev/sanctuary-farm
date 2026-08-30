@@ -1,6 +1,5 @@
-// Twelve baby farm animals, one per multiplication family. Chibi storybook look:
-// big round head, tiny body, warm palette. Family 10 (Tenner) is the cold-start
-// gift — a friendly butter-yellow calf.
+// Twelve farm animals, one per multiplication family. Storybook look, warm
+// palette. Family 10 (Tenner) is the cold-start gift — a friendly cow.
 import type { AnimalKind, CreatureParams, DefaultCreatureParams } from '@/contracts'
 import { createRng } from '@/contracts'
 
@@ -8,23 +7,22 @@ type Def = { animal: AnimalKind; palette: [string, string, string]; eyeStyle: Cr
 
 export const HAND_TUNED_CREATURE_PARAMS: Readonly<Record<number, Def>> = {
   1: { animal: 'chick', palette: ['#FFD54F', '#FFF3C4', '#C98A2E'], eyeStyle: 'big' },
-  2: { animal: 'duckling', palette: ['#FFE082', '#FFF8E1', '#E0912F'], eyeStyle: 'sparkly' },
-  3: { animal: 'bunny', palette: ['#D7CCC8', '#FBEFEA', '#7C6A63'], eyeStyle: 'wide' },
-  4: { animal: 'lamb', palette: ['#F5F0E6', '#FFFFFF', '#8D7B66'], eyeStyle: 'big' },
-  5: { animal: 'piglet', palette: ['#F8BBD0', '#FCE4EC', '#C2185B'], eyeStyle: 'sparkly' },
-  6: { animal: 'kitten', palette: ['#FFCC80', '#FFF3E0', '#8D5524'], eyeStyle: 'sleepy' },
-  7: { animal: 'puppy', palette: ['#BCAAA4', '#EFEBE9', '#5D4037'], eyeStyle: 'big' },
-  8: { animal: 'foal', palette: ['#A1887F', '#D7CCC8', '#4E342E'], eyeStyle: 'wide' },
-  9: { animal: 'fawn', palette: ['#D2A679', '#F0E0CC', '#6D4C33'], eyeStyle: 'sparkly' },
-  10: { animal: 'calf', palette: ['#FFE0A3', '#FFF6E5', '#8D6E3A'], eyeStyle: 'big' },
-  11: { animal: 'gosling', palette: ['#DCE775', '#F9FBE7', '#827717'], eyeStyle: 'wide' },
-  12: { animal: 'kid', palette: ['#B0BEC5', '#ECEFF1', '#455A64'], eyeStyle: 'sleepy' },
+  2: { animal: 'duck', palette: ['#FFE082', '#FFF8E1', '#E0912F'], eyeStyle: 'sparkly' },
+  3: { animal: 'rabbit', palette: ['#D7CCC8', '#FBEFEA', '#7C6A63'], eyeStyle: 'wide' },
+  4: { animal: 'sheep', palette: ['#8D7B66', '#F5F0E6', '#4E4033'], eyeStyle: 'big' },
+  5: { animal: 'pig', palette: ['#F4A7C0', '#FCE4EC', '#B23A69'], eyeStyle: 'sparkly' },
+  6: { animal: 'cat', palette: ['#FFB74D', '#FFF3E0', '#7A4A24'], eyeStyle: 'sleepy' },
+  7: { animal: 'dog', palette: ['#BCAAA4', '#EFEBE9', '#5D4037'], eyeStyle: 'big' },
+  8: { animal: 'horse', palette: ['#A1887F', '#D7CCC8', '#4E342E'], eyeStyle: 'wide' },
+  9: { animal: 'goat', palette: ['#CFC3B4', '#F0EAE0', '#5F5343'], eyeStyle: 'sparkly' },
+  10: { animal: 'cow', palette: ['#F5E7C8', '#FFFBF0', '#6E5C3A'], eyeStyle: 'big' },
+  11: { animal: 'goose', palette: ['#ECEFF1', '#FFFFFF', '#78909C'], eyeStyle: 'wide' },
+  12: { animal: 'donkey', palette: ['#B0A79A', '#E8E3DA', '#4B4438'], eyeStyle: 'sleepy' },
 }
 
-// Fixed order so a family outside 1..12 still resolves deterministically.
 const KINDS: AnimalKind[] = [
-  'chick', 'duckling', 'bunny', 'lamb', 'piglet', 'kitten',
-  'puppy', 'foal', 'fawn', 'calf', 'gosling', 'kid',
+  'chick', 'duck', 'rabbit', 'sheep', 'pig', 'cat',
+  'dog', 'horse', 'goat', 'cow', 'goose', 'donkey',
 ]
 const EYES: CreatureParams['eyeStyle'][] = ['big', 'sleepy', 'sparkly', 'wide']
 
@@ -36,9 +34,9 @@ export const defaultCreatureParams: DefaultCreatureParams = (family) => {
   return {
     animal: KINDS[Math.floor(r() * KINDS.length)],
     palette: [
-      `hsl(${hue} 70% 72%)`,
-      `hsl(${hue} 60% 92%)`,
-      `hsl(${hue} 45% 32%)`,
+      `hsl(${hue} 55% 70%)`,
+      `hsl(${hue} 45% 92%)`,
+      `hsl(${hue} 40% 30%)`,
     ],
     eyeStyle: EYES[Math.floor(r() * EYES.length)],
   }

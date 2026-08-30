@@ -55,6 +55,6 @@ describe('BarnInterior', () => {
         onSelectStall={() => {}}
       />,
     )
-    expect(screen.getByLabelText('needs feeding')).toBeInTheDocument()
+    expect(screen.getByLabelText('needs care')).toBeInTheDocument()
   })
 })

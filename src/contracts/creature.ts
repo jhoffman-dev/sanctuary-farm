@@ -3,20 +3,20 @@
 
 import type { ReactNode } from 'react'
 
-/** The baby animal a family hatches into. */
+/** The farm animal a family hatches into. */
 export type AnimalKind =
   | 'chick'
-  | 'duckling'
-  | 'bunny'
-  | 'lamb'
-  | 'piglet'
-  | 'kitten'
-  | 'puppy'
-  | 'foal'
-  | 'fawn'
-  | 'calf'
-  | 'gosling'
-  | 'kid'
+  | 'duck'
+  | 'rabbit'
+  | 'sheep'
+  | 'pig'
+  | 'cat'
+  | 'dog'
+  | 'horse'
+  | 'goat'
+  | 'cow'
+  | 'goose'
+  | 'donkey'
 
 export type CreatureParams = {
   animal: AnimalKind

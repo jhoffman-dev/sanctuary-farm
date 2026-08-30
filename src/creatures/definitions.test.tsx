@@ -4,8 +4,8 @@ import { COLD_START_CREATURE_FAMILY } from '@/contracts'
 import { ALL_CREATURE_PARAMS, defaultCreatureParams } from './definitions'
 
 const KINDS: AnimalKind[] = [
-  'chick', 'duckling', 'bunny', 'lamb', 'piglet', 'kitten',
-  'puppy', 'foal', 'fawn', 'calf', 'gosling', 'kid',
+  'chick', 'duck', 'rabbit', 'sheep', 'pig', 'cat',
+  'dog', 'horse', 'goat', 'cow', 'goose', 'donkey',
 ]
 const EYE: CreatureParams['eyeStyle'][] = ['big', 'sleepy', 'sparkly', 'wide']
 const FAMILIES = Array.from({ length: 12 }, (_, i) => i + 1)
@@ -37,9 +37,9 @@ describe('creature definitions', () => {
     expect(seen.size).toBe(12)
   })
 
-  it('gives the cold-start gift family a friendly calf', () => {
+  it('gives the cold-start gift family a friendly cow', () => {
     const gift = defaultCreatureParams(COLD_START_CREATURE_FAMILY)
-    expect(gift.animal).toBe('calf')
+    expect(gift.animal).toBe('cow')
     expect(gift.eyeStyle).toBe('big')
     expect(ALL_CREATURE_PARAMS[COLD_START_CREATURE_FAMILY]).toEqual(gift)
   })

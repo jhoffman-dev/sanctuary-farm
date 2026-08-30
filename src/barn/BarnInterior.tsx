@@ -1,23 +1,30 @@
 // Side-on view of the barn: two facing rows of stalls with an aisle between
 // them. One creature per hatched family; empty stalls stay visible as future
-// space. `badges[stallIndex]` raises a soft "needs feeding" indicator above
-// that stall. Tapping an occupied stall calls `onSelectStall`.
-import { HEALTH_HAPPY_AT, HEALTH_SAD_AT, type HatchedCreature } from '@/contracts'
+// space. Each occupied stall shows a health bar so it's clear at a glance which
+// animal needs attention. `badges[stallIndex]` raises a "needs care" indicator.
+import { HEALTH_HAPPY_AT, HEALTH_MAX, HEALTH_SAD_AT, type HatchedCreature } from '@/contracts'
 import { CreatureSVG } from '@/creatures/CreatureSVG'
 
 export type BarnInteriorProps = {
   creatures: HatchedCreature[]
   totalStalls?: number
   badges?: Record<number, boolean> // stallIndex -> chores outstanding
-  /** stallIndex -> 0..100 health, for a small dot on the stall */
+  /** stallIndex -> 0..100 health, shown as a bar on the stall front */
   health?: Record<number, number>
   onSelectStall: (stallIndex: number) => void
 }
 
-function healthDot(h: number | undefined) {
+function StallHealthBar({ h }: { h: number | undefined }) {
   if (h == null) return null
+  const pct = Math.max(0, Math.min(100, (h / HEALTH_MAX) * 100))
   const c = h < HEALTH_SAD_AT ? '#ef5350' : h < HEALTH_HAPPY_AT ? '#ffb74d' : '#66bb6a'
-  return <span className="mt-0.5 inline-block h-2 w-2 rounded-full" style={{ background: c }} aria-hidden />
+  return (
+    <div className="mt-1 w-full px-1" aria-label={`health ${Math.round(h)} of ${HEALTH_MAX}`}>
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/15">
+        <div className="h-full rounded-full" style={{ width: `${pct}%`, background: c }} />
+      </div>
+    </div>
+  )
 }
 
 function Stall({
@@ -34,14 +41,14 @@ function Stall({
   onSelect: (i: number) => void
 }) {
   const common =
-    'relative flex h-32 w-full flex-col items-center justify-end rounded-b-md border-x-4 border-b-4 border-amber-900/50 bg-gradient-to-b px-1 pb-1'
+    'relative flex h-36 w-full flex-col items-center justify-end rounded-b-md border-x-4 border-b-4 border-amber-900/50 bg-gradient-to-b px-1 pb-1.5'
 
   return (
     <div className="relative flex flex-col items-center">
       {badge ? (
         <span
           data-part="badge"
-          aria-label="needs feeding"
+          aria-label="needs care"
           className="absolute -top-3 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-amber-300 text-amber-900 shadow ring-2 ring-amber-100"
         >
           ●
@@ -56,11 +63,11 @@ function Stall({
           onClick={() => onSelect(index)}
           className={`${common} cursor-pointer from-amber-50 to-amber-200 hover:to-amber-300`}
         >
-          <CreatureSVG params={creature.params} mood="idle" size={72} title={creature.name} />
+          <CreatureSVG params={creature.params} mood="idle" size={68} title={creature.name} />
           <span className="max-w-full truncate text-[11px] font-semibold text-amber-950">
             {creature.name}
           </span>
-          {healthDot(health)}
+          <StallHealthBar h={health} />
         </button>
       ) : (
         <div

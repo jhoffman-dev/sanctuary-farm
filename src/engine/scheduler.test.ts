@@ -278,3 +278,41 @@ describe('snapshot', () => {
     expect(() => createScheduler(snap, { rng: createRng(1) }).next()).not.toThrow()
   })
 })
+
+describe('nextInFamily — egg practice can drive a family to mastery', () => {
+  const FAMILY = 3
+  const famIds = ALL_FACTS.filter((f) => f.family === FAMILY).map((f) => f.id)
+
+  it('only serves facts from the requested family', () => {
+    const state = initialSchedulerState()
+    // introduce just two of the 3s
+    setFact(state, '2x3', { box: 1 })
+    setFact(state, '3x2', { box: 1 })
+    const s = createScheduler(state, { rng: createRng(1) })
+    for (let i = 0; i < 30; i++) {
+      const f = s.nextInFamily(FAMILY)
+      expect(f.family).toBe(FAMILY)
+      s.grade(f.id, f.answer, 1200)
+    }
+  })
+
+  it('introduces the rest of the family once the known ones are mastered, then hatches', () => {
+    const state = initialSchedulerState()
+    setFact(state, '1x3', { box: 1 })
+    const s = createScheduler(state, { rng: createRng(7) })
+
+    let mastered = false
+    for (let i = 0; i < 400 && !mastered; i++) {
+      const f = s.nextInFamily(FAMILY)
+      const r = s.grade(f.id, f.answer, 900) // always fast + correct
+      if (r.familyJustMastered === FAMILY) mastered = true
+    }
+
+    expect(mastered).toBe(true)
+    expect(s.isMastered(FAMILY)).toBe(true)
+    // every fact in the family ended up introduced
+    const snap = s.snapshot()
+    for (const id of famIds) expect(snap.facts[id].introduced).toBe(true)
+    expect(s.familyProgress(FAMILY)).toBe(1)
+  })
+})

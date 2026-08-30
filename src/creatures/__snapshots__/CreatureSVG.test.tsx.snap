@@ -13,126 +13,114 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-1 1`]
 >
   <ellipse
     cx="50"
-    cy="92"
+    cy="93"
     fill="#00000018"
-    rx="26"
-    ry="6"
+    rx="25"
+    ry="5.5"
   />
   <g
     transform="translate(0 0)"
   >
     <path
-      d="M65 76 q10 2 8 10 q-5 2 -9 -2 Z"
+      d="M66 78 q12 -3 9 8 q-4 5 -8 1 Z"
       fill="#FFF3C4"
     />
-    <ellipse
-      cx="40"
-      cy="90"
-      fill="#FFD54F"
-      rx="7"
-      ry="5"
-    />
-    <ellipse
-      cx="60"
-      cy="90"
-      fill="#FFD54F"
-      rx="7"
-      ry="5"
-    />
-    <ellipse
-      cx="50"
-      cy="76"
-      fill="#FFD54F"
-      rx="19"
-      ry="15"
-    />
-    <ellipse
-      cx="50"
-      cy="79"
-      fill="#FFF3C4"
-      rx="11.78"
-      ry="9.3"
-    />
-    <circle
-      cx="50"
-      cy="43"
-      fill="#FFD54F"
-      r="27"
-    />
-    <ellipse
-      cx="50"
-      cy="52"
-      fill="#FFF3C4"
-      opacity="0.55"
-      rx="19.439999999999998"
-      ry="16.74"
-    />
-    <g
-      transform="translate(50 16)"
-    >
-      <path
-        d="M-5 4 Q-6 -8 -1 -3 Q0 -12 4 -3 Q9 -9 6 4 Z"
-        fill="#C98A2E"
-        opacity="0.85"
-      />
-    </g>
     <ellipse
       cx="38"
-      cy="52"
-      fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      cy="90"
+      fill="#FFD54F"
+      rx="7"
+      ry="5"
     />
     <ellipse
       cx="62"
+      cy="90"
+      fill="#FFD54F"
+      rx="7"
+      ry="5"
+    />
+    <ellipse
+      cx="50"
+      cy="78"
+      fill="#FFD54F"
+      rx="20"
+      ry="14"
+    />
+    <ellipse
+      cx="50"
+      cy="81"
+      fill="#FFF3C4"
+      rx="12"
+      ry="8.68"
+    />
+    <circle
+      cx="50"
+      cy="44"
+      fill="#FFD54F"
+      r="26"
+    />
+    <path
+      d="M45 22 q-1 -8 4 -5 q1 -8 4 -2 q6 -5 5 5"
+      fill="#C98A2E"
+      opacity="0.8"
+    />
+    <ellipse
+      cx="39"
       cy="52"
       fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
+    />
+    <ellipse
+      cx="61"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
     />
     <g
       data-eyes="big"
       data-part="eyes"
     >
       <g
-        transform="translate(40 45) "
+        transform="translate(40.5 45) "
       >
         <ellipse
           fill="#C98A2E"
-          rx="4.2"
-          ry="4.2"
+          rx="4"
+          ry="4"
         />
         <circle
-          cx="-1.6800000000000002"
-          cy="-1.6800000000000002"
+          cx="-1.6"
+          cy="-1.6"
           fill="#fff"
-          r="1.6800000000000002"
+          r="1.6"
         />
       </g>
       <g
-        transform="translate(60 45) "
+        transform="translate(59.5 45) "
       >
         <ellipse
           fill="#C98A2E"
-          rx="4.2"
-          ry="4.2"
+          rx="4"
+          ry="4"
         />
         <circle
-          cx="-1.6800000000000002"
-          cy="-1.6800000000000002"
+          cx="-1.6"
+          cy="-1.6"
           fill="#fff"
-          r="1.6800000000000002"
+          r="1.6"
         />
       </g>
     </g>
     <path
-      d="M44 50 L56 50 L50 58 Z"
+      d="M44 53 L56 53 L50 62 Z"
       fill="#F5A623"
     />
     <path
-      d="M46.5 58 q3.5 3.5 7 0"
+      d="M46.5 56 q3.5 3.5 7 0"
       data-part="mouth-idle"
       fill="none"
       stroke="#C98A2E"
@@ -145,8 +133,8 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-1 1`]
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-2 1`] = `
 <svg
-  aria-label="duckling"
-  data-animal="duckling"
+  aria-label="duck"
+  data-animal="duck"
   data-mood="idle"
   data-testid="creature"
   height="200"
@@ -156,117 +144,124 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-2 1`]
 >
   <ellipse
     cx="50"
-    cy="92"
+    cy="93"
     fill="#00000018"
-    rx="26"
-    ry="6"
+    rx="25"
+    ry="5.5"
   />
   <g
     transform="translate(0 0)"
   >
     <path
-      d="M65 76 q10 2 8 10 q-5 2 -9 -2 Z"
-      fill="#FFF8E1"
-    />
-    <ellipse
-      cx="40"
-      cy="90"
-      fill="#FFE082"
-      rx="7"
-      ry="5"
-    />
-    <ellipse
-      cx="60"
-      cy="90"
-      fill="#FFE082"
-      rx="7"
-      ry="5"
-    />
-    <ellipse
-      cx="50"
-      cy="76"
-      fill="#FFE082"
-      rx="19"
-      ry="15"
-    />
-    <ellipse
-      cx="50"
-      cy="79"
-      fill="#FFF8E1"
-      rx="11.78"
-      ry="9.3"
-    />
-    <circle
-      cx="50"
-      cy="43"
-      fill="#FFE082"
-      r="27"
-    />
-    <ellipse
-      cx="50"
-      cy="52"
-      fill="#FFF8E1"
-      opacity="0.55"
-      rx="19.439999999999998"
-      ry="16.74"
+      d="M64 75 q14 0 12 -12"
+      fill="none"
+      stroke="#FFE082"
+      stroke-linecap="round"
+      stroke-width="7"
     />
     <ellipse
       cx="38"
-      cy="52"
-      fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      cy="90"
+      fill="#FFE082"
+      rx="7"
+      ry="5"
     />
     <ellipse
       cx="62"
+      cy="90"
+      fill="#FFE082"
+      rx="7"
+      ry="5"
+    />
+    <ellipse
+      cx="50"
+      cy="78"
+      fill="#FFE082"
+      rx="20"
+      ry="14"
+    />
+    <ellipse
+      cx="50"
+      cy="81"
+      fill="#FFF8E1"
+      rx="12"
+      ry="8.68"
+    />
+    <circle
+      cx="50"
+      cy="44"
+      fill="#FFE082"
+      r="26"
+    />
+    <ellipse
+      cx="39"
       cy="52"
       fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
+    />
+    <ellipse
+      cx="61"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
     />
     <g
       data-eyes="sparkly"
       data-part="eyes"
     >
       <g
-        transform="translate(40 45) "
+        transform="translate(40.5 45) "
       >
         <ellipse
           fill="#E0912F"
-          rx="4.2"
-          ry="4.2"
+          rx="4"
+          ry="4"
         />
         <circle
-          cx="-1.6800000000000002"
-          cy="-1.6800000000000002"
+          cx="-1.6"
+          cy="-1.6"
           fill="#fff"
-          r="1.6800000000000002"
+          r="1.6"
         />
       </g>
       <g
-        transform="translate(60 45) "
+        transform="translate(59.5 45) "
       >
         <ellipse
           fill="#E0912F"
-          rx="4.2"
-          ry="4.2"
+          rx="4"
+          ry="4"
         />
         <circle
-          cx="-1.6800000000000002"
-          cy="-1.6800000000000002"
+          cx="-1.6"
+          cy="-1.6"
           fill="#fff"
-          r="1.6800000000000002"
+          r="1.6"
         />
       </g>
     </g>
+    <g>
+      <ellipse
+        cx="50"
+        cy="56"
+        fill="#F5A623"
+        rx="12"
+        ry="6"
+      />
+      <ellipse
+        cx="50"
+        cy="58"
+        fill="#e0912f"
+        rx="12"
+        ry="4"
+      />
+    </g>
     <path
-      d="M44 50 L56 50 L50 58 Z"
-      fill="#F5A623"
-    />
-    <path
-      d="M46.5 58 q3.5 3.5 7 0"
+      d="M46.5 55 q3.5 3.5 7 0"
       data-part="mouth-idle"
       fill="none"
       stroke="#E0912F"
@@ -279,8 +274,8 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-2 1`]
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-3 1`] = `
 <svg
-  aria-label="bunny"
-  data-animal="bunny"
+  aria-label="rabbit"
+  data-animal="rabbit"
   data-mood="idle"
   data-testid="creature"
   height="200"
@@ -290,161 +285,161 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-3 1`]
 >
   <ellipse
     cx="50"
-    cy="92"
+    cy="93"
     fill="#00000018"
-    rx="26"
-    ry="6"
+    rx="25"
+    ry="5.5"
   />
   <g
     transform="translate(0 0)"
   >
     <circle
-      cx="71"
+      cx="72"
+      cy="80"
+      fill="#FBEFEA"
+      r="7"
+    />
+    <ellipse
+      cx="38"
+      cy="90"
+      fill="#D7CCC8"
+      rx="7"
+      ry="5"
+    />
+    <ellipse
+      cx="62"
+      cy="90"
+      fill="#D7CCC8"
+      rx="7"
+      ry="5"
+    />
+    <ellipse
+      cx="50"
       cy="78"
-      fill="#FBEFEA"
-      r="6"
-    />
-    <ellipse
-      cx="40"
-      cy="90"
       fill="#D7CCC8"
-      rx="7"
-      ry="5"
-    />
-    <ellipse
-      cx="60"
-      cy="90"
-      fill="#D7CCC8"
-      rx="7"
-      ry="5"
+      rx="20"
+      ry="14"
     />
     <ellipse
       cx="50"
-      cy="76"
-      fill="#D7CCC8"
-      rx="19"
-      ry="15"
-    />
-    <ellipse
-      cx="50"
-      cy="79"
+      cy="81"
       fill="#FBEFEA"
-      rx="11.78"
-      ry="9.3"
+      rx="12"
+      ry="8.68"
     />
     <g>
       <g
-        transform="translate(32 23)"
+        transform="translate(43 28)"
       >
         <g
-          transform="rotate(-12)"
+          transform="rotate(-10)"
         >
           <ellipse
             cx="0"
-            cy="-14"
+            cy="-15"
             fill="#D7CCC8"
             rx="6"
-            ry="16"
+            ry="17"
           />
           <ellipse
             cx="0"
-            cy="-14"
+            cy="-15"
             fill="#FBEFEA"
             rx="2.6"
-            ry="11"
+            ry="12"
           />
         </g>
       </g>
       <g
-        transform="translate(68 23)"
+        transform="translate(57 28)"
       >
         <g
-          transform="rotate(12)"
+          transform="rotate(10)"
         >
           <ellipse
             cx="0"
-            cy="-14"
+            cy="-15"
             fill="#D7CCC8"
             rx="6"
-            ry="16"
+            ry="17"
           />
           <ellipse
             cx="0"
-            cy="-14"
+            cy="-15"
             fill="#FBEFEA"
             rx="2.6"
-            ry="11"
+            ry="12"
           />
         </g>
       </g>
     </g>
     <circle
       cx="50"
-      cy="43"
+      cy="44"
       fill="#D7CCC8"
-      r="27"
+      r="26"
     />
     <ellipse
-      cx="50"
-      cy="52"
-      fill="#FBEFEA"
-      opacity="0.55"
-      rx="19.439999999999998"
-      ry="16.74"
-    />
-    <ellipse
-      cx="38"
+      cx="39"
       cy="52"
       fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
     />
     <ellipse
-      cx="62"
+      cx="61"
       cy="52"
       fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
     />
     <g
       data-eyes="wide"
       data-part="eyes"
     >
       <g
-        transform="translate(40 45) "
+        transform="translate(40.5 45) "
       >
         <ellipse
           fill="#7C6A63"
-          rx="5"
-          ry="5"
+          rx="4.8"
+          ry="4.8"
         />
       </g>
       <g
-        transform="translate(60 45) "
+        transform="translate(59.5 45) "
       >
         <ellipse
           fill="#7C6A63"
-          rx="5"
-          ry="5"
+          rx="4.8"
+          ry="4.8"
         />
       </g>
     </g>
+    <g>
+      <path
+        d="M46 52 h8"
+        stroke="#7C6A63"
+        stroke-linecap="round"
+        stroke-width="2"
+      />
+      <path
+        d="M50 52 v3"
+        stroke="#7C6A63"
+        stroke-linecap="round"
+        stroke-width="2"
+      />
+      <path
+        d="M46 58 q4 3 0 6 M54 58 q-4 3 0 6"
+        fill="none"
+        stroke="#fff"
+        stroke-width="2"
+      />
+    </g>
     <path
-      d="M47 52 h6"
-      stroke="#7C6A63"
-      stroke-linecap="round"
-      stroke-width="2"
-    />
-    <path
-      d="M50 52 v3"
-      stroke="#7C6A63"
-      stroke-linecap="round"
-      stroke-width="2"
-    />
-    <path
-      d="M46.5 58 q3.5 3.5 7 0"
+      d="M46.5 54 q3.5 3.5 7 0"
       data-part="mouth-idle"
       fill="none"
       stroke="#7C6A63"
@@ -457,8 +452,8 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-3 1`]
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-4 1`] = `
 <svg
-  aria-label="lamb"
-  data-animal="lamb"
+  aria-label="sheep"
+  data-animal="sheep"
   data-mood="idle"
   data-testid="creature"
   height="200"
@@ -468,176 +463,205 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-4 1`]
 >
   <ellipse
     cx="50"
-    cy="92"
+    cy="93"
     fill="#00000018"
-    rx="26"
-    ry="6"
+    rx="25"
+    ry="5.5"
   />
   <g
     transform="translate(0 0)"
   >
-    <circle
-      cx="71"
-      cy="78"
-      fill="#FFFFFF"
-      r="6"
-    />
-    <ellipse
-      cx="40"
-      cy="90"
-      fill="#F5F0E6"
-      rx="7"
-      ry="5"
-    />
-    <ellipse
-      cx="60"
-      cy="90"
-      fill="#F5F0E6"
-      rx="7"
-      ry="5"
-    />
-    <ellipse
-      cx="50"
-      cy="76"
-      fill="#F5F0E6"
-      rx="19"
-      ry="15"
-    />
-    <ellipse
-      cx="50"
-      cy="79"
-      fill="#FFFFFF"
-      rx="11.78"
-      ry="9.3"
-    />
-    <g>
-      <g
-        transform="translate(32 23)"
-      >
-        <ellipse
-          cx="-3"
-          cy="6"
-          fill="#F5F0E6"
-          rx="7"
-          ry="11"
-        />
-      </g>
-      <g
-        transform="translate(68 23)"
-      >
-        <ellipse
-          cx="3"
-          cy="6"
-          fill="#F5F0E6"
-          rx="7"
-          ry="11"
-        />
-      </g>
-    </g>
-    <circle
-      cx="50"
-      cy="43"
-      fill="#F5F0E6"
-      r="27"
-    />
-    <ellipse
-      cx="50"
-      cy="52"
-      fill="#FFFFFF"
-      opacity="0.55"
-      rx="19.439999999999998"
-      ry="16.74"
-    />
-    <g
-      transform="translate(50 20)"
-    >
-      <path
-        d="M-8 0 Q-14 -8 -8 -12"
-        fill="none"
-        stroke="#8D7B66"
-        stroke-linecap="round"
-        stroke-width="3"
-      />
-      <path
-        d="M8 0 Q14 -8 8 -12"
-        fill="none"
-        stroke="#8D7B66"
-        stroke-linecap="round"
-        stroke-width="3"
-      />
-    </g>
     <ellipse
       cx="38"
-      cy="52"
-      fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      cy="90"
+      fill="#8D7B66"
+      rx="7"
+      ry="5"
     />
     <ellipse
       cx="62"
+      cy="90"
+      fill="#8D7B66"
+      rx="7"
+      ry="5"
+    />
+    <ellipse
+      cx="50"
+      cy="78"
+      fill="#8D7B66"
+      rx="20"
+      ry="14"
+    />
+    <ellipse
+      cx="50"
+      cy="81"
+      fill="#F5F0E6"
+      rx="12"
+      ry="8.68"
+    />
+    <g
+      fill="#F5F0E6"
+    >
+      <circle
+        cx="38"
+        cy="72"
+        r="9"
+      />
+      <circle
+        cx="50"
+        cy="68"
+        r="9"
+      />
+      <circle
+        cx="62"
+        cy="72"
+        r="9"
+      />
+      <circle
+        cx="44"
+        cy="80"
+        r="9"
+      />
+      <circle
+        cx="57"
+        cy="80"
+        r="9"
+      />
+    </g>
+    <g>
+      <g
+        transform="translate(27 42)"
+      >
+        <ellipse
+          cx="-2"
+          cy="2"
+          fill="#4E4033"
+          opacity="0.55"
+          rx="5"
+          ry="3.5"
+        />
+      </g>
+      <g
+        transform="translate(73 42)"
+      >
+        <ellipse
+          cx="2"
+          cy="2"
+          fill="#4E4033"
+          opacity="0.55"
+          rx="5"
+          ry="3.5"
+        />
+      </g>
+    </g>
+    <circle
+      cx="50"
+      cy="44"
+      fill="#8D7B66"
+      r="26"
+    />
+    <g
+      fill="#F5F0E6"
+    >
+      <circle
+        cx="34"
+        cy="26"
+        r="11"
+      />
+      <circle
+        cx="50"
+        cy="22"
+        r="11"
+      />
+      <circle
+        cx="66"
+        cy="26"
+        r="11"
+      />
+      <circle
+        cx="28"
+        cy="38"
+        r="11"
+      />
+      <circle
+        cx="72"
+        cy="38"
+        r="11"
+      />
+      <circle
+        cx="42"
+        cy="20"
+        r="11"
+      />
+      <circle
+        cx="58"
+        cy="20"
+        r="11"
+      />
+    </g>
+    <ellipse
+      cx="39"
       cy="52"
       fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
+    />
+    <ellipse
+      cx="61"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
     />
     <g
       data-eyes="big"
       data-part="eyes"
     >
       <g
-        transform="translate(40 45) "
+        transform="translate(40.5 45) "
       >
         <ellipse
-          fill="#8D7B66"
-          rx="4.2"
-          ry="4.2"
+          fill="#4E4033"
+          rx="4"
+          ry="4"
         />
         <circle
-          cx="-1.6800000000000002"
-          cy="-1.6800000000000002"
+          cx="-1.6"
+          cy="-1.6"
           fill="#fff"
-          r="1.6800000000000002"
+          r="1.6"
         />
       </g>
       <g
-        transform="translate(60 45) "
+        transform="translate(59.5 45) "
       >
         <ellipse
-          fill="#8D7B66"
-          rx="4.2"
-          ry="4.2"
+          fill="#4E4033"
+          rx="4"
+          ry="4"
         />
         <circle
-          cx="-1.6800000000000002"
-          cy="-1.6800000000000002"
+          cx="-1.6"
+          cy="-1.6"
           fill="#fff"
-          r="1.6800000000000002"
+          r="1.6"
         />
       </g>
     </g>
-    <g>
-      <ellipse
-        cx="50"
-        cy="54"
-        fill="#FFFFFF"
-        rx="9"
-        ry="7"
-      />
-      <ellipse
-        cx="50"
-        cy="52"
-        fill="#8D7B66"
-        rx="3"
-        ry="2.4"
-      />
-    </g>
+    <ellipse
+      cx="50"
+      cy="55"
+      fill="#4E4033"
+      rx="3"
+      ry="2.2"
+    />
     <path
-      d="M46.5 58 q3.5 3.5 7 0"
+      d="M46.5 57 q3.5 3.5 7 0"
       data-part="mouth-idle"
       fill="none"
-      stroke="#8D7B66"
+      stroke="#4E4033"
       stroke-linecap="round"
       stroke-width="2.2"
     />
@@ -647,8 +671,8 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-4 1`]
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-5 1`] = `
 <svg
-  aria-label="piglet"
-  data-animal="piglet"
+  aria-label="pig"
+  data-animal="pig"
   data-mood="idle"
   data-testid="creature"
   height="200"
@@ -658,158 +682,153 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-5 1`]
 >
   <ellipse
     cx="50"
-    cy="92"
+    cy="93"
     fill="#00000018"
-    rx="26"
-    ry="6"
+    rx="25"
+    ry="5.5"
   />
   <g
     transform="translate(0 0)"
   >
     <path
-      d="M67 78 q10 -2 6 6 q-3 6 3 5"
+      d="M66 78 q9 -1 6 6 q-3 6 3 5"
       fill="none"
-      stroke="#F8BBD0"
+      opacity="0.6"
+      stroke="#B23A69"
       stroke-linecap="round"
-      stroke-width="3"
+      stroke-width="2.5"
     />
     <ellipse
-      cx="40"
+      cx="38"
       cy="90"
-      fill="#F8BBD0"
+      fill="#F4A7C0"
       rx="7"
       ry="5"
     />
     <ellipse
-      cx="60"
+      cx="62"
       cy="90"
-      fill="#F8BBD0"
+      fill="#F4A7C0"
       rx="7"
       ry="5"
     />
     <ellipse
       cx="50"
-      cy="76"
-      fill="#F8BBD0"
-      rx="19"
-      ry="15"
+      cy="78"
+      fill="#F4A7C0"
+      rx="20"
+      ry="14"
     />
     <ellipse
       cx="50"
-      cy="79"
+      cy="81"
       fill="#FCE4EC"
-      rx="11.78"
-      ry="9.3"
+      rx="12"
+      ry="8.68"
     />
     <g>
       <g
-        transform="translate(32 23)"
+        transform="translate(36 29)"
       >
         <path
-          d="M0 4 L-9 -8 L1 -6 Z"
-          fill="#F8BBD0"
+          d="M0 6 L-9 -9 L2 -7 Z"
+          fill="#F4A7C0"
         />
       </g>
       <g
-        transform="translate(68 23)"
+        transform="translate(64 29)"
       >
         <path
-          d="M0 4 L9 -8 L-1 -6 Z"
-          fill="#F8BBD0"
+          d="M0 6 L9 -9 L-2 -7 Z"
+          fill="#F4A7C0"
         />
       </g>
     </g>
     <circle
       cx="50"
-      cy="43"
-      fill="#F8BBD0"
-      r="27"
+      cy="44"
+      fill="#F4A7C0"
+      r="26"
     />
     <ellipse
-      cx="50"
-      cy="52"
-      fill="#FCE4EC"
-      opacity="0.55"
-      rx="19.439999999999998"
-      ry="16.74"
-    />
-    <ellipse
-      cx="38"
+      cx="39"
       cy="52"
       fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
     />
     <ellipse
-      cx="62"
+      cx="61"
       cy="52"
       fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
     />
     <g
       data-eyes="sparkly"
       data-part="eyes"
     >
       <g
-        transform="translate(40 45) "
+        transform="translate(40.5 45) "
       >
         <ellipse
-          fill="#C2185B"
-          rx="4.2"
-          ry="4.2"
+          fill="#B23A69"
+          rx="4"
+          ry="4"
         />
         <circle
-          cx="-1.6800000000000002"
-          cy="-1.6800000000000002"
+          cx="-1.6"
+          cy="-1.6"
           fill="#fff"
-          r="1.6800000000000002"
+          r="1.6"
         />
       </g>
       <g
-        transform="translate(60 45) "
+        transform="translate(59.5 45) "
       >
         <ellipse
-          fill="#C2185B"
-          rx="4.2"
-          ry="4.2"
+          fill="#B23A69"
+          rx="4"
+          ry="4"
         />
         <circle
-          cx="-1.6800000000000002"
-          cy="-1.6800000000000002"
+          cx="-1.6"
+          cy="-1.6"
           fill="#fff"
-          r="1.6800000000000002"
+          r="1.6"
         />
       </g>
     </g>
     <g>
       <ellipse
         cx="50"
-        cy="53"
+        cy="59"
         fill="#FCE4EC"
-        rx="9"
-        ry="7"
+        rx="10"
+        ry="8"
       />
-      <circle
-        cx="47"
-        cy="53"
-        fill="#C2185B"
-        r="1.6"
+      <ellipse
+        cx="46"
+        cy="59"
+        fill="#B23A69"
+        rx="1.8"
+        ry="2.4"
       />
-      <circle
-        cx="53"
-        cy="53"
-        fill="#C2185B"
-        r="1.6"
+      <ellipse
+        cx="54"
+        cy="59"
+        fill="#B23A69"
+        rx="1.8"
+        ry="2.4"
       />
     </g>
     <path
-      d="M46.5 58 q3.5 3.5 7 0"
+      d="M46.5 59 q3.5 3.5 7 0"
       data-part="mouth-idle"
       fill="none"
-      stroke="#C2185B"
+      stroke="#B23A69"
       stroke-linecap="round"
       stroke-width="2.2"
     />
@@ -819,8 +838,8 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-5 1`]
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-6 1`] = `
 <svg
-  aria-label="kitten"
-  data-animal="kitten"
+  aria-label="cat"
+  data-animal="cat"
   data-mood="idle"
   data-testid="creature"
   height="200"
@@ -830,145 +849,161 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-6 1`]
 >
   <ellipse
     cx="50"
-    cy="92"
+    cy="93"
     fill="#00000018"
-    rx="26"
-    ry="6"
+    rx="25"
+    ry="5.5"
   />
   <g
     transform="translate(0 0)"
   >
     <path
-      d="M67 78 q12 0 12 -14"
+      d="M66 78 q16 2 12 -16 q-3 -6 3 -9"
       fill="none"
-      stroke="#FFCC80"
+      stroke="#FFB74D"
       stroke-linecap="round"
       stroke-width="5"
     />
     <ellipse
-      cx="40"
+      cx="38"
       cy="90"
-      fill="#FFCC80"
+      fill="#FFB74D"
       rx="7"
       ry="5"
     />
     <ellipse
-      cx="60"
+      cx="62"
       cy="90"
-      fill="#FFCC80"
+      fill="#FFB74D"
       rx="7"
       ry="5"
     />
     <ellipse
       cx="50"
-      cy="76"
-      fill="#FFCC80"
-      rx="19"
-      ry="15"
+      cy="78"
+      fill="#FFB74D"
+      rx="20"
+      ry="14"
     />
     <ellipse
       cx="50"
-      cy="79"
+      cy="81"
       fill="#FFF3E0"
-      rx="11.78"
-      ry="9.3"
+      rx="12"
+      ry="8.68"
     />
+    <g
+      opacity="0.35"
+      stroke="#7A4A24"
+      stroke-linecap="round"
+      stroke-width="2"
+    >
+      <path
+        d="M42 70 v12 M50 67 v14 M58 70 v12"
+      />
+    </g>
     <g>
       <g
-        transform="translate(32 23)"
+        transform="translate(35 30)"
       >
-        <path
-          d="M0 6 L-11 -12 L-2 -4 Z"
-          fill="#FFCC80"
-          stroke="#8D5524"
-          stroke-width="1"
-        />
+        <g>
+          <path
+            d="M0 8 L-13 -12 L1 -5 Z"
+            fill="#FFB74D"
+            stroke="#7A4A24"
+            stroke-width="1"
+          />
+          <path
+            d="M-2 4 L-8 -7 L-1 -2 Z"
+            fill="#FFF3E0"
+          />
+        </g>
       </g>
       <g
-        transform="translate(68 23)"
+        transform="translate(65 30)"
       >
-        <path
-          d="M0 6 L11 -12 L2 -4 Z"
-          fill="#FFCC80"
-          stroke="#8D5524"
-          stroke-width="1"
-        />
+        <g>
+          <path
+            d="M0 8 L13 -12 L-1 -5 Z"
+            fill="#FFB74D"
+            stroke="#7A4A24"
+            stroke-width="1"
+          />
+          <path
+            d="M2 4 L8 -7 L1 -2 Z"
+            fill="#FFF3E0"
+          />
+        </g>
       </g>
     </g>
     <circle
       cx="50"
-      cy="43"
-      fill="#FFCC80"
-      r="27"
+      cy="44"
+      fill="#FFB74D"
+      r="26"
     />
     <ellipse
-      cx="50"
-      cy="52"
-      fill="#FFF3E0"
-      opacity="0.55"
-      rx="19.439999999999998"
-      ry="16.74"
-    />
-    <ellipse
-      cx="38"
+      cx="39"
       cy="52"
       fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
     />
     <ellipse
-      cx="62"
+      cx="61"
       cy="52"
       fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
     />
     <g
       data-eyes="sleepy"
       data-part="eyes"
     >
       <g
-        transform="translate(40 45) "
+        transform="translate(40.5 45) "
       >
         <ellipse
-          fill="#8D5524"
+          fill="#7A4A24"
           rx="3"
           ry="2.0999999999999996"
         />
       </g>
       <g
-        transform="translate(60 45) "
+        transform="translate(59.5 45) "
       >
         <ellipse
-          fill="#8D5524"
+          fill="#7A4A24"
           rx="3"
           ry="2.0999999999999996"
         />
       </g>
     </g>
     <g>
-      <ellipse
-        cx="50"
-        cy="54"
-        fill="#FFF3E0"
-        rx="9"
-        ry="7"
+      <path
+        d="M47 49 L53 49 L50 53 Z"
+        fill="#e8918f"
       />
-      <ellipse
-        cx="50"
-        cy="52"
-        fill="#8D5524"
-        rx="3"
-        ry="2.4"
-      />
+      <g
+        stroke="#7A4A24"
+        stroke-linecap="round"
+        stroke-width="1.4"
+      >
+        <path
+          d="M36 52 h-11 M36 55 h-10"
+        />
+        <path
+          d="M64 52 h11 M64 55 h10"
+        />
+      </g>
     </g>
     <path
-      d="M46.5 58 q3.5 3.5 7 0"
+      d="M46.5 52 q3.5 3.5 7 0"
       data-part="mouth-idle"
       fill="none"
-      stroke="#8D5524"
+      stroke="#7A4A24"
       stroke-linecap="round"
       stroke-width="2.2"
     />
@@ -978,8 +1013,8 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-6 1`]
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-7 1`] = `
 <svg
-  aria-label="puppy"
-  data-animal="puppy"
+  aria-label="dog"
+  data-animal="dog"
   data-mood="idle"
   data-testid="creature"
   height="200"
@@ -989,30 +1024,30 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-7 1`]
 >
   <ellipse
     cx="50"
-    cy="92"
+    cy="93"
     fill="#00000018"
-    rx="26"
-    ry="6"
+    rx="25"
+    ry="5.5"
   />
   <g
     transform="translate(0 0)"
   >
     <path
-      d="M67 78 q10 -6 4 -14"
+      d="M65 76 q14 -3 10 -16"
       fill="none"
       stroke="#BCAAA4"
       stroke-linecap="round"
-      stroke-width="5"
+      stroke-width="6"
     />
     <ellipse
-      cx="40"
+      cx="38"
       cy="90"
       fill="#BCAAA4"
       rx="7"
       ry="5"
     />
     <ellipse
-      cx="60"
+      cx="62"
       cy="90"
       fill="#BCAAA4"
       rx="7"
@@ -1020,125 +1055,124 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-7 1`]
     />
     <ellipse
       cx="50"
-      cy="76"
+      cy="78"
       fill="#BCAAA4"
-      rx="19"
-      ry="15"
+      rx="20"
+      ry="14"
     />
     <ellipse
       cx="50"
-      cy="79"
+      cy="81"
       fill="#EFEBE9"
-      rx="11.78"
-      ry="9.3"
+      rx="12"
+      ry="8.68"
     />
     <g>
       <g
-        transform="translate(32 23)"
+        transform="translate(33 32)"
       >
         <ellipse
-          cx="-3"
-          cy="6"
+          cx="-2"
+          cy="7"
           fill="#BCAAA4"
-          rx="7"
-          ry="11"
+          rx="7.5"
+          ry="13"
+          transform="rotate(-8)"
         />
       </g>
       <g
-        transform="translate(68 23)"
+        transform="translate(67 32)"
       >
         <ellipse
-          cx="3"
-          cy="6"
+          cx="2"
+          cy="7"
           fill="#BCAAA4"
-          rx="7"
-          ry="11"
+          rx="7.5"
+          ry="13"
+          transform="rotate(8)"
         />
       </g>
     </g>
     <circle
       cx="50"
-      cy="43"
+      cy="44"
       fill="#BCAAA4"
-      r="27"
+      r="26"
     />
     <ellipse
-      cx="50"
-      cy="52"
-      fill="#EFEBE9"
-      opacity="0.55"
-      rx="19.439999999999998"
-      ry="16.74"
-    />
-    <ellipse
-      cx="38"
+      cx="39"
       cy="52"
       fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
     />
     <ellipse
-      cx="62"
+      cx="61"
       cy="52"
       fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
     />
     <g
       data-eyes="big"
       data-part="eyes"
     >
       <g
-        transform="translate(40 45) "
+        transform="translate(40.5 45) "
       >
         <ellipse
           fill="#5D4037"
-          rx="4.2"
-          ry="4.2"
+          rx="4"
+          ry="4"
         />
         <circle
-          cx="-1.6800000000000002"
-          cy="-1.6800000000000002"
+          cx="-1.6"
+          cy="-1.6"
           fill="#fff"
-          r="1.6800000000000002"
+          r="1.6"
         />
       </g>
       <g
-        transform="translate(60 45) "
+        transform="translate(59.5 45) "
       >
         <ellipse
           fill="#5D4037"
-          rx="4.2"
-          ry="4.2"
+          rx="4"
+          ry="4"
         />
         <circle
-          cx="-1.6800000000000002"
-          cy="-1.6800000000000002"
+          cx="-1.6"
+          cy="-1.6"
           fill="#fff"
-          r="1.6800000000000002"
+          r="1.6"
         />
       </g>
     </g>
     <g>
       <ellipse
         cx="50"
-        cy="54"
+        cy="55"
         fill="#EFEBE9"
-        rx="9"
-        ry="7"
+        rx="11"
+        ry="8"
       />
       <ellipse
         cx="50"
         cy="52"
         fill="#5D4037"
-        rx="3"
-        ry="2.4"
+        rx="4"
+        ry="3"
+      />
+      <path
+        d="M50 55 v5"
+        stroke="#5D4037"
+        stroke-width="1.6"
       />
     </g>
     <path
-      d="M46.5 58 q3.5 3.5 7 0"
+      d="M46.5 56 q3.5 3.5 7 0"
       data-part="mouth-idle"
       fill="none"
       stroke="#5D4037"
@@ -1151,8 +1185,8 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-7 1`]
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-8 1`] = `
 <svg
-  aria-label="foal"
-  data-animal="foal"
+  aria-label="horse"
+  data-animal="horse"
   data-mood="idle"
   data-testid="creature"
   height="200"
@@ -1162,30 +1196,28 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-8 1`]
 >
   <ellipse
     cx="50"
-    cy="92"
+    cy="93"
     fill="#00000018"
-    rx="26"
-    ry="6"
+    rx="25"
+    ry="5.5"
   />
   <g
     transform="translate(0 0)"
   >
     <path
-      d="M67 78 q12 0 12 -14"
-      fill="none"
-      stroke="#A1887F"
-      stroke-linecap="round"
-      stroke-width="5"
+      d="M64 76 q10 0 12 16 q-3 6 -9 6"
+      fill="#4E342E"
+      opacity="0.7"
     />
     <ellipse
-      cx="40"
+      cx="38"
       cy="90"
       fill="#A1887F"
       rx="7"
       ry="5"
     />
     <ellipse
-      cx="60"
+      cx="62"
       cy="90"
       fill="#A1887F"
       rx="7"
@@ -1193,111 +1225,130 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-8 1`]
     />
     <ellipse
       cx="50"
-      cy="76"
+      cy="78"
       fill="#A1887F"
-      rx="19"
-      ry="15"
+      rx="20"
+      ry="14"
     />
     <ellipse
       cx="50"
-      cy="79"
+      cy="81"
       fill="#D7CCC8"
-      rx="11.78"
-      ry="9.3"
+      rx="12"
+      ry="8.68"
     />
     <g>
       <g
-        transform="translate(32 23)"
+        transform="translate(38 24)"
       >
-        <path
-          d="M0 6 L-11 -12 L-2 -4 Z"
-          fill="#A1887F"
-          stroke="#4E342E"
-          stroke-width="1"
-        />
+        <g>
+          <path
+            d="M0 6 L-5 -12 L4 -3 Z"
+            fill="#A1887F"
+          />
+          <path
+            d="M-0.5 3 L-3 -7 L1.5 -1 Z"
+            fill="#D7CCC8"
+          />
+        </g>
       </g>
       <g
-        transform="translate(68 23)"
+        transform="translate(62 24)"
       >
-        <path
-          d="M0 6 L11 -12 L2 -4 Z"
-          fill="#A1887F"
-          stroke="#4E342E"
-          stroke-width="1"
-        />
+        <g>
+          <path
+            d="M0 6 L5 -12 L-4 -3 Z"
+            fill="#A1887F"
+          />
+          <path
+            d="M0.5 3 L3 -7 L-1.5 -1 Z"
+            fill="#D7CCC8"
+          />
+        </g>
       </g>
     </g>
     <circle
       cx="50"
-      cy="43"
+      cy="44"
       fill="#A1887F"
-      r="27"
+      r="26"
+    />
+    <path
+      d="M46 18 q-8 6 -6 20 q4 -3 6 -8 q0 6 3 10 q3 -6 3 -14 q4 6 4 12 q4 -8 2 -18"
+      fill="#4E342E"
+      opacity="0.8"
     />
     <ellipse
-      cx="50"
-      cy="52"
-      fill="#D7CCC8"
-      opacity="0.55"
-      rx="19.439999999999998"
-      ry="16.74"
-    />
-    <ellipse
-      cx="38"
+      cx="39"
       cy="52"
       fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
     />
     <ellipse
-      cx="62"
+      cx="61"
       cy="52"
       fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
     />
     <g
       data-eyes="wide"
       data-part="eyes"
     >
       <g
-        transform="translate(40 45) "
+        transform="translate(40.5 45) "
       >
         <ellipse
           fill="#4E342E"
-          rx="5"
-          ry="5"
+          rx="4.8"
+          ry="4.8"
         />
       </g>
       <g
-        transform="translate(60 45) "
+        transform="translate(59.5 45) "
       >
         <ellipse
           fill="#4E342E"
-          rx="5"
-          ry="5"
+          rx="4.8"
+          ry="4.8"
         />
       </g>
     </g>
     <g>
       <ellipse
         cx="50"
-        cy="54"
+        cy="66"
+        fill="#A1887F"
+        rx="12"
+        ry="13"
+      />
+      <ellipse
+        cx="50"
+        cy="73"
         fill="#D7CCC8"
         rx="9"
         ry="7"
       />
       <ellipse
-        cx="50"
-        cy="52"
+        cx="46"
+        cy="73"
         fill="#4E342E"
-        rx="3"
-        ry="2.4"
+        rx="1.6"
+        ry="2"
+      />
+      <ellipse
+        cx="54"
+        cy="73"
+        fill="#4E342E"
+        rx="1.6"
+        ry="2"
       />
     </g>
     <path
-      d="M46.5 58 q3.5 3.5 7 0"
+      d="M46.5 68 q3.5 3.5 7 0"
       data-part="mouth-idle"
       fill="none"
       stroke="#4E342E"
@@ -1310,8 +1361,8 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-8 1`]
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-9 1`] = `
 <svg
-  aria-label="fawn"
-  data-animal="fawn"
+  aria-label="goat"
+  data-animal="goat"
   data-mood="idle"
   data-testid="creature"
   height="200"
@@ -1321,133 +1372,146 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-9 1`]
 >
   <ellipse
     cx="50"
-    cy="92"
+    cy="93"
     fill="#00000018"
-    rx="26"
-    ry="6"
+    rx="25"
+    ry="5.5"
   />
   <g
     transform="translate(0 0)"
   >
-    <path
-      d="M67 78 q12 0 12 -14"
-      fill="none"
-      stroke="#D2A679"
-      stroke-linecap="round"
-      stroke-width="5"
-    />
     <ellipse
-      cx="40"
+      cx="38"
       cy="90"
-      fill="#D2A679"
+      fill="#CFC3B4"
       rx="7"
       ry="5"
     />
     <ellipse
-      cx="60"
+      cx="62"
       cy="90"
-      fill="#D2A679"
+      fill="#CFC3B4"
       rx="7"
       ry="5"
     />
     <ellipse
       cx="50"
-      cy="76"
-      fill="#D2A679"
-      rx="19"
-      ry="15"
+      cy="78"
+      fill="#CFC3B4"
+      rx="20"
+      ry="14"
     />
     <ellipse
       cx="50"
-      cy="79"
-      fill="#F0E0CC"
-      rx="11.78"
-      ry="9.3"
+      cy="81"
+      fill="#F0EAE0"
+      rx="12"
+      ry="8.68"
     />
     <g>
       <g
-        transform="translate(32 23)"
+        transform="translate(29 40)"
       >
-        <path
-          d="M0 6 L-11 -12 L-2 -4 Z"
-          fill="#D2A679"
-          stroke="#6D4C33"
-          stroke-width="1"
+        <ellipse
+          cx="-4"
+          cy="4"
+          fill="#CFC3B4"
+          rx="8"
+          ry="4"
+          transform="rotate(-12)"
         />
       </g>
       <g
-        transform="translate(68 23)"
+        transform="translate(71 40)"
       >
-        <path
-          d="M0 6 L11 -12 L2 -4 Z"
-          fill="#D2A679"
-          stroke="#6D4C33"
-          stroke-width="1"
+        <ellipse
+          cx="4"
+          cy="4"
+          fill="#CFC3B4"
+          rx="8"
+          ry="4"
+          transform="rotate(12)"
         />
       </g>
     </g>
     <circle
       cx="50"
-      cy="43"
-      fill="#D2A679"
-      r="27"
+      cy="44"
+      fill="#CFC3B4"
+      r="26"
     />
+    <g>
+      <g
+        transform="translate(42 24)"
+      >
+        <path
+          d="M0 4 q-3 -10 2 -16"
+          fill="none"
+          stroke="#5F5343"
+          stroke-linecap="round"
+          stroke-width="3.5"
+        />
+      </g>
+      <g
+        transform="translate(58 24)"
+      >
+        <path
+          d="M0 4 q3 -10 -2 -16"
+          fill="none"
+          stroke="#5F5343"
+          stroke-linecap="round"
+          stroke-width="3.5"
+        />
+      </g>
+    </g>
     <ellipse
-      cx="50"
-      cy="52"
-      fill="#F0E0CC"
-      opacity="0.55"
-      rx="19.439999999999998"
-      ry="16.74"
-    />
-    <ellipse
-      cx="38"
+      cx="39"
       cy="52"
       fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
     />
     <ellipse
-      cx="62"
+      cx="61"
       cy="52"
       fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
     />
     <g
       data-eyes="sparkly"
       data-part="eyes"
     >
       <g
-        transform="translate(40 45) "
+        transform="translate(40.5 45) "
       >
         <ellipse
-          fill="#6D4C33"
-          rx="4.2"
-          ry="4.2"
+          fill="#5F5343"
+          rx="4"
+          ry="4"
         />
         <circle
-          cx="-1.6800000000000002"
-          cy="-1.6800000000000002"
+          cx="-1.6"
+          cy="-1.6"
           fill="#fff"
-          r="1.6800000000000002"
+          r="1.6"
         />
       </g>
       <g
-        transform="translate(60 45) "
+        transform="translate(59.5 45) "
       >
         <ellipse
-          fill="#6D4C33"
-          rx="4.2"
-          ry="4.2"
+          fill="#5F5343"
+          rx="4"
+          ry="4"
         />
         <circle
-          cx="-1.6800000000000002"
-          cy="-1.6800000000000002"
+          cx="-1.6"
+          cy="-1.6"
           fill="#fff"
-          r="1.6800000000000002"
+          r="1.6"
         />
       </g>
     </g>
@@ -1455,23 +1519,29 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-9 1`]
       <ellipse
         cx="50"
         cy="54"
-        fill="#F0E0CC"
-        rx="9"
-        ry="7"
+        fill="#F0EAE0"
+        rx="8"
+        ry="6"
       />
       <ellipse
         cx="50"
         cy="52"
-        fill="#6D4C33"
+        fill="#5F5343"
         rx="3"
-        ry="2.4"
+        ry="2"
+      />
+      <path
+        d="M46 61 q4 8 8 0"
+        fill="#F0EAE0"
+        stroke="#5F5343"
+        stroke-width="1"
       />
     </g>
     <path
-      d="M46.5 58 q3.5 3.5 7 0"
+      d="M46.5 55 q3.5 3.5 7 0"
       data-part="mouth-idle"
       fill="none"
-      stroke="#6D4C33"
+      stroke="#5F5343"
       stroke-linecap="round"
       stroke-width="2.2"
     />
@@ -1481,8 +1551,8 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-9 1`]
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-10 1`] = `
 <svg
-  aria-label="calf"
-  data-animal="calf"
+  aria-label="cow"
+  data-animal="cow"
   data-mood="idle"
   data-testid="creature"
   height="200"
@@ -1492,184 +1562,210 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-10 1`
 >
   <ellipse
     cx="50"
-    cy="92"
+    cy="93"
     fill="#00000018"
-    rx="26"
-    ry="6"
+    rx="25"
+    ry="5.5"
   />
   <g
     transform="translate(0 0)"
   >
     <path
-      d="M67 78 q12 0 12 -14"
+      d="M66 78 q11 3 10 15"
       fill="none"
-      stroke="#FFE0A3"
+      stroke="#6E5C3A"
       stroke-linecap="round"
-      stroke-width="5"
+      stroke-width="3"
     />
     <ellipse
-      cx="40"
+      cx="38"
       cy="90"
-      fill="#FFE0A3"
+      fill="#F5E7C8"
       rx="7"
       ry="5"
     />
     <ellipse
-      cx="60"
+      cx="62"
       cy="90"
-      fill="#FFE0A3"
+      fill="#F5E7C8"
       rx="7"
       ry="5"
     />
     <ellipse
       cx="50"
-      cy="76"
-      fill="#FFE0A3"
-      rx="19"
-      ry="15"
+      cy="78"
+      fill="#F5E7C8"
+      rx="20"
+      ry="14"
     />
     <ellipse
       cx="50"
-      cy="79"
-      fill="#FFF6E5"
-      rx="11.78"
-      ry="9.3"
+      cy="81"
+      fill="#FFFBF0"
+      rx="12"
+      ry="8.68"
     />
+    <g
+      fill="#6E5C3A"
+      opacity="0.22"
+    >
+      <ellipse
+        cx="41"
+        cy="75"
+        rx="6"
+        ry="5"
+      />
+      <ellipse
+        cx="58"
+        cy="81"
+        rx="5"
+        ry="4"
+      />
+    </g>
     <g>
       <g
-        transform="translate(32 23)"
+        transform="translate(25 44)"
       >
         <ellipse
-          cx="-4"
+          cx="-2"
           cy="2"
-          fill="#FFE0A3"
-          rx="9"
-          ry="6"
+          fill="#F5E7C8"
+          rx="8.5"
+          ry="5.5"
+          transform="rotate(-12)"
         />
       </g>
       <g
-        transform="translate(68 23)"
+        transform="translate(75 44)"
       >
         <ellipse
-          cx="4"
+          cx="2"
           cy="2"
-          fill="#FFE0A3"
-          rx="9"
-          ry="6"
+          fill="#F5E7C8"
+          rx="8.5"
+          ry="5.5"
+          transform="rotate(12)"
         />
       </g>
     </g>
     <circle
       cx="50"
-      cy="43"
-      fill="#FFE0A3"
-      r="27"
+      cy="44"
+      fill="#F5E7C8"
+      r="26"
     />
-    <ellipse
-      cx="50"
-      cy="52"
-      fill="#FFF6E5"
-      opacity="0.55"
-      rx="19.439999999999998"
-      ry="16.74"
-    />
-    <g
-      transform="translate(50 18)"
-    >
+    <g>
+      <g>
+        <g
+          transform="translate(42 24)"
+        >
+          <path
+            d="M0 3 q-3 -7 -7 -3"
+            fill="none"
+            opacity="0.85"
+            stroke="#6E5C3A"
+            stroke-linecap="round"
+            stroke-width="4"
+          />
+        </g>
+        <g
+          transform="translate(58 24)"
+        >
+          <path
+            d="M0 3 q3 -7 7 -3"
+            fill="none"
+            opacity="0.85"
+            stroke="#6E5C3A"
+            stroke-linecap="round"
+            stroke-width="4"
+          />
+        </g>
+      </g>
       <path
-        d="M-9 2 q-3 -6 1 -8"
-        fill="none"
-        stroke="#FFF6E5"
-        stroke-linecap="round"
-        stroke-width="3.5"
-      />
-      <path
-        d="M9 2 q3 -6 -1 -8"
-        fill="none"
-        stroke="#FFF6E5"
-        stroke-linecap="round"
-        stroke-width="3.5"
-      />
-      <ellipse
-        cx="0"
-        cy="-4"
-        fill="#FFE0A3"
-        rx="9"
-        ry="6"
+        d="M43 23 q7 -8 14 0"
+        fill="#6E5C3A"
+        opacity="0.3"
       />
     </g>
     <ellipse
-      cx="38"
+      cx="39"
       cy="52"
       fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
     />
     <ellipse
-      cx="62"
+      cx="61"
       cy="52"
       fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
     />
     <g
       data-eyes="big"
       data-part="eyes"
     >
       <g
-        transform="translate(40 45) "
+        transform="translate(40.5 45) "
       >
         <ellipse
-          fill="#8D6E3A"
-          rx="4.2"
-          ry="4.2"
+          fill="#6E5C3A"
+          rx="4"
+          ry="4"
         />
         <circle
-          cx="-1.6800000000000002"
-          cy="-1.6800000000000002"
+          cx="-1.6"
+          cy="-1.6"
           fill="#fff"
-          r="1.6800000000000002"
+          r="1.6"
         />
       </g>
       <g
-        transform="translate(60 45) "
+        transform="translate(59.5 45) "
       >
         <ellipse
-          fill="#8D6E3A"
-          rx="4.2"
-          ry="4.2"
+          fill="#6E5C3A"
+          rx="4"
+          ry="4"
         />
         <circle
-          cx="-1.6800000000000002"
-          cy="-1.6800000000000002"
+          cx="-1.6"
+          cy="-1.6"
           fill="#fff"
-          r="1.6800000000000002"
+          r="1.6"
         />
       </g>
     </g>
     <g>
       <ellipse
         cx="50"
-        cy="54"
-        fill="#FFF6E5"
-        rx="9"
-        ry="7"
+        cy="60"
+        fill="#FFFBF0"
+        rx="13"
+        ry="9.5"
       />
       <ellipse
-        cx="50"
-        cy="52"
-        fill="#8D6E3A"
-        rx="3"
-        ry="2.4"
+        cx="44.5"
+        cy="59"
+        fill="#6E5C3A"
+        rx="2"
+        ry="2.7"
+      />
+      <ellipse
+        cx="55.5"
+        cy="59"
+        fill="#6E5C3A"
+        rx="2"
+        ry="2.7"
       />
     </g>
     <path
-      d="M46.5 58 q3.5 3.5 7 0"
+      d="M46.5 59 q3.5 3.5 7 0"
       data-part="mouth-idle"
       fill="none"
-      stroke="#8D6E3A"
+      stroke="#6E5C3A"
       stroke-linecap="round"
       stroke-width="2.2"
     />
@@ -1679,8 +1775,8 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-10 1`
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-11 1`] = `
 <svg
-  aria-label="gosling"
-  data-animal="gosling"
+  aria-label="goose"
+  data-animal="goose"
   data-mood="idle"
   data-testid="creature"
   height="200"
@@ -1690,108 +1786,114 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-11 1`
 >
   <ellipse
     cx="50"
-    cy="92"
+    cy="93"
     fill="#00000018"
-    rx="26"
-    ry="6"
+    rx="25"
+    ry="5.5"
   />
   <g
     transform="translate(0 0)"
   >
     <path
-      d="M65 76 q10 2 8 10 q-5 2 -9 -2 Z"
-      fill="#F9FBE7"
-    />
-    <ellipse
-      cx="40"
-      cy="90"
-      fill="#DCE775"
-      rx="7"
-      ry="5"
-    />
-    <ellipse
-      cx="60"
-      cy="90"
-      fill="#DCE775"
-      rx="7"
-      ry="5"
-    />
-    <ellipse
-      cx="50"
-      cy="76"
-      fill="#DCE775"
-      rx="19"
-      ry="15"
-    />
-    <ellipse
-      cx="50"
-      cy="79"
-      fill="#F9FBE7"
-      rx="11.78"
-      ry="9.3"
-    />
-    <circle
-      cx="50"
-      cy="43"
-      fill="#DCE775"
-      r="27"
-    />
-    <ellipse
-      cx="50"
-      cy="52"
-      fill="#F9FBE7"
-      opacity="0.55"
-      rx="19.439999999999998"
-      ry="16.74"
+      d="M50 52 q-16 6 -14 26"
+      fill="none"
+      stroke="#ECEFF1"
+      stroke-linecap="round"
+      stroke-width="13"
     />
     <ellipse
       cx="38"
-      cy="52"
-      fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      cy="90"
+      fill="#ECEFF1"
+      rx="7"
+      ry="5"
     />
     <ellipse
       cx="62"
+      cy="90"
+      fill="#ECEFF1"
+      rx="7"
+      ry="5"
+    />
+    <ellipse
+      cx="50"
+      cy="78"
+      fill="#ECEFF1"
+      rx="20"
+      ry="14"
+    />
+    <ellipse
+      cx="50"
+      cy="81"
+      fill="#FFFFFF"
+      rx="12"
+      ry="8.68"
+    />
+    <circle
+      cx="50"
+      cy="44"
+      fill="#ECEFF1"
+      r="26"
+    />
+    <ellipse
+      cx="39"
       cy="52"
       fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
+    />
+    <ellipse
+      cx="61"
+      cy="52"
+      fill="#F48FB1"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
     />
     <g
       data-eyes="wide"
       data-part="eyes"
     >
       <g
-        transform="translate(40 45) "
+        transform="translate(40.5 45) "
       >
         <ellipse
-          fill="#827717"
-          rx="5"
-          ry="5"
+          fill="#78909C"
+          rx="4.8"
+          ry="4.8"
         />
       </g>
       <g
-        transform="translate(60 45) "
+        transform="translate(59.5 45) "
       >
         <ellipse
-          fill="#827717"
-          rx="5"
-          ry="5"
+          fill="#78909C"
+          rx="4.8"
+          ry="4.8"
         />
       </g>
     </g>
+    <g>
+      <ellipse
+        cx="50"
+        cy="52"
+        fill="#F5A623"
+        rx="9"
+        ry="5"
+      />
+      <circle
+        cx="44"
+        cy="49"
+        fill="#e0912f"
+        r="2"
+      />
+    </g>
     <path
-      d="M44 50 L56 50 L50 58 Z"
-      fill="#F5A623"
-    />
-    <path
-      d="M46.5 58 q3.5 3.5 7 0"
+      d="M46.5 57 q3.5 3.5 7 0"
       data-part="mouth-idle"
       fill="none"
-      stroke="#827717"
+      stroke="#78909C"
       stroke-linecap="round"
       stroke-width="2.2"
     />
@@ -1801,8 +1903,8 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-11 1`
 
 exports[`CreatureSVG > matches snapshot for every family at 200px > family-12 1`] = `
 <svg
-  aria-label="kid"
-  data-animal="kid"
+  aria-label="donkey"
+  data-animal="donkey"
   data-mood="idle"
   data-testid="creature"
   height="200"
@@ -1812,134 +1914,141 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-12 1`
 >
   <ellipse
     cx="50"
-    cy="92"
+    cy="93"
     fill="#00000018"
-    rx="26"
-    ry="6"
+    rx="25"
+    ry="5.5"
   />
   <g
     transform="translate(0 0)"
   >
     <path
-      d="M65 76 q10 2 8 10 q-5 2 -9 -2 Z"
-      fill="#ECEFF1"
+      d="M65 78 q12 2 12 16"
+      fill="none"
+      stroke="#4B4438"
+      stroke-linecap="round"
+      stroke-width="4"
     />
     <ellipse
-      cx="40"
+      cx="38"
       cy="90"
-      fill="#B0BEC5"
+      fill="#B0A79A"
       rx="7"
       ry="5"
     />
     <ellipse
-      cx="60"
+      cx="62"
       cy="90"
-      fill="#B0BEC5"
+      fill="#B0A79A"
       rx="7"
       ry="5"
     />
     <ellipse
       cx="50"
-      cy="76"
-      fill="#B0BEC5"
-      rx="19"
-      ry="15"
+      cy="78"
+      fill="#B0A79A"
+      rx="20"
+      ry="14"
     />
     <ellipse
       cx="50"
-      cy="79"
-      fill="#ECEFF1"
-      rx="11.78"
-      ry="9.3"
+      cy="81"
+      fill="#E8E3DA"
+      rx="12"
+      ry="8.68"
     />
     <g>
       <g
-        transform="translate(32 23)"
+        transform="translate(41 26)"
       >
-        <path
-          d="M0 6 L-11 -12 L-2 -4 Z"
-          fill="#B0BEC5"
-          stroke="#455A64"
-          stroke-width="1"
-        />
+        <g
+          transform="rotate(-8)"
+        >
+          <ellipse
+            cx="0"
+            cy="-14"
+            fill="#B0A79A"
+            rx="5.5"
+            ry="16"
+          />
+          <ellipse
+            cx="0"
+            cy="-14"
+            fill="#E8E3DA"
+            rx="2.4"
+            ry="11"
+          />
+        </g>
       </g>
       <g
-        transform="translate(68 23)"
+        transform="translate(59 26)"
       >
-        <path
-          d="M0 6 L11 -12 L2 -4 Z"
-          fill="#B0BEC5"
-          stroke="#455A64"
-          stroke-width="1"
-        />
+        <g
+          transform="rotate(8)"
+        >
+          <ellipse
+            cx="0"
+            cy="-14"
+            fill="#B0A79A"
+            rx="5.5"
+            ry="16"
+          />
+          <ellipse
+            cx="0"
+            cy="-14"
+            fill="#E8E3DA"
+            rx="2.4"
+            ry="11"
+          />
+        </g>
       </g>
     </g>
     <circle
       cx="50"
-      cy="43"
-      fill="#B0BEC5"
-      r="27"
+      cy="44"
+      fill="#B0A79A"
+      r="26"
+    />
+    <path
+      d="M50 18 q-3 8 0 16 q3 -8 0 -16"
+      fill="none"
+      stroke="#4B4438"
+      stroke-width="4"
     />
     <ellipse
-      cx="50"
-      cy="52"
-      fill="#ECEFF1"
-      opacity="0.55"
-      rx="19.439999999999998"
-      ry="16.74"
-    />
-    <g
-      transform="translate(50 20)"
-    >
-      <path
-        d="M-8 0 Q-14 -8 -8 -12"
-        fill="none"
-        stroke="#455A64"
-        stroke-linecap="round"
-        stroke-width="3"
-      />
-      <path
-        d="M8 0 Q14 -8 8 -12"
-        fill="none"
-        stroke="#455A64"
-        stroke-linecap="round"
-        stroke-width="3"
-      />
-    </g>
-    <ellipse
-      cx="38"
+      cx="39"
       cy="52"
       fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
     />
     <ellipse
-      cx="62"
+      cx="61"
       cy="52"
       fill="#F48FB1"
-      opacity="0.5"
-      rx="4"
-      ry="3"
+      opacity="0.45"
+      rx="3.6"
+      ry="2.6"
     />
     <g
       data-eyes="sleepy"
       data-part="eyes"
     >
       <g
-        transform="translate(40 45) "
+        transform="translate(40.5 45) "
       >
         <ellipse
-          fill="#455A64"
+          fill="#4B4438"
           rx="3"
           ry="2.0999999999999996"
         />
       </g>
       <g
-        transform="translate(60 45) "
+        transform="translate(59.5 45) "
       >
         <ellipse
-          fill="#455A64"
+          fill="#4B4438"
           rx="3"
           ry="2.0999999999999996"
         />
@@ -1948,24 +2057,31 @@ exports[`CreatureSVG > matches snapshot for every family at 200px > family-12 1`
     <g>
       <ellipse
         cx="50"
-        cy="54"
-        fill="#ECEFF1"
-        rx="9"
-        ry="7"
+        cy="60"
+        fill="#E8E3DA"
+        rx="11"
+        ry="9"
       />
       <ellipse
-        cx="50"
-        cy="52"
-        fill="#455A64"
-        rx="3"
-        ry="2.4"
+        cx="46"
+        cy="60"
+        fill="#4B4438"
+        rx="1.7"
+        ry="2.2"
+      />
+      <ellipse
+        cx="54"
+        cy="60"
+        fill="#4B4438"
+        rx="1.7"
+        ry="2.2"
       />
     </g>
     <path
-      d="M46.5 58 q3.5 3.5 7 0"
+      d="M46.5 60 q3.5 3.5 7 0"
       data-part="mouth-idle"
       fill="none"
-      stroke="#455A64"
+      stroke="#4B4438"
       stroke-linecap="round"
       stroke-width="2.2"
     />

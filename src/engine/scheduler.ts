@@ -372,24 +372,38 @@ export function createScheduler(
   }
 
   function nextInFamily(family: number): Fact {
-    const pool = ALL_FACTS.filter(
-      (f) => f.family === family && inRange(f) && state.facts[f.id]?.introduced,
-    )
-    if (pool.length === 0) return next()
+    const famFacts = ALL_FACTS.filter((f) => f.family === family && inRange(f))
+    if (famFacts.length === 0) return next()
+
     const gc = state.globalCounter
-    // lowest box first, then most overdue, then worst rolling latency
-    const pick = [...pool].sort((a, b) => {
+    const byNeed = (a: Fact, b: Fact) => {
       const fa = state.facts[a.id]
       const fb = state.facts[b.id]
       if (fa.box !== fb.box) return fa.box - fb.box
       const da = gc - fa.dueAt
       const db = gc - fb.dueAt
       if (da !== db) return db - da
-      return (
-        rollingMean(fb.recentLatencies ?? []) - rollingMean(fa.recentLatencies ?? [])
-      )
-    })[0]
-    return serve(pick)
+      return rollingMean(fb.recentLatencies ?? []) - rollingMean(fa.recentLatencies ?? [])
+    }
+
+    const introduced = famFacts.filter((f) => st(f.id)?.introduced)
+    // Introduced facts that still need work (not yet mastered).
+    const needsWork = introduced.filter((f) => !isFactMastered(state.facts[f.id]))
+    if (needsWork.length > 0) return serve([...needsWork].sort(byNeed)[0])
+
+    // Every introduced fact in the family is mastered — introduce a new one so
+    // the family can actually be completed and the egg can hatch. (Practising an
+    // egg is a deliberate choice to drive that family to mastery.)
+    const unintroduced = famFacts
+      .filter((f) => !st(f.id)?.introduced)
+      .sort((a, b) => a.a - b.a || a.b - b.b)
+    if (unintroduced.length > 0) {
+      doIntroduce(unintroduced[0])
+      return serve(unintroduced[0])
+    }
+
+    // All introduced and mastered — keep the least-recently-seen one sharp.
+    return serve([...famFacts].sort((a, b) => gc - state.facts[b.id].dueAt - (gc - state.facts[a.id].dueAt))[0])
   }
 
   return {
