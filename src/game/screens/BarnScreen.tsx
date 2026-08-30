@@ -3,11 +3,15 @@ import { CARE_EMOJI } from '@/contracts'
 import { useGame } from '../gameState'
 
 export function BarnScreen() {
-  const { creatures, choreFamilies, tasksRemaining, totalStalls, allChoresDone, go, back } =
+  const { creatures, care, choreFamilies, tasksRemaining, totalStalls, allChoresDone, go, back } =
     useGame()
 
   const badges: Record<number, boolean> = {}
-  for (const c of creatures) badges[c.stallIndex] = choreFamilies.includes(c.family)
+  const health: Record<number, number> = {}
+  for (const c of creatures) {
+    badges[c.stallIndex] = choreFamilies.includes(c.family)
+    health[c.stallIndex] = care[c.family]?.health ?? 100
+  }
 
   return (
     <div className="min-h-dvh">
@@ -22,6 +26,7 @@ export function BarnScreen() {
         creatures={creatures}
         totalStalls={totalStalls}
         badges={badges}
+        health={health}
         onSelectStall={(stallIndex) => go('stall', { stallIndex })}
       />
 

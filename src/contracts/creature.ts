@@ -25,7 +25,14 @@ export type CreatureParams = {
   eyeStyle: 'big' | 'sleepy' | 'sparkly' | 'wide'
 }
 
-export type CreatureMood = 'idle' | 'happy' | 'eating' | 'puzzled' | 'sleeping'
+export type CreatureMood =
+  | 'idle'
+  | 'happy'
+  | 'content' // resting smile (healthy)
+  | 'sad' // resting droop (low health) — gentle, never distressed
+  | 'eating'
+  | 'puzzled'
+  | 'sleeping'
 
 export type HatchedCreature = {
   family: number

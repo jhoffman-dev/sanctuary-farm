@@ -55,7 +55,7 @@ export function NestScreen() {
           creatureSlot={
             <Egg family={practising} progress={scheduler.familyProgress(practising)} size={90} />
           }
-          onQuestionGraded={onGraded}
+          onQuestionGraded={(r) => onGraded(r, { earnsCoins: true })}
           onComplete={(log) => {
             completePractice(log)
             setPractising(null)

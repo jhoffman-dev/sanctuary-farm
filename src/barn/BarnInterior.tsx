@@ -2,25 +2,35 @@
 // them. One creature per hatched family; empty stalls stay visible as future
 // space. `badges[stallIndex]` raises a soft "needs feeding" indicator above
 // that stall. Tapping an occupied stall calls `onSelectStall`.
-import type { HatchedCreature } from '@/contracts'
+import { HEALTH_HAPPY_AT, HEALTH_SAD_AT, type HatchedCreature } from '@/contracts'
 import { CreatureSVG } from '@/creatures/CreatureSVG'
 
 export type BarnInteriorProps = {
   creatures: HatchedCreature[]
   totalStalls?: number
   badges?: Record<number, boolean> // stallIndex -> chores outstanding
+  /** stallIndex -> 0..100 health, for a small dot on the stall */
+  health?: Record<number, number>
   onSelectStall: (stallIndex: number) => void
+}
+
+function healthDot(h: number | undefined) {
+  if (h == null) return null
+  const c = h < HEALTH_SAD_AT ? '#ef5350' : h < HEALTH_HAPPY_AT ? '#ffb74d' : '#66bb6a'
+  return <span className="mt-0.5 inline-block h-2 w-2 rounded-full" style={{ background: c }} aria-hidden />
 }
 
 function Stall({
   index,
   creature,
   badge,
+  health,
   onSelect,
 }: {
   index: number
   creature: HatchedCreature | undefined
   badge: boolean
+  health: number | undefined
   onSelect: (i: number) => void
 }) {
   const common =
@@ -50,6 +60,7 @@ function Stall({
           <span className="max-w-full truncate text-[11px] font-semibold text-amber-950">
             {creature.name}
           </span>
+          {healthDot(health)}
         </button>
       ) : (
         <div
@@ -71,6 +82,7 @@ export function BarnInterior({
   totalStalls = 12,
   onSelectStall,
   badges = {},
+  health = {},
 }: BarnInteriorProps) {
   const byStall = new Map(creatures.map((c) => [c.stallIndex, c]))
   const perWall = Math.ceil(totalStalls / 2)
@@ -88,6 +100,7 @@ export function BarnInterior({
           index={i}
           creature={byStall.get(i)}
           badge={!!badges[i]}
+          health={health[i]}
           onSelect={onSelectStall}
         />
       ))}

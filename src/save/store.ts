@@ -1,7 +1,14 @@
 // Versioned localStorage save store for Sanctuary Farm.
 // One key (`SAVE_KEY`), value is `JSON.stringify(SaveData)`. `migrate()` best-effort
 // upgrades any blob to the current schema and never throws.
-import { MAX_TABLE_DEFAULT, SAVE_KEY, SCHEMA_VERSION, STARTING_FEED } from '@/contracts'
+import {
+  HEALTH_MAX,
+  HEALTH_START,
+  MAX_TABLE_DEFAULT,
+  SAVE_KEY,
+  SCHEMA_VERSION,
+  STARTING_FEED,
+} from '@/contracts'
 import type {
   AnimalCare,
   EmptySave,
@@ -46,16 +53,28 @@ function isSchedulerState(v: unknown): v is SchedulerState {
   )
 }
 
-function isAnimalCare(v: unknown): v is AnimalCare {
+function isCareRecord(v: unknown): v is { family: number; done: Record<string, unknown> } {
   return isRecord(v) && typeof v.family === 'number' && isRecord(v.done)
 }
+
+const CARE_KEYS = ['feed', 'water', 'clean', 'play'] as const
 
 function coerceCare(v: unknown): Record<number, AnimalCare> {
   if (!isRecord(v)) return {}
   const out: Record<number, AnimalCare> = {}
   for (const [k, val] of Object.entries(v)) {
     const fam = Number(k)
-    if (Number.isFinite(fam) && isAnimalCare(val)) out[fam] = val as AnimalCare
+    if (!Number.isFinite(fam) || !isCareRecord(val)) continue
+    const done = {} as AnimalCare['done']
+    for (const key of CARE_KEYS) {
+      done[key] = typeof val.done[key] === 'string' ? (val.done[key] as string) : null
+    }
+    const rawHealth = (val as Record<string, unknown>).health
+    const health =
+      typeof rawHealth === 'number'
+        ? Math.max(0, Math.min(HEALTH_MAX, rawHealth))
+        : HEALTH_START
+    out[fam] = { family: fam, done, health }
   }
   return out
 }

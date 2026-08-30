@@ -80,19 +80,24 @@ const emptyLog = (over: Partial<SessionLog> = {}): SessionLog => ({
   ...over,
 })
 
-describe('GameProvider — coins come only from graded answers', () => {
-  it('FLUENT pays more than a plain correct; a wrong answer pays nothing', () => {
+describe('GameProvider — coins come only from the paddock and the nest', () => {
+  it('a graded answer with earnsCoins pays; a plain stall answer pays nothing', () => {
     const { result } = setup()
     expect(result.current.save.coins).toBe(0)
 
+    // stall care answers earn no coins
     act(() => result.current.onGraded(gradeResult({ correct: true, outcome: 'FLUENT' })))
+    expect(result.current.save.coins).toBe(0)
+
+    // paddock / nest answers do
+    act(() => result.current.onGraded(gradeResult({ correct: true, outcome: 'FLUENT' }), { earnsCoins: true }))
     expect(result.current.save.coins).toBe(COINS_PER_FLUENT)
 
-    act(() => result.current.onGraded(gradeResult({ correct: true, outcome: 'SLOW' })))
+    act(() => result.current.onGraded(gradeResult({ correct: true, outcome: 'SLOW' }), { earnsCoins: true }))
     expect(result.current.save.coins).toBe(COINS_PER_FLUENT + COINS_PER_CORRECT)
 
     const held = result.current.save.coins
-    act(() => result.current.onGraded(gradeResult({ correct: false, outcome: 'WRONG' })))
+    act(() => result.current.onGraded(gradeResult({ correct: false, outcome: 'WRONG' }), { earnsCoins: true }))
     expect(result.current.save.coins).toBe(held)
   })
 })
@@ -107,9 +112,9 @@ describe('GameProvider — the feed shed economy', () => {
     })
     expect(bought).toBe(false)
 
-    // earn enough
+    // earn enough (paddock/nest answers)
     for (let i = 0; i < FEED_BUNDLE_PRICE; i++) {
-      act(() => result.current.onGraded(gradeResult({ correct: true, outcome: 'SLOW' })))
+      act(() => result.current.onGraded(gradeResult({ correct: true, outcome: 'SLOW' }), { earnsCoins: true }))
     }
     const feedBefore = result.current.save.feed
     const coinsBefore = result.current.save.coins
@@ -123,17 +128,28 @@ describe('GameProvider — the feed shed economy', () => {
 })
 
 describe('GameProvider — care + daily chores', () => {
-  it('a care round marks that task done today; feeding consumes feed', () => {
+  it('a care round marks that task done today; feeding consumes feed; health rises', () => {
     const { result } = setup()
     const fam = COLD_START_CREATURE_FAMILY
     const feedBefore = result.current.save.feed
+    const healthBefore = result.current.care[fam].health
 
     act(() => result.current.completeCare(fam, 'water', emptyLog()))
     expect(result.current.tasksRemaining(fam)).not.toContain('water')
     expect(result.current.save.feed).toBe(feedBefore) // watering is free
+    expect(result.current.care[fam].health).toBeGreaterThan(healthBefore)
 
     act(() => result.current.completeCare(fam, 'feed', emptyLog()))
     expect(result.current.save.feed).toBe(feedBefore - FEED_PER_FEEDING)
+  })
+
+  it('health never exceeds the max', () => {
+    const { result } = setup()
+    const fam = COLD_START_CREATURE_FAMILY
+    for (let i = 0; i < 20; i++) {
+      act(() => result.current.completeCare(fam, 'play', emptyLog()))
+    }
+    expect(result.current.care[fam].health).toBeLessThanOrEqual(100)
   })
 
   it('finishing every task for every animal stamps the day and shows the goodnight summary', () => {

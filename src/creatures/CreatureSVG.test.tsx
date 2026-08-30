@@ -5,7 +5,7 @@ import { CreatureSVG } from './CreatureSVG'
 import { defaultCreatureParams } from './definitions'
 
 const FAMILIES = Array.from({ length: 12 }, (_, i) => i + 1)
-const MOODS: CreatureMood[] = ['idle', 'happy', 'eating', 'puzzled', 'sleeping']
+const MOODS: CreatureMood[] = ['idle', 'happy', 'content', 'sad', 'eating', 'puzzled', 'sleeping']
 const COORD_ATTRS = [
   'cx', 'cy', 'r', 'rx', 'ry', 'x', 'y', 'x1', 'y1', 'x2', 'y2', 'width', 'height',
 ]

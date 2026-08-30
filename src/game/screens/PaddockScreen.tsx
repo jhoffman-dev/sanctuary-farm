@@ -31,7 +31,7 @@ export function PaddockScreen() {
           scheduler={scheduler}
           mode={{ kind: 'timed', durationMs: PADDOCK_DURATION_MS }}
           context="paddock"
-          onQuestionGraded={onGraded}
+          onQuestionGraded={(r) => onGraded(r, { earnsCoins: true })}
           onComplete={done}
         />
       ) : (

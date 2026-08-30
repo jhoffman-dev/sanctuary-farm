@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react'
 import {
+  CARE_HEALTH_BONUS,
   CARE_TASKS,
   COINS_PER_CORRECT,
   COINS_PER_FLUENT,
@@ -17,6 +18,9 @@ import {
   FEED_BUNDLE_PRICE,
   FEED_BUNDLE_UNITS,
   FEED_PER_FEEDING,
+  HEALTH_DECAY_PER_DAY,
+  HEALTH_FLOOR,
+  HEALTH_MAX,
   emptyAnimalCare,
   type AnimalCare,
   type CareTask,
@@ -32,7 +36,7 @@ import { createSaveStore } from '@/save/store'
 import { createAudioBus } from '@/audio/sounds'
 import { idempotentScheduler } from './idempotentScheduler'
 import { makeCreature, nextFreeStall } from './creatureFor'
-import { todayStr } from './todayStr'
+import { daysBetween, todayStr } from './todayStr'
 
 const TOTAL_STALLS = 12
 
@@ -62,8 +66,9 @@ export type GameApi = {
   go: (screen: Screen, params?: { stallIndex?: number }) => void
   enterHotspot: (id: HotspotId, screen: Screen) => void
   back: () => void
-  /** per graded answer — coins (correct answers only) + hatch detection */
-  onGraded: (result: GradeResult) => void
+  /** per graded answer — persists scheduler progress + detects a hatch. Pass
+   *  `{ earnsCoins: true }` from the paddock and the nest (the only coin venues). */
+  onGraded: (result: GradeResult, opts?: { earnsCoins?: boolean }) => void
   /** spend coins on a feed bundle. Returns false if she can't afford it. */
   buyFeed: () => boolean
   /** a completed care round in a stall (feed/water/clean/play) */
@@ -79,8 +84,18 @@ export type GameApi = {
 
 const GameContext = createContext<GameApi | null>(null)
 
-/** One-time normalisation of a loaded save: the cold-start gift animal. */
+/** The most recent day any care task was done for this animal, or null. */
+function lastCaredDay(care: AnimalCare): string | null {
+  const days = Object.values(care.done).filter((d): d is string => !!d)
+  return days.length ? days.sort().at(-1)! : null
+}
+
+/**
+ * One-time normalisation of a loaded save: cold-start gift animal, a care record
+ * per animal, and a health drop for any days the animal wasn't tended at all.
+ */
 function primeSave(raw: SaveData): SaveData {
+  const today = todayStr()
   let save = raw
   if (!save.creatures.some((c) => c.family === COLD_START_CREATURE_FAMILY)) {
     save = {
@@ -88,14 +103,26 @@ function primeSave(raw: SaveData): SaveData {
       creatures: [...save.creatures, makeCreature(COLD_START_CREATURE_FAMILY, 0)],
     }
   }
-  // Every hatched animal needs a care record.
-  const care = { ...save.care }
+
+  const care: Record<number, AnimalCare> = {}
   let changed = false
   for (const c of save.creatures) {
-    if (!care[c.family]) {
-      care[c.family] = emptyAnimalCare(c.family)
-      changed = true
+    let entry = save.care[c.family] ?? emptyAnimalCare(c.family)
+    if (!save.care[c.family]) changed = true
+
+    // Health decay: one hit per missed day, capped, never below the floor.
+    const last = lastCaredDay(entry)
+    if (last && last < today) {
+      const missed = Math.min(5, Math.max(0, daysBetween(last, today) - 1))
+      if (missed > 0) {
+        const health = Math.max(HEALTH_FLOOR, entry.health - missed * HEALTH_DECAY_PER_DAY)
+        if (health !== entry.health) {
+          entry = { ...entry, health }
+          changed = true
+        }
+      }
     }
+    care[c.family] = entry
   }
   return changed ? { ...save, care } : save
 }
@@ -187,14 +214,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const allChoresDone = choreFamilies.length === 0
 
   const onGraded = useCallback<GameApi['onGraded']>(
-    (result) => {
+    (result, opts) => {
+      // Coins are earned ONLY in the paddock and the nest hollow.
       const gained =
-        result.outcome === 'FLUENT'
-          ? COINS_PER_FLUENT
-          : result.correct
-            ? COINS_PER_CORRECT
-            : 0
-      persistWithScheduler({ coins: save.coins + gained })
+        opts?.earnsCoins
+          ? result.outcome === 'FLUENT'
+            ? COINS_PER_FLUENT
+            : result.correct
+              ? COINS_PER_CORRECT
+              : 0
+          : 0
+      persistWithScheduler(gained > 0 ? { coins: save.coins + gained } : {})
 
       if (
         result.familyJustMastered != null &&
@@ -223,7 +253,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const prev = save.care[family] ?? emptyAnimalCare(family)
       const care: Record<number, AnimalCare> = {
         ...save.care,
-        [family]: { ...prev, done: { ...prev.done, [task]: today } },
+        [family]: {
+          ...prev,
+          done: { ...prev.done, [task]: today },
+          health: Math.min(HEALTH_MAX, prev.health + CARE_HEALTH_BONUS[task]),
+        },
       }
       const feed = task === 'feed' ? Math.max(0, save.feed - FEED_PER_FEEDING) : save.feed
       const sessions = [...save.sessions, log].slice(-200)

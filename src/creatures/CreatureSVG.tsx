@@ -28,6 +28,16 @@ function Eyes({ mood, style, ink }: { mood: CreatureMood; style: string; ink: st
       </g>
     )
   }
+  if (mood === 'sad') {
+    return (
+      <g data-part="eyes" data-eyes="sad">
+        <path data-part="eyebrow" d={`M${50 - dx - 6} ${y - 6} q6 4 11 2`} stroke={ink} strokeWidth={2} fill="none" strokeLinecap="round" />
+        <path d={`M${50 + dx - 5} ${y - 4} q6 -2 11 -2`} stroke={ink} strokeWidth={2} fill="none" strokeLinecap="round" />
+        <ellipse cx={50 - dx} cy={y + 1} rx={3.4} ry={3.4} fill={ink} />
+        <ellipse cx={50 + dx} cy={y + 1} rx={3.4} ry={3.4} fill={ink} />
+      </g>
+    )
+  }
   const rBase = style === 'sleepy' ? 3 : style === 'wide' ? 5 : 4.2
   const squint = mood === 'puzzled'
   return (
@@ -36,7 +46,7 @@ function Eyes({ mood, style, ink }: { mood: CreatureMood; style: string; ink: st
       {[-dx, dx].map((ox, i) => (
         <g key={i} transform={`translate(${50 + ox} ${y}) ${squint && i === 0 ? 'scale(1 0.55)' : ''}`}>
           <ellipse rx={rBase} ry={style === 'sleepy' ? rBase * 0.7 : rBase} fill={ink} />
-          {style === 'sparkly' || style === 'big' ? (
+          {style === 'sparkly' || style === 'big' || mood === 'content' ? (
             <circle cx={rBase * -0.4} cy={rBase * -0.4} r={rBase * 0.4} fill="#fff" />
           ) : null}
         </g>
@@ -53,7 +63,20 @@ function Mouth({ mood, ink }: { mood: CreatureMood; ink: string }) {
   if (mood === 'puzzled') {
     return <path data-part="mouth-puzzled" d={`M46 ${y} q4 -3 8 0`} stroke={ink} strokeWidth={2.2} fill="none" strokeLinecap="round" />
   }
-  const w = mood === 'happy' ? 5 : 3.5
+  if (mood === 'sad') {
+    // gentle downturn — glum, not crying
+    return (
+      <path
+        data-part="mouth-sad"
+        d={`M45 ${y + 3} q5 -5 10 0`}
+        stroke={ink}
+        strokeWidth={2.2}
+        fill="none"
+        strokeLinecap="round"
+      />
+    )
+  }
+  const w = mood === 'happy' ? 5 : mood === 'content' ? 4.2 : 3.5
   return (
     <path
       data-part={`mouth-${mood}`}

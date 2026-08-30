@@ -1,8 +1,8 @@
-// A creature's care panel: the animal, its name, four daily needs, and a round
-// of questions to tend each. Feeding also spends feed (bought in the feed shed).
+// A creature's care panel: the animal, its health, four daily needs, and a round
+// of questions to tend each. During a round a little scene reacts to every
+// correct answer (trough fills, broom sweeps, the animal dances).
 //
-// D11 held — the stall does NOT filter which facts are asked. `familyContext` is
-// informational; the scheduler serves whatever is due across every family.
+// D11 held — the stall does NOT filter which facts are asked.
 import { useState } from 'react'
 import { motion } from 'motion/react'
 import {
@@ -12,6 +12,9 @@ import {
   CARE_TASKS,
   CARE_VERB,
   FEED_PER_FEEDING,
+  HEALTH_HAPPY_AT,
+  HEALTH_MAX,
+  HEALTH_SAD_AT,
   type AnimalCare,
   type CareTask,
   type CreatureMood,
@@ -23,6 +26,7 @@ import {
 import { CreatureSVG } from '@/creatures/CreatureSVG'
 import { moodVariants, MOOD_TRANSFORM_ORIGIN } from '@/creatures/animations'
 import { QuizPanel } from '@/quiz/QuizPanel'
+import { CareScene } from './CareScene'
 
 export type StallPanelProps = {
   creature: HatchedCreature
@@ -35,6 +39,33 @@ export type StallPanelProps = {
   onCareComplete: (task: CareTask, log: SessionLog) => void
   onClose: () => void
   onQuestionGraded?: (result: GradeResult) => void
+}
+
+function restingMood(health: number): CreatureMood {
+  if (health < HEALTH_SAD_AT) return 'sad'
+  if (health >= HEALTH_HAPPY_AT) return 'content'
+  return 'idle'
+}
+
+function HealthBar({ health }: { health: number }) {
+  const pct = Math.max(0, Math.min(100, (health / HEALTH_MAX) * 100))
+  const colour = health < HEALTH_SAD_AT ? '#ef5350' : health < HEALTH_HAPPY_AT ? '#ffb74d' : '#66bb6a'
+  return (
+    <div className="mx-auto w-56" aria-label={`health ${Math.round(health)} of ${HEALTH_MAX}`}>
+      <div className="mb-1 flex items-center justify-between text-[11px] font-semibold text-stone-500">
+        <span>❤️ Health</span>
+        <span>{Math.round(health)}</span>
+      </div>
+      <div className="h-3 overflow-hidden rounded-full bg-stone-200">
+        <motion.div
+          className="h-full rounded-full"
+          style={{ background: colour }}
+          animate={{ width: `${pct}%` }}
+          transition={{ type: 'spring', stiffness: 160, damping: 20 }}
+        />
+      </div>
+    </div>
+  )
 }
 
 export function StallPanel({
@@ -53,9 +84,11 @@ export function StallPanel({
   const [draft, setDraft] = useState(creature.name)
   const [task, setTask] = useState<CareTask | null>(null)
   const [mood, setMood] = useState<CreatureMood>('idle')
+  const [correct, setCorrect] = useState(0)
 
   const isDone = (t: CareTask) => care.done[t] === today
   const canFeed = feed >= FEED_PER_FEEDING
+  const rest = restingMood(care.health)
 
   function commitName() {
     const next = draft.trim()
@@ -68,7 +101,11 @@ export function StallPanel({
     setEditing(false)
   }
 
-  const anim = moodVariants[mood]
+  function startTask(t: CareTask) {
+    setCorrect(0)
+    setMood('idle')
+    setTask(t)
+  }
 
   if (task) {
     return (
@@ -81,9 +118,20 @@ export function StallPanel({
           mode={{ kind: 'count', questions: CARE_QUESTIONS[task] }}
           context="stall"
           familyContext={creature.family}
-          creatureSlot={<CreatureSVG params={creature.params} mood={mood} size={96} title={name} />}
+          creatureSlot={
+            <CareScene
+              task={task}
+              creature={creature}
+              name={name}
+              done={correct}
+              total={CARE_QUESTIONS[task]}
+            />
+          }
           onMood={setMood}
-          onQuestionGraded={onQuestionGraded}
+          onQuestionGraded={(r) => {
+            if (r.correct) setCorrect((c) => c + 1)
+            onQuestionGraded?.(r)
+          }}
           onComplete={(log) => {
             setTask(null)
             setMood('idle')
@@ -99,11 +147,13 @@ export function StallPanel({
       <motion.div
         className="mx-auto w-fit"
         style={{ transformOrigin: MOOD_TRANSFORM_ORIGIN }}
-        animate={anim.animate}
-        transition={anim.transition}
+        animate={moodVariants[mood === 'idle' ? rest : mood].animate}
+        transition={moodVariants[mood === 'idle' ? rest : mood].transition}
       >
-        <CreatureSVG params={creature.params} mood={mood} size={160} title={name} />
+        <CreatureSVG params={creature.params} mood={mood === 'idle' ? rest : mood} size={160} title={name} />
       </motion.div>
+
+      <HealthBar health={care.health} />
 
       {editing ? (
         <form
@@ -153,7 +203,7 @@ export function StallPanel({
               type="button"
               aria-label={CARE_LABEL[t]}
               disabled={disabled}
-              onClick={() => setTask(t)}
+              onClick={() => startTask(t)}
               className={`rounded-xl border p-3 text-sm font-semibold transition ${
                 done
                   ? 'border-emerald-300 bg-emerald-50 text-emerald-700'

@@ -26,6 +26,14 @@ export const moodVariants: Record<CreatureMood, MoodMotion> = {
     animate: { y: [0, -16, 0, -9, 0], scaleY: [1, 0.9, 1.04, 0.95, 1], rotate: 0 },
     transition: { duration: 0.6, repeat: 1, ease: 'easeOut' },
   },
+  content: {
+    animate: { y: [0, -1, 0], scaleY: [1, 1.02, 1], rotate: 0 },
+    transition: { duration: 3.6, repeat: Infinity, ease: 'easeInOut' },
+  },
+  sad: {
+    animate: { y: [0, 1.5, 0], scaleY: [1, 0.985, 1], rotate: 0 },
+    transition: { duration: 4.2, repeat: Infinity, ease: 'easeInOut' },
+  },
   eating: {
     animate: { y: [0, -2.5, 0], rotate: [0, -2.5, 2.5, 0], scaleY: [1, 0.97, 1] },
     transition: { duration: 0.36, repeat: Infinity, ease: 'easeInOut' },

@@ -41,7 +41,7 @@ async function back() {
   const b = page.getByRole('button', { name: /← farmyard|← barn|back to the farm/i }).first()
   if (await b.count()) { await b.click(); await page.waitForTimeout(700) }
 }
-async function answer(n) {
+async function answer(n, { shotName } = {}) {
   const pad = page.getByTestId('number-pad')
   for (let q = 0; q < n; q++) {
     await page.waitForTimeout(500)
@@ -50,7 +50,9 @@ async function answer(n) {
     if (!m) return q
     for (const d of String(Number(m[1]) * Number(m[2]))) await pad.getByRole('button', { name: d }).click()
     await pad.getByRole('button', { name: /confirm/i }).click()
-    await page.waitForTimeout(1100)
+    await page.waitForTimeout(600)
+    if (shotName && q === 1) await shot(shotName) // mid-round, 2 answers in
+    await page.waitForTimeout(600)
   }
   return n
 }
@@ -60,40 +62,26 @@ await page.waitForTimeout(1000)
 console.log('boot       :', await txt())
 await shot('r0-boot')
 
-// feed shed
-await walkToTile(9, 8)
-await page.waitForTimeout(3000)
-console.log('-> feedshed:', await txt())
-await shot('r1-feedshed')
-const buy = page.getByRole('button', { name: /buy for/i })
-if ((await buy.count()) && !(await buy.isDisabled())) {
-  await buy.click(); await page.waitForTimeout(400)
-  console.log('   bought  :', await txt())
-} else {
-  console.log('   (buy disabled — no coins yet, as expected)')
-}
-await back()
-
-// barn -> stall -> all four care tasks
+// barn -> stall -> care mini-scenes
 await walkToTile(4, 8)
-await page.waitForTimeout(3500)
-console.log('-> barn    :', await txt())
-await shot('r2-barn')
-for (const task of ['Water', 'Clean', 'Play', 'Feed']) {
-  const tenner = page.getByRole('button', { name: 'Tenner' })
-  if (!(await tenner.count())) { console.log('   (no more stalls to open — chores done?)'); break }
-  await tenner.click()
-  await page.waitForTimeout(500)
-  if (task === 'Water') await shot('r3-stall')
+await page.waitForTimeout(3800)
+await shot('r1-barn')
+await page.getByRole('button', { name: 'Tenner' }).click()
+await page.waitForTimeout(600)
+await shot('r2-stall')
+for (const [task, sceneShot] of [['Water', 'r3-water-scene'], ['Clean', 'r4-clean-scene'], ['Play', 'r5-play-scene'], ['Feed', null]]) {
+  const t = page.getByRole('button', { name: 'Tenner' })
+  if (await t.count()) { await t.click(); await page.waitForTimeout(500) }
   const btn = page.getByRole('button', { name: task, exact: true })
   if (!(await btn.count()) || (await btn.isDisabled())) { console.log(`   ${task}: n/a`); await back(); continue }
   await btn.click()
-  const got = await answer(6)
+  await page.waitForTimeout(1400)
+  const got = await answer(6, { shotName: sceneShot ?? undefined })
   console.log(`   ${task}: answered ${got} · ${(await txt()).slice(0, 90)}`)
   await page.waitForTimeout(700)
 }
 console.log('after care :', await txt())
-await shot('r4-after-care')
+await shot('r6-goodnight')
 
 console.log('\n--- console ---')
 console.log(logs.filter((l) => !/DevTools|\[vite\]/.test(l)).join('\n') || '(clean)')
