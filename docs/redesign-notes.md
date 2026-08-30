@@ -29,6 +29,16 @@ Paddock / Nest Hollow  →  earn coins  →  buy feed at the feed shed
 
 ## What changed
 
+Later still (2026-08-30, batch 3): each animal has a **health bar** (care raises it,
+neglect decays it, floor 15); **care rounds show a reactive scene** (trough fills, broom
+sweeps, animal dances per correct answer); **coins are earned only in the paddock and the
+nest** (stall care earns none); the keeper is 2× and wears a cowboy hat; the 12 creatures
+are distinct farm animals. Batch 4: a **petting zoo** by the pond (`home: 'barn' | 'zoo'`,
+`moveAnimal`) and a **training ring** on the centre path (`TrainingScreen` — area model /
+distributive property, ×10 anchor, doubling, near-squares; no quiz). Egg practice bug
+fixed twice — `nextInFamily` now keeps ~4 family facts in rotation and drives the family
+to full mastery.
+
 | Area | Before | After |
 | --- | --- | --- |
 | Currency | `currency: { pellets, coins }`, display-only | `coins` (spendable) + `feed` (consumable). `SaveData` v2. |
