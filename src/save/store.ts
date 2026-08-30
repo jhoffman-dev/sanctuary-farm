@@ -130,7 +130,10 @@ export function migrate(raw: unknown): SaveData {
       globalCounter:
         typeof working.globalCounter === 'number' ? working.globalCounter : base.globalCounter,
       creatures: Array.isArray(working.creatures)
-        ? (working.creatures as HatchedCreature[])
+        ? (working.creatures as HatchedCreature[]).map((c) => ({
+            ...c,
+            home: c?.home === 'zoo' ? 'zoo' : 'barn',
+          }))
         : base.creatures,
       care: coerceCare(working.care),
       coins: typeof working.coins === 'number' ? working.coins : base.coins,

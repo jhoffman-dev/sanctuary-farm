@@ -24,6 +24,7 @@ import {
   emptyAnimalCare,
   type AnimalCare,
   type CareTask,
+  type CreatureHome,
   type GradeResult,
   type HatchedCreature,
   type HotspotId,
@@ -76,6 +77,8 @@ export type GameApi = {
   /** a completed free round (paddock / egg practice) */
   completePractice: (log: SessionLog) => void
   renameCreature: (family: number, name: string) => void
+  /** send an animal to the barn or the petting zoo by the pond */
+  moveAnimal: (family: number, home: CreatureHome) => void
   claimHatch: (name?: string) => HatchedCreature | null
   setMuted: (muted: boolean) => void
   exportSave: () => string
@@ -270,9 +273,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
       persistWithScheduler({ care, feed, sessions, lastChoresDate })
 
-      // Back to the barn to pick the next task — or the goodnight summary.
+      // Back to where the animal lives to pick the next task — or the goodnight
+      // summary once every animal is cared for.
+      const home = save.creatures.find((c) => c.family === family)?.home
       setNav({
-        view: { screen: stillPending ? 'barn' : 'summary' },
+        view: { screen: stillPending ? (home === 'zoo' ? 'pettingzoo' : 'barn') : 'summary' },
         stack: [{ screen: 'farmyard' }],
       })
     },
@@ -293,6 +298,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
       persist({
         ...save,
         creatures: save.creatures.map((c) => (c.family === family ? { ...c, name: trimmed } : c)),
+      })
+    },
+    [persist, save],
+  )
+
+  const moveAnimal = useCallback<GameApi['moveAnimal']>(
+    (family, home) => {
+      persist({
+        ...save,
+        creatures: save.creatures.map((c) => (c.family === family ? { ...c, home } : c)),
       })
     },
     [persist, save],
@@ -357,12 +372,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
       completeCare,
       completePractice,
       renameCreature,
+      moveAnimal,
       claimHatch,
       setMuted,
       exportSave,
       resetSave,
     }),
-    [save, scheduler, audio, nav, tasksRemaining, choreFamilies, allChoresDone, pendingHatch, lastHotspot, go, enterHotspot, back, onGraded, buyFeed, completeCare, completePractice, renameCreature, claimHatch, setMuted, exportSave, resetSave],
+    [save, scheduler, audio, nav, tasksRemaining, choreFamilies, allChoresDone, pendingHatch, lastHotspot, go, enterHotspot, back, onGraded, buyFeed, completeCare, completePractice, renameCreature, moveAnimal, claimHatch, setMuted, exportSave, resetSave],
   )
 
   return <GameContext value={api}>{children}</GameContext>

@@ -10,6 +10,8 @@ export type Screen =
   | 'paddock'
   | 'nest'
   | 'feedshed'
+  | 'pettingzoo'
+  | 'training'
   | 'summary'
   | 'dashboard'
 
@@ -20,6 +22,8 @@ export type ScreenParams = {
   paddock: undefined
   nest: undefined
   feedshed: undefined
+  pettingzoo: undefined
+  training: undefined
   summary: undefined
   dashboard: undefined
 }

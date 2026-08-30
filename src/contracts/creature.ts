@@ -34,12 +34,16 @@ export type CreatureMood =
   | 'puzzled'
   | 'sleeping'
 
+export type CreatureHome = 'barn' | 'zoo'
+
 export type HatchedCreature = {
   family: number
   name: string // player-assigned, defaults from DEFAULT_CREATURE_NAMES
   params: CreatureParams
   hatchedAt: number // epoch ms
   stallIndex: number
+  /** where the animal lives — the barn, or the petting zoo by the pond */
+  home?: CreatureHome
 }
 
 export type CreatureSVGProps = {

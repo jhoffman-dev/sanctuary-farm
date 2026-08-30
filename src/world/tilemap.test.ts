@@ -4,7 +4,15 @@ import type { HotspotId, Vec2 } from '@/contracts'
 import { findPath } from './pathfind'
 import { createTilemap, tilemap } from './tilemap'
 
-const HOTSPOT_IDS: HotspotId[] = ['barn', 'paddock', 'nest', 'feedshed', 'farmhouse']
+const HOTSPOT_IDS: HotspotId[] = [
+  'barn',
+  'paddock',
+  'nest',
+  'feedshed',
+  'farmhouse',
+  'training',
+  'pettingzoo',
+]
 
 describe('tilemap', () => {
   it('is exactly GRID_W × GRID_H', () => {
@@ -35,7 +43,7 @@ describe('tilemap', () => {
     expect(tilemap.isWalkable(tilemap.playerStart.x, tilemap.playerStart.y)).toBe(true)
   })
 
-  it('has all five hotspots, each on a walkable tile', () => {
+  it('has all seven hotspots, each on a walkable tile', () => {
     const ids = tilemap.hotspots.map((h) => h.id).sort()
     expect(ids).toEqual([...HOTSPOT_IDS].sort())
     for (const h of tilemap.hotspots) {

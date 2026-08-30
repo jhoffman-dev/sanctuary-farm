@@ -22,6 +22,8 @@ export function FarmyardScreen() {
     else if (id === 'nest') enterHotspot(id, 'nest')
     else if (id === 'paddock') enterHotspot(id, 'paddock')
     else if (id === 'feedshed') enterHotspot(id, 'feedshed')
+    else if (id === 'pettingzoo') enterHotspot(id, 'pettingzoo')
+    else if (id === 'training') enterHotspot(id, 'training')
     else if (id === 'farmhouse') enterHotspot(id, 'summary')
   }
 

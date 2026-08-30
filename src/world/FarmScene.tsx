@@ -192,6 +192,44 @@ function pathShapesFor(map: Tilemap) {
   return cells
 }
 
+/** A low rail fence framing the pond area — the petting zoo. */
+function PettingZooFence() {
+  const x0 = px(1) + 6
+  const x1 = px(8) - 6
+  const y0 = px(11) + 8
+  const y1 = px(16)
+  const seg = (a: number, b: number, c: number, d: number, key: string) => (
+    <g key={key}>
+      <line x1={a} y1={b} x2={c} y2={d} stroke={POST} strokeWidth={7} strokeLinecap="round" />
+      <line x1={a} y1={b + 8} x2={c} y2={d + 8} stroke={RAIL_HI} strokeWidth={4} strokeLinecap="round" />
+    </g>
+  )
+  return (
+    <g opacity={0.95}>
+      <rect x={x0} y={y0} width={x1 - x0} height={y1 - y0} rx={10} fill="#aed581" opacity={0.35} />
+      {/* posts */}
+      {[x0, (x0 + x1) / 2, x1].map((px2, i) => (
+        <rect key={i} x={px2 - 3} y={y0 - 6} width={6} height={y1 - y0 + 10} rx={2} fill={POST} />
+      ))}
+      {seg(x0, y0, x1 - px(1.4), y0, 'top-left')}
+      {seg(x1 - px(0.6), y0, x1, y0, 'top-right')}
+      {seg(x1, y0, x1, y1, 'right')}
+    </g>
+  )
+}
+
+function TrainingRing() {
+  const cx = px(11) + T / 2
+  const cy = px(3) + T / 2
+  return (
+    <g transform={`translate(${cx} ${cy})`}>
+      <ellipse rx={30} ry={20} fill="#d7b98c" />
+      <ellipse rx={30} ry={20} fill="none" stroke="#b98a5a" strokeWidth={3} strokeDasharray="6 5" />
+      <ellipse rx={16} ry={10} fill="#c8a877" />
+    </g>
+  )
+}
+
 function Nest({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x} ${y})`}>
@@ -228,6 +266,12 @@ export function FarmScene({ map }: { map: Tilemap }) {
       {/* paths */}
       {pathShapesFor(map)}
 
+      {/* petting-zoo enclosure around the pond (decorative) */}
+      <PettingZooFence />
+
+      {/* training ring on the centre path */}
+      <TrainingRing />
+
       {/* water */}
       <Pond x={px(3)} y={px(12)} w={px(3)} h={px(3)} />
 
@@ -241,11 +285,9 @@ export function FarmScene({ map }: { map: Tilemap }) {
       <Nest x={px(18) + T / 2} y={px(3) + T / 2} />
 
       {/* decorative trees + bushes */}
-      <Tree x={px(2) + 20} y={px(2) + 30} s={0.9} />
       <Tree x={px(22)} y={px(2) + 20} s={1.05} />
       <Tree x={px(22)} y={px(15)} s={0.85} />
-      <Tree x={px(2) + 16} y={px(15) + 6} s={0.8} />
-      <circle cx={px(7) + 10} cy={px(10)} r={12} fill="#7cb342" />
+      <Tree x={px(2) + 16} y={px(3) + 6} s={0.8} />
       <circle cx={px(13)} cy={px(9) + 20} r={10} fill="#81c784" />
     </g>
   )

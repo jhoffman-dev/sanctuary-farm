@@ -5,7 +5,14 @@ export type TileType = 'grass' | 'path' | 'fence' | 'water' | 'building'
 
 export type Vec2 = { x: number; y: number }
 
-export type HotspotId = 'barn' | 'paddock' | 'nest' | 'feedshed' | 'farmhouse'
+export type HotspotId =
+  | 'barn'
+  | 'paddock'
+  | 'nest'
+  | 'feedshed'
+  | 'farmhouse'
+  | 'pettingzoo'
+  | 'training'
 
 export type Hotspot = {
   id: HotspotId

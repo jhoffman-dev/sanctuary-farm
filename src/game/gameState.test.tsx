@@ -194,6 +194,18 @@ describe('GameProvider — navigation', () => {
     expect(result.current.view.screen).toBe('farmyard')
   })
 
+  it('moveAnimal sends an animal to the petting zoo and back', () => {
+    const { result } = setup()
+    const fam = COLD_START_CREATURE_FAMILY
+    expect(result.current.creatures.find((c) => c.family === fam)?.home).toBe('barn')
+
+    act(() => result.current.moveAnimal(fam, 'zoo'))
+    expect(result.current.creatures.find((c) => c.family === fam)?.home).toBe('zoo')
+
+    act(() => result.current.moveAnimal(fam, 'barn'))
+    expect(result.current.creatures.find((c) => c.family === fam)?.home).toBe('barn')
+  })
+
   it('enterHotspot records the hotspot so the return trip spawns her there', () => {
     const { result } = setup()
     expect(result.current.lastHotspot).toBeNull()

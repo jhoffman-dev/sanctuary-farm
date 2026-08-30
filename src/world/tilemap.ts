@@ -25,10 +25,10 @@ const ROWS: readonly string[] = [
   'F..BBBB.BBB-......-.....F', //  7
   'F...-....-.-......-.....F', //  8  barn/feed-shed/spine/paddock spurs
   'F-----------------------F', //  9  main street
-  'F..........-......-.....F', // 10
-  'F..........-...FFF-FFF..F', // 11  farmhouse door (11,11) · paddock gate (18,11)
-  'F..WWW....BBBB.F..-..F..F', // 12  pond (x3-5) · farmhouse (x10-13) · paddock
-  'F..WWW....BBBB.F..-..F..F', // 13  paddock hotspot (18,13) on-path
+  'F......-...-......-.....F', // 10  x7 spur -> petting zoo
+  'F......-...-...FFF-FFF..F', // 11  farmhouse door (11,11) · paddock gate (18,11)
+  'F..WWW.-..BBBB.F..-..F..F', // 12  pond (x3-5) · petting-zoo spur x7 · farmhouse x10-13
+  'F..WWW.-..BBBB.F..-..F..F', // 13  petting zoo (7,13) · paddock hotspot (18,13)
   'F..WWW....BBBB.F.....F..F', // 14
   'F.........BBBB.FFFFFFF..F', // 15  paddock south wall
   'F.......................F', // 16
@@ -41,6 +41,8 @@ const HOTSPOTS: readonly Hotspot[] = [
   { id: 'nest', tile: { x: 18, y: 4 }, label: 'Nest hollow' },
   { id: 'paddock', tile: { x: 18, y: 13 }, label: 'Paddock' },
   { id: 'farmhouse', tile: { x: 11, y: 11 }, label: 'Farmhouse' },
+  { id: 'training', tile: { x: 11, y: 3 }, label: 'Training ring' },
+  { id: 'pettingzoo', tile: { x: 7, y: 13 }, label: 'Petting zoo' },
 ]
 
 const PLAYER_START: Vec2 = { x: 11, y: 11 } // the farmhouse door

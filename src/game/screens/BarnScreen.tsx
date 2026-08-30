@@ -6,9 +6,10 @@ export function BarnScreen() {
   const { creatures, care, choreFamilies, tasksRemaining, totalStalls, allChoresDone, go, back } =
     useGame()
 
+  const barnCreatures = creatures.filter((c) => c.home !== 'zoo')
   const badges: Record<number, boolean> = {}
   const health: Record<number, number> = {}
-  for (const c of creatures) {
+  for (const c of barnCreatures) {
     badges[c.stallIndex] = choreFamilies.includes(c.family)
     health[c.stallIndex] = care[c.family]?.health ?? 100
   }
@@ -23,7 +24,7 @@ export function BarnScreen() {
       </header>
 
       <BarnInterior
-        creatures={creatures}
+        creatures={barnCreatures}
         totalStalls={totalStalls}
         badges={badges}
         health={health}
@@ -34,7 +35,7 @@ export function BarnScreen() {
         {allChoresDone ? (
           <p>Everyone is cared for. Tap a stall any time to practise.</p>
         ) : (
-          creatures
+          barnCreatures
             .filter((c) => tasksRemaining(c.family).length > 0)
             .map((c) => (
               <p key={c.family}>

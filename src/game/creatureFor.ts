@@ -13,6 +13,7 @@ export function makeCreature(family: number, stallIndex: number, at = Date.now()
     params: creatureParamsFor(family),
     hatchedAt: at,
     stallIndex,
+    home: 'barn',
   }
 }
 
