@@ -4,32 +4,20 @@ Notion holds two things: the **board** (tickets — the single source of truth f
 work) and the **docs** (PRD, plan, architecture, ADRs — mirrored from the repo,
 read here). Humans watch both; agents work from the board and keep it current.
 
-## Setup (Jonathan — one-time)
+- **Board:** <https://app.notion.com/p/3cd672aa2c4a809ca13bddf87a2c9d64>
+  (data source `collection://3cd672aa-2c4a-80ec-a1ab-000b40f7e4d1`)
+- **Docs home:** <https://app.notion.com/p/3cd672aa2c4a814e8714e77635cc762a>
 
-1. **Create an internal integration:** notion.so/my-integrations → *New
-   integration* → internal → the workspace with the DB. Copy the token (`ntn_…`).
-2. **Share the database with it:** open "Sanctuary Farm DB" → `•••` →
-   *Connections* → add the integration.
-3. **Create a docs home:** add a new empty page (e.g. "Sanctuary Farm — Docs"),
-   and share it with the integration the same way.
-4. **Get the ids:** each from its URL — `notion.so/<workspace>/<32-hex-chars>?…` —
-   the 32 hex chars are the database id / page id.
-5. **Store locally (gitignored):** create `.claude/notion.local.json`:
-   ```json
-   { "token": "ntn_…", "dbId": "<db 32 hex>", "docsRootPageId": "<page 32 hex>" }
-   ```
-   (or the env vars `NOTION_TOKEN` / `SANCTUARY_FARM_DB_ID` /
-   `SANCTUARY_FARM_DOCS_PAGE_ID`.)
-6. `node .claude/skills/notion-board/notion.mjs setup` — creates the missing
-   properties (below) via the API and prints the one or two it can't (the **ID**
-   property; native Status options), which take ~20 s in the UI.
-7. Add the four views (below), then
-   `node .claude/skills/notion-board/notion.mjs import docs/backlog.csv` to load
-   the starter backlog.
-8. `node scripts/notion/sync-docs.mjs` to push the docs, then commit the updated
-   `scripts/notion/docs-manifest.json` and `docs/README.md`.
+## Access
 
-Steps 6–8 can be run by an agent once the token is in place — hand it off.
+Agents read and write the board and docs through the **Notion MCP connector**
+(skills: `notion-board`, `notion-docs`). There is no local token or CLI. If the
+connector isn't available in a session, say so and proceed with code work,
+noting what you would have changed on the board.
+
+The board was built and the starter backlog imported on 2026-08-31. Schema,
+views, and all 70 seed tickets are live — the setup below is a record, not a
+to-do.
 
 ## Schema
 
@@ -38,17 +26,13 @@ Steps 6–8 can be run by an agent once the token is in place — hand it off.
 | **Name** | Title | the ticket title |
 | **ID** | Unique ID | prefix `SF` — Notion auto-numbers (`SF-1`, `SF-2`, …) |
 | **Type** | Select | `Epic` · `Story` · `Task` · `Bug` |
-| **Status** | Status | `Backlog` · `Ready` · `In progress` · `In review` · `Blocked` · `Done` |
+| **Status** | Select | `Backlog` · `Ready` · `In progress` · `In review` · `Blocked` · `Done` |
 | **Assignee** | Select | `Jonathan` (human-only) · *empty* = any agent |
 | **Size** | Select | `XS` · `S` · `M` |
-| **Priority** | Select | `P0` · `P1` · `P2` |
+| **Priority** | Select | `P0` · `P1` · `P2` · `P3` |
 | **Phase** | Select | `Phase 0` … `Phase 6` |
-| **Epic** | Relation → same DB | the parent Epic (and Story for Tasks) |
+| **Epic** | Relation → same DB | the parent Epic (and Story for Tasks); back-relation `Children` |
 | **PR** | URL | the pull request, once opened |
-
-> Use Notion's built-in **Unique ID** property so keys are stable and
-> auto-assigned. The API can't set it on create; the script reads it back and
-> prints it.
 
 ## Views
 
@@ -56,8 +40,8 @@ Steps 6–8 can be run by an agent once the token is in place — hand it off.
   review → Blocked → Done`. The working view.
 - **By phase** — board grouped by `Phase`, filtered `Status ≠ Done`. Roadmap at a
   glance.
-- **Jonathan's queue** — filter `Assignee = Jonathan` and `Status ≠ Done`. The
-  human to-do list.
+- **Jonathan's queue** — table, filter `Assignee = Jonathan` and `Status ≠ Done`.
+  The human to-do list.
 - **Backlog** — table, filter `Status = Backlog`, sort `Priority` then `Phase`.
 
 ## How work flows
@@ -72,7 +56,6 @@ Agents move their own tickets (skill: `notion-board`). See `CLAUDE.md` §Workflo
 
 The prose docs live as markdown in `docs/` (authored via PR) and are mirrored to
 Notion pages under the docs home. Notion is where to **read** them; edit the
-markdown and re-sync. `scripts/notion/docs-manifest.json` is the list;
-`docs/README.md` is the link index; `scripts/notion/sync-docs.mjs` does the push
-(skill: `notion-docs`). `CLAUDE.md` is deliberately not mirrored — it's the
-agent entry point and stays in the repo.
+markdown and push the change with the `notion-docs` skill. `docs/README.md` is
+the link index. `CLAUDE.md` is deliberately not mirrored — it's the agent entry
+point and stays in the repo.

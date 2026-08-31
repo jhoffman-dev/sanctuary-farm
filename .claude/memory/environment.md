@@ -9,5 +9,6 @@
   is a devDependency; `npx playwright install chromium` if missing.
 - No remote on the git repo yet. `main` is the working branch until CI + branch
   protection exist.
-- Notion board access needs `.claude/notion.local.json` (gitignored) or
-  `NOTION_TOKEN` / `SANCTUARY_FARM_DB_ID` env vars — not yet provided.
+- Notion board + docs are reached through the **Notion MCP connector** (skills:
+  `notion-board`, `notion-docs`). No local token or CLI. If the connector isn't
+  in the session, say so and proceed with code work. URLs + schema: `docs/board.md`.

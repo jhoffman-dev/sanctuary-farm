@@ -94,7 +94,7 @@ coherent pack), there is a backend, "beat your own best" in the paddock is fine.
 Ticket (Notion board) → `architect` refines & sizes → dev implements on a branch
 with tests → `qa` verifies (incl. e2e / screenshots) → `reviewer` checks against
 this file → human merges. Move the ticket across the board as you go (skill:
-`notion-board`).
+`notion-board`, via the Notion MCP connector).
 
 Branch names: `feat/SF-123-short-slug`, `fix/…`, `chore/…`. One ticket per PR.
 PR description links the ticket and states what changed + how it was verified.
@@ -104,10 +104,11 @@ PR description links the ticket and states what changed + how it was verified.
 `.claude/agents/`: `architect`, `domain-dev`, `app-dev`, `qa`, `reviewer`,
 `devops`. Pick by the layer/task. Full briefs in each file.
 
-`.claude/skills/`: `write-ticket` (ticket shape), `notion-board` (move tickets on
-the board), `feature-workflow` (branch → gate → PR → merge), `adr` (record a
+`.claude/skills/`: `write-ticket` (ticket shape), `notion-board` (read/create/move
+tickets), `feature-workflow` (branch → gate → PR → merge), `adr` (record a
 decision), `notion-docs` (push a changed doc to Notion). The board and docs live
-in Notion — `docs/board.md`.
+in Notion and are reached through the **Notion MCP connector** — no local token
+or CLI. `docs/board.md` has the URLs and schema.
 
 ## Memory
 
