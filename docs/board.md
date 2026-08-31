@@ -27,7 +27,7 @@ to-do.
 | **ID** | Unique ID | prefix `SF` — Notion auto-numbers (`SF-1`, `SF-2`, …) |
 | **Type** | Select | `Epic` · `Story` · `Task` · `Bug` |
 | **Status** | Select | `Backlog` · `Ready` · `In progress` · `In review` · `Blocked` · `Done` |
-| **Assignee** | Select | `Jonathan` (human-only) · *empty* = any agent |
+| **Assignee** | Select | `James` (human-only) · *empty* = any agent |
 | **Size** | Select | `XS` · `S` · `M` |
 | **Priority** | Select | `P0` · `P1` · `P2` · `P3` |
 | **Phase** | Select | `Phase 0` … `Phase 6` |
@@ -40,7 +40,7 @@ to-do.
   review → Blocked → Done`. The working view.
 - **By phase** — board grouped by `Phase`, filtered `Status ≠ Done`. Roadmap at a
   glance.
-- **Jonathan's queue** — table, filter `Assignee = Jonathan` and `Status ≠ Done`.
+- **James' queue** — table, filter `Assignee = James` and `Status ≠ Done`.
   The human to-do list.
 - **Backlog** — table, filter `Status = Backlog`, sort `Priority` then `Phase`.
 

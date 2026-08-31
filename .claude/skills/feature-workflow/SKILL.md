@@ -47,10 +47,10 @@ Address `REQUEST CHANGES` on the same branch; push; re-request.
 
 ## 6. Merge
 
-**A human (Jonathan) merges.** After merge, via `notion-board`: set Status →
+**A human (James) merges.** After merge, via `notion-board`: set Status →
 `Done`. Delete the branch.
 
 ## Blocked?
 
-Set Status → `Blocked`, add a comment with the reason, and if it needs Jonathan,
-set Assignee → `Jonathan`. Pick up the next `Ready` ticket.
+Set Status → `Blocked`, add a comment with the reason, and if it needs James,
+set Assignee → `James`. Pick up the next `Ready` ticket.

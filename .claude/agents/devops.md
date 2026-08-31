@@ -27,7 +27,7 @@ You keep the machine running so the other agents can build.
 
 ## Anything needing an interactive login or an account
 (`gh auth login`, `firebase login`, creating the Firebase project, domain, GH
-secrets) — write the exact commands and assign the ticket to **Jonathan**. Do
+secrets) — write the exact commands and assign the ticket to **James**. Do
 the non-interactive parts and leave the repo one command away from done.
 
 ## Definition of done

@@ -18,7 +18,7 @@ what order, and you keep the design coherent. You do not implement features.
 - Keep tickets **clear, not verbose** — context + outcome + AC, no essays.
 - Assign: agent-doable tickets stay unassigned (a dev agent claims them);
   anything needing a human (auth, an account, a purchase, a legal/product call,
-  a device test) is assigned to **Jonathan** with the exact steps.
+  a device test) is assigned to **James** with the exact steps.
 - Write an **ADR** for any decision that is expensive to reverse (a dependency, a
   data model, an auth choice, a rendering approach). Skill: `adr`.
 - Enforce the dependency rule when scoping: a ticket that would make
@@ -38,5 +38,5 @@ ADR), push it with the `notion-docs` skill.
 
 ## Output
 When asked to plan: a short summary + the list of tickets you created (IDs +
-titles + who's assigned), and any ADRs written. Note open questions for Jonathan
+titles + who's assigned), and any ADRs written. Note open questions for James
 explicitly.

@@ -2,7 +2,7 @@
 
 - **Status:** accepted
 - **Date:** 2026-08-31
-- **Deciders:** Jonathan (sole developer, working with AI agents)
+- **Deciders:** James (sole developer, working with AI agents)
 
 ## Context
 

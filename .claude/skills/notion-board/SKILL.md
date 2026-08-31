@@ -14,7 +14,7 @@ Its schema and the board columns are documented in `docs/board.md`.
 Work the board through the **Notion MCP tools** (`notion-fetch`,
 `notion-query-data-sources`, `notion-create-pages`, `notion-update-page`,
 `notion-create-comment`). If the connector isn't available in the session,
-**do not guess** — tell Jonathan the board can't be reached, do the code work,
+**do not guess** — tell James the board can't be reached, do the code work,
 and note which tickets you would have created/moved.
 
 Always `notion-fetch` the data source first in a session to get the current
@@ -44,7 +44,7 @@ the parent Epic's page URL). Put the ticket body in `content`. Notion assigns th
 `properties: { "Status": "In progress" }` (Backlog / Ready / In progress / In
 review / Blocked / Done).
 
-**Assign** — `properties: { "Assignee": "Jonathan" }` or `{ "Assignee": null }`.
+**Assign** — `properties: { "Assignee": "James" }` or `{ "Assignee": null }`.
 
 **Add a note** — `notion-create-comment` on the ticket's page URL.
 
@@ -56,7 +56,7 @@ review / Blocked / Done).
 - Open the PR, then: set `PR` and Status → `In review`.
 - After human merge: Status → `Done`.
 - Blocked on a human/decision: Status → `Blocked` + a comment saying why +
-  assign to Jonathan if it's his.
+  assign to James if it's his.
 
 Keep the board honest — never leave a ticket "In progress" that you've stopped.
 
