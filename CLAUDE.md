@@ -1,64 +1,109 @@
-# Sanctuary Farm — working notes for agents
+# Sanctuary Farm — agent handbook
 
-A multiplication-fluency game for a 10-year-old, built as a browser app.
-Full spec: `docs/SPEC.md`. Contracts appendix: `docs/CONTRACTS.md`.
-Orchestration + per-track briefs: `docs/AGENTS.md`, `docs/tracks/`.
+A 2.5D farm game that teaches math fluency. Free, ad-free, PII-free, playable
+from a link on any device.
 
-## Commands
+**Read first:** `docs/PRD.md` · `docs/architecture.md` · `docs/implementation-plan.md`
+· `docs/adr/`. History of the prototype: `docs/redesign-notes.md`, `docs/original-spec.md`.
+
+> Status: the prototype in `src/` is the current alpha. The rebuild (monorepo,
+> Clean Architecture, react-three-fiber) is Phase 1+. Until Phase 1 lands, `src/`
+> is the app; after, it moves under `apps/web` and `packages/*`.
+
+## Stack
+
+- TypeScript (strict) · React 19 · **react-three-fiber / Three.js** for the world ·
+  Tailwind for 2D UI · Vitest · Playwright for e2e.
+- **pnpm** workspaces. Node pinned in `.nvmrc` + `engines`.
+- Firebase: Hosting (game + landing), custom Auth, Firestore, Cloud Functions.
+- Deploy: Firebase Hosting. PR previews + prod on merge.
+
+## Architecture — the rule that matters
+
+**Dependencies point inward.** `domain` → nothing. `application` → `domain`.
+`infrastructure` → `application` + `domain`. `presentation` → `application` (and
+`domain` *types* only).
+
+- **`packages/domain`** — pure rules: the scheduler (Leitner + latency +
+  interleave + tiers), curriculum, mastery. No framework, no I/O, no
+  `Date.now()`, no `Math.random()` — inject a `Clock` and an `Rng`.
+- **`packages/application`** — use-cases + ports (`SaveStore`, `Clock`, `Rng`,
+  `AudioBus`, `IdProvider`). Returns plain data / events.
+- **`packages/persistence`, `packages/audio`, `functions/`** — adapters. Thin.
+- **`apps/web`** — React + r3f. **Holds zero game rules.** If a component is
+  deciding what fact comes next, it's in the wrong layer.
+
+Full detail + the monorepo layout: `docs/architecture.md`.
+
+## Clean Code — enforced in review
+
+- Names say *what*, not *how*. No `data` / `info` / `manager` / `helper` as a
+  whole name.
+- One thing per function; prefer < ~30 lines; > 3 params → pass an object.
+- Comments explain *why* or a non-obvious constraint — never restate the code.
+- No dead code, no commented-out code. No `any` without a one-line reason.
+- Errors are handled or propagated on purpose — never swallowed.
+- One reason to change per module. Rules + rendering + I/O in one file → split.
+- Cross-package imports go through the package's public entry only.
+
+## Testing — required to merge
+
+| Layer | Kind | Bar |
+| --- | --- | --- |
+| domain | unit, pure, seeded RNG + fixed clock | ~90%+ lines; every rule tested |
+| application | unit, fake adapters | every use-case, happy + key edges |
+| infrastructure | integration | round-trip + failure modes |
+| presentation | component + e2e smokes | key flows render; day-one loop e2e-green |
+
+No snapshot test as a stand-in for a behaviour test.
+
+## Commands (current prototype; will move to pnpm scripts in Phase 1)
 
 | Command | What |
 | --- | --- |
-| `npm run dev` | Vite dev server. Renders the **dev-route index** (`src/dev/DevRoutes.tsx`). Add `?app=1` to boot the real game shell (`src/App.tsx`). |
-| `npm run typecheck` | `tsc -b --noEmit`. Must be clean before you hand off. |
-| `npm test` | Vitest, single run. |
-| `npm run test:watch` | Vitest watch. |
-| `npm run lint` | oxlint. Must be clean. |
-| `npm run build` | `tsc -b && vite build`. Must succeed before you hand off. |
+| `npm run dev` | Vite dev server (game at `/`, dev routes at `?dev=1`) |
+| `npm run typecheck` / `npm run lint` / `npm test` / `npm run build` | must all pass before hand-off |
+| `npm run smoke` | Playwright walkthrough → screenshots in `../Debugging Images/` |
 
-Node ≥ 20 (developed on 26). Package manager: **npm** (a `package-lock.json` is committed).
+Node is Homebrew-installed — prefix bash calls with `export PATH="/opt/homebrew/bin:$PATH"`.
 
-## Stack (as built — supersedes the spec's "React 18" line)
+## Game design — hold the line
 
-- Vite 8 + React 19 + TypeScript (strict) — path alias `@/*` → `src/*`
-- Tailwind CSS 4 via `@tailwindcss/vite` (`@import "tailwindcss"` in `src/index.css`, no config file)
-- `motion` (Framer Motion v13) — UI transitions and creature idle animation only
-- A plain `requestAnimationFrame` loop for character movement (not `motion`)
-- Inline SVG for **all** art. No image files, no sprite sheets, no external assets.
-- Web Audio API for sound, oscillator-synthesized. No audio files.
-- `localStorage` for persistence. No backend, no accounts, no network calls at runtime.
-- Deploy: Vercel static build.
+1. **No multiple choice, ever.** A number pad only.
+2. **Math advances; exploration reveals.** Coins/feed/egg progress come only from
+   graded answers — and coins only in the paddock and nest.
+3. **Latency drives mastery.** Correctness alone is never enough.
+4. **Sessions end on time.** The game says goodnight; it never begs.
+5. **Interleave.** Never block-drill; never a family 3× in a row.
+6. **No punishment framing.** Animals get glum, never starve / sicken / leave.
+7. **No ads, no purchases, no PII.** (ADR-0002.) Any social feature is
+   pick-from-phrases, never free text kids see.
+8. **Accessible.** Colour-blind-safe, keyboard-playable, respects reduced-motion,
+   readable at small sizes.
 
-**Do not add** a game engine, a state-management library, a UI component library, or a
-pathfinding package. Everything here is small enough to write directly.
+Superseded from the prototype era: art is now bought/authored assets (one
+coherent pack), there is a backend, "beat your own best" in the paddock is fine.
 
-## How the parallel build is organised
+## Workflow
 
-- `src/contracts/` — every shared type + `constants.ts` (all tuning numbers) + `rng.ts`
-  (seedable RNG). **Frozen.** Import from `@/contracts`. If you think a contract is wrong,
-  stop and flag it — do not edit it unilaterally.
-- Every cross-track module exists as a `// STUB` at its real path. **You replace only your
-  own track's stubs** (see `docs/AGENTS.md` for the ownership table). Never edit another
-  track's files.
-- Dev routes: each track owns exactly one file `src/dev/routes/<name>.route.tsx` that
-  `export default`s a `DevRoute`. They are picked up by a glob — **no shared registry file
-  to edit**, so no collisions.
-- `src/engine/facts.ts` is a Phase 0 reference implementation (shared infra). Track A owns
-  further changes but must keep `buildFacts` / `ALL_FACTS` stable.
+Ticket (Notion board) → `architect` refines & sizes → dev implements on a branch
+with tests → `qa` verifies (incl. e2e / screenshots) → `reviewer` checks against
+this file → human merges. Move the ticket across the board as you go (skill:
+`notion-board`).
 
-## Non-negotiable rules — hold the line on all of them
+Branch names: `feat/SF-123-short-slug`, `fix/…`, `chore/…`. One ticket per PR.
+PR description links the ticket and states what changed + how it was verified.
 
-1. **No multiple choice, ever.** A number pad only. Multiple choice trains elimination, not recall.
-2. **Exploration reveals; math advances.** No pellet, coin, or point of egg progress originates
-   anywhere except a graded answer. No foraging, no idle income, no paying minigames.
-3. **No punishment for absence.** Creatures never starve, sicken, run away, or look sad about
-   neglect. Guilt mechanics turn a game into an obligation.
-4. **No social features, leaderboards, external links, ads, or purchases.**
-5. **Latency drives promotion.** Correctness alone is never sufficient (see the grading table).
-6. **Sessions end on time.** The game says goodnight; it never asks for one more round.
-7. **Interleave families.** Never block-drill. Never the same family more than twice in a row.
-8. **All art and audio generated in code.** No downloaded assets, ever.
+## Agents
 
-## What success looks like
+`.claude/agents/`: `architect`, `domain-dev`, `app-dev`, `qa`, `reviewer`,
+`devops`. Pick by the layer/task. Full briefs in each file.
 
-She answers any fact from 1×1 to 12×12 correctly in **under three seconds**, without visible
-computation. Everything else exists to make her want to open the game tomorrow.
+## Memory
+
+Shared, durable knowledge lives in `docs/` — product intent in `docs/PRD.md`,
+architecture in `docs/architecture.md`, expensive-to-reverse decisions in
+`docs/adr/` (skill: `adr`). Agent-to-agent notes and gotchas go in
+`.claude/memory/` (one markdown file per topic, `MEMORY.md` is the index). Read
+the index at task start; append a note when you learn something the next agent
+will need. Don't put transient task state there.

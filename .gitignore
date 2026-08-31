@@ -23,5 +23,15 @@ dist-ssr
 *.sln
 *.sw?
 
-# Claude Code worktrees / job state
-.claude/
+# Claude Code — commit agents/skills/memory; ignore local state & secrets
+.claude/worktrees/
+.claude/*.local.json
+.claude/settings.local.json
+notion.local.json
+
+# Firebase / secrets
+.firebase/
+*-service-account.json
+.env
+.env.*
+!.env.example
