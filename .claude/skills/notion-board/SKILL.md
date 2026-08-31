@@ -28,6 +28,8 @@ All via `node .claude/skills/notion-board/notion.mjs <cmd> [args]`:
 
 | Command | Does |
 | --- | --- |
+| `schema` | show the DB's properties vs what the board needs |
+| `setup` | create the missing properties via the API (one-time) |
 | `list [--status Ready]` | print tickets (id, key, title, type, status, assignee) |
 | `get <SF-123>` | full ticket |
 | `create --type Task --title "..." --epic SF-1 --status Backlog --file body.md` | create a ticket; prints its key |

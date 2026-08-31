@@ -20,13 +20,16 @@ read here). Humans watch both; agents work from the board and keep it current.
    ```
    (or the env vars `NOTION_TOKEN` / `SANCTUARY_FARM_DB_ID` /
    `SANCTUARY_FARM_DOCS_PAGE_ID`.)
-6. Run `node .claude/skills/notion-board/notion.mjs schema` — it prints the DB's
-   properties and flags what's missing.
-7. Add the missing properties (below) and the four views, then
+6. `node .claude/skills/notion-board/notion.mjs setup` — creates the missing
+   properties (below) via the API and prints the one or two it can't (the **ID**
+   property; native Status options), which take ~20 s in the UI.
+7. Add the four views (below), then
    `node .claude/skills/notion-board/notion.mjs import docs/backlog.csv` to load
    the starter backlog.
 8. `node scripts/notion/sync-docs.mjs` to push the docs, then commit the updated
    `scripts/notion/docs-manifest.json` and `docs/README.md`.
+
+Steps 6–8 can be run by an agent once the token is in place — hand it off.
 
 ## Schema
 

@@ -4,7 +4,8 @@
 // Config: .claude/notion.local.json or env — see scripts/notion/lib.mjs and docs/board.md.
 //
 // Commands:
-//   schema
+//   schema                       show DB properties vs what the board needs
+//   setup                        create the missing properties via the API
 //   list [--status <s>] [--assignee <a>] [--type <t>] [--phase <p>]
 //   get <SF-123>
 //   create --type <Epic|Story|Task|Bug> --title "..." [--epic SF-1] [--status Backlog]
@@ -20,7 +21,7 @@ import { readFileSync } from 'node:fs';
 import { loadConfig, makeApi } from '../../../scripts/notion/lib.mjs';
 
 const HELP =
-  'commands: schema | list | get | create | move | assign | link | note | import\n' +
+  'commands: schema | setup | list | get | create | move | assign | link | note | import\n' +
   'see the header of this file or docs/board.md';
 if (!process.argv[2] || ['help', '-h', '--help'].includes(process.argv[2])) {
   console.log(HELP);
@@ -148,6 +149,45 @@ async function cmdSchema() {
   }
 }
 
+async function cmdSetup() {
+  const d = await db();
+  const has = d.properties;
+  const add = {};
+  const sel = (options) => ({ select: { options: options.map((name) => ({ name })) } });
+
+  if (!has.Type) add.Type = sel(['Epic', 'Story', 'Task', 'Bug']);
+  if (!has.Assignee) add.Assignee = sel(['Jonathan']);
+  if (!has.Size) add.Size = sel(['XS', 'S', 'M']);
+  if (!has.Priority) add.Priority = sel(['P0', 'P1', 'P2']);
+  if (!has.Phase) add.Phase = sel(['Phase 0', 'Phase 1', 'Phase 2', 'Phase 3', 'Phase 4', 'Phase 5', 'Phase 6']);
+  if (!has.PR) add.PR = { url: {} };
+  if (!has.Epic) add.Epic = { relation: { database_id: dbId, type: 'single_property', single_property: {} } };
+  // Status: the API can't create or edit a native `status` property, so if one
+  // isn't already there we make a plain select we CAN drive.
+  if (!has.Status) add.Status = sel(['Backlog', 'Ready', 'In progress', 'In review', 'Blocked', 'Done']);
+
+  if (Object.keys(add).length) {
+    await api(`/databases/${dbId}`, 'PATCH', { properties: add });
+    console.log(`Added: ${Object.keys(add).join(', ')}`);
+  } else {
+    console.log('All properties already present.');
+  }
+
+  // Things the API can't do — report for a 20-second UI fix.
+  const manual = [];
+  if (!has.ID) manual.push('Add an "ID" property of type "ID" (Unique ID), prefix "SF" — for stable ticket keys.');
+  if (has.Status?.type === 'status') {
+    const opts = new Set((has.Status.status?.options || []).map((o) => o.name));
+    const need = ['Backlog', 'Ready', 'In progress', 'In review', 'Blocked', 'Done'].filter((s) => !opts.has(s));
+    if (need.length) manual.push(`Status is a native "status" property — add these options in the UI: ${need.join(', ')}.`);
+  }
+  if (manual.length) {
+    console.log('\nDo these in the Notion UI (the API cannot):');
+    for (const m of manual) console.log(`  - ${m}`);
+  }
+  console.log('\nThen: node .claude/skills/notion-board/notion.mjs import docs/backlog.csv');
+}
+
 async function cmdList(flags) {
   const pages = await allPages();
   const rows = pages
@@ -198,7 +238,7 @@ function bodyToBlocks(body) {
     }));
 }
 
-async function createTicket({ type, title, status, assignee, size, priority, phase, epic, body }) {
+async function createTicket({ type, title, status, assignee, size, priority, phase, epic, epicId, body }) {
   const props = { Name: titleProp(title) };
   if (type) props.Type = await selectProp('Type', type);
   props.Status = await selectProp('Status', status || 'Backlog');
@@ -206,10 +246,8 @@ async function createTicket({ type, title, status, assignee, size, priority, pha
   if (size) props.Size = await selectProp('Size', size);
   if (priority) props.Priority = await selectProp('Priority', priority);
   if (phase) props.Phase = await selectProp('Phase', phase);
-  if (epic) {
-    const parent = await findByKey(epic);
-    props.Epic = { relation: [{ id: parent.id }] };
-  }
+  const parentId = epicId || (epic ? (await findByKey(epic)).id : null);
+  if (parentId) props.Epic = { relation: [{ id: parentId }] };
   const page = await api('/pages', 'POST', {
     parent: { database_id: dbId },
     properties: props,
@@ -321,15 +359,15 @@ async function cmdImport(path) {
   }));
   const order = { Epic: 0, Story: 1, Task: 2, Bug: 3 };
   records.sort((a, b) => (order[a.type] ?? 9) - (order[b.type] ?? 9));
-  const titleToKey = {};
+  const titleToId = {};
   for (const rec of records) {
-    // allow Epic column to name a title from this same import
-    if (rec.epic && titleToKey[rec.epic]) rec.epic = titleToKey[rec.epic];
-    const page = await createTicket(rec);
-    const fresh = await api(`/pages/${page.id}`);
-    const key = keyOf(fresh);
-    titleToKey[rec.title] = key;
-    console.log(`  ${key.padEnd(7)} ${rec.type?.padEnd(6)} ${rec.title}`);
+    // the Epic column names another row's Title (usually an Epic in this import)
+    const epicId = rec.epic ? titleToId[rec.epic] : undefined;
+    if (rec.epic && !epicId) console.log(`  (note: epic "${rec.epic}" for "${rec.title}" not found in this import — left unlinked)`);
+    const page = await createTicket({ ...rec, epicId });
+    titleToId[rec.title] = page.id;
+    const key = keyOf(await api(`/pages/${page.id}`));
+    console.log(`  ${key.padEnd(7)} ${(rec.type || '').padEnd(6)} ${rec.title}`);
   }
   console.log(`\nImported ${records.length} ticket(s).`);
 }
@@ -342,6 +380,9 @@ const { flags, pos } = parseArgs(rest);
 switch (cmd) {
   case 'schema':
     await cmdSchema();
+    break;
+  case 'setup':
+    await cmdSetup();
     break;
   case 'list':
     await cmdList(flags);

@@ -16,7 +16,7 @@ Size: XS / S / M · Priority: P0 (now) / P1 / P2.
 | Tickets total | 63 |
 | Done | 15 |
 | Ready | 22 |
-| Assigned to Jonathan | 14 |
+| Assigned to Jonathan | 13 |
 
 ## Phase 0 — Project foundation
 
@@ -43,7 +43,7 @@ _P0 · agents_ — Housekeeping before feature work: docs, agents, skills, board
 | Task | Decide repository visibility (public vs private) | Ready | Jonathan | XS | P0 |
 | Task | Choose a license and add LICENSE | Ready | Jonathan | XS | P0 |
 | Task | Notion: create integration, share DB + a Docs page, add credentials | Ready | Jonathan | XS | P0 |
-| Task | Notion: add missing DB properties then import the backlog | Ready | Jonathan | S | P0 |
+| Task | Notion: build the board and import the backlog | Ready | — | S | P0 |
 | Task | Notion: push the docs and verify the sync | Ready | — | S | P0 |
 | Task | Firebase: auth and create the project | Ready | Jonathan | S | P0 |
 | Task | Decide GitHub Project vs Notion-only board | Ready | Jonathan | XS | P0 |
@@ -113,9 +113,9 @@ _P0 · agents_ — Housekeeping before feature work: docs, agents, skills, board
 
 **Notion: create integration, share DB + a Docs page, add credentials** — Follow docs/board.md Setup: internal integration; share "Sanctuary Farm DB" AND a new empty page (e.g. "Sanctuary Farm — Docs") with it; put token + dbId + docsRootPageId in .claude/notion.local.json; run notion.mjs schema.
 
-**Notion: add missing DB properties then import the backlog** — After credentials work: add properties schema reports missing (Type, Status, Assignee, Size, Priority, Phase, Epic relation, PR url, Unique ID prefix SF), add the four views, then notion.mjs import docs/backlog.csv.
+**Notion: build the board and import the backlog** — After the token is in .claude/notion.local.json: run notion.mjs setup (creates properties), add the "ID" property + the four views in the UI as it instructs, then notion.mjs import docs/backlog.csv. AC: the board shows every backlog ticket with Type/Status/Phase/Epic set.
 
-**Notion: push the docs and verify the sync** — After credentials + the Docs page exist: run node scripts/notion/sync-docs.mjs, open each created page, confirm headings / tables / code render acceptably, commit the manifest with its page ids and the updated docs/README.md. Fix mdToBlocks in scripts/notion/lib.mjs for anything mangled. AC: every manifest doc has a working Notion link.
+**Notion: push the docs and verify the sync** — After the token + the Docs page exist: run node scripts/notion/sync-docs.mjs, open each created page, confirm headings / tables / code render acceptably, commit the manifest with its page ids and the updated docs/README.md. Fix mdToBlocks in scripts/notion/lib.mjs for anything mangled. AC: every manifest doc has a working Notion link.
 
 **Firebase: auth and create the project** — Interactive. firebase login; create a project; pick a project id (e.g. sanctuary-farm-app); add two Hosting sites (game, landing); enable Firestore + Functions. Hand the project id back.
 
