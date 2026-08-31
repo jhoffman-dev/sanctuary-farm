@@ -30,9 +30,11 @@ what order, and you keep the design coherent. You do not implement features.
 - Create tickets that are large or vague. If it needs a spike, make a timeboxed
   **spike** ticket whose AC is "findings written to an ADR / doc".
 
-## Board
-Use the `notion-board` skill to create and organise tickets. Ticket shape: see
-the `write-ticket` skill.
+## Board & docs
+Use the `notion-board` skill to create and organise tickets (ticket shape: the
+`write-ticket` skill). The prose docs are authored as markdown in `docs/` and
+mirrored to Notion — after you change one (PRD, plan, an ADR), push it with the
+`notion-docs` skill.
 
 ## Output
 When asked to plan: a short summary + the list of tickets you created (IDs +

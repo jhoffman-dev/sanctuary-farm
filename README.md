@@ -21,10 +21,12 @@ Reachable by any kid on any device from a link.
 | [`docs/architecture.md`](docs/architecture.md) | Clean Architecture layers + the dependency rule |
 | [`docs/implementation-plan.md`](docs/implementation-plan.md) | phases 0–6 |
 | [`docs/adr/`](docs/adr/) | decisions that are expensive to reverse (stack, identity) |
-| [`docs/notion-board.md`](docs/notion-board.md) | the ticket board — schema, setup, flow |
+| [`docs/board.md`](docs/board.md) | the Notion board + docs — schema, setup, flow |
 
-Prototype-era design notes: `docs/redesign-notes.md`, `docs/SPEC.md`,
-`docs/original-spec.md`.
+The prose docs are mirrored to **Notion** (that's where to read them) —
+`docs/README.md` has the links; the markdown here is the authoring surface,
+pushed with the `notion-docs` skill. Prototype-era design notes:
+`docs/redesign-notes.md`, `docs/SPEC.md`, `docs/original-spec.md`.
 
 ## Run the prototype
 

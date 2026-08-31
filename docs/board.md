@@ -1,26 +1,32 @@
-# The Notion board — "Sanctuary Farm DB"
+# The board and docs in Notion — "Sanctuary Farm DB"
 
-The single source of truth for work. Humans watch it; agents work from it and
-keep it current.
+Notion holds two things: the **board** (tickets — the single source of truth for
+work) and the **docs** (PRD, plan, architecture, ADRs — mirrored from the repo,
+read here). Humans watch both; agents work from the board and keep it current.
 
 ## Setup (Jonathan — one-time)
 
 1. **Create an internal integration:** notion.so/my-integrations → *New
-   integration* → internal → workspace with the DB. Copy the token (`ntn_…`).
+   integration* → internal → the workspace with the DB. Copy the token (`ntn_…`).
 2. **Share the database with it:** open "Sanctuary Farm DB" → `•••` →
    *Connections* → add the integration.
-3. **Get the database id:** from the DB's URL —
-   `notion.so/<workspace>/<32-hex-chars>?v=…` — the 32 hex chars.
-4. **Store both locally (gitignored):** create `.claude/notion.local.json`:
+3. **Create a docs home:** add a new empty page (e.g. "Sanctuary Farm — Docs"),
+   and share it with the integration the same way.
+4. **Get the ids:** each from its URL — `notion.so/<workspace>/<32-hex-chars>?…` —
+   the 32 hex chars are the database id / page id.
+5. **Store locally (gitignored):** create `.claude/notion.local.json`:
    ```json
-   { "token": "ntn_…", "dbId": "<32 hex chars>" }
+   { "token": "ntn_…", "dbId": "<db 32 hex>", "docsRootPageId": "<page 32 hex>" }
    ```
-   (or export `NOTION_TOKEN` and `SANCTUARY_FARM_DB_ID`.)
-5. Run `node .claude/skills/notion-board/notion.mjs schema` — it prints the DB's
-   current properties and tells you which are missing.
-6. Add any missing properties (below), then
+   (or the env vars `NOTION_TOKEN` / `SANCTUARY_FARM_DB_ID` /
+   `SANCTUARY_FARM_DOCS_PAGE_ID`.)
+6. Run `node .claude/skills/notion-board/notion.mjs schema` — it prints the DB's
+   properties and flags what's missing.
+7. Add the missing properties (below) and the four views, then
    `node .claude/skills/notion-board/notion.mjs import docs/backlog.csv` to load
    the starter backlog.
+8. `node scripts/notion/sync-docs.mjs` to push the docs, then commit the updated
+   `scripts/notion/docs-manifest.json` and `docs/README.md`.
 
 ## Schema
 
@@ -58,3 +64,12 @@ claimed it) → `In review` (PR open, qa + reviewer) → `Done` (human merged).
 `Blocked` any time, with a note saying why.
 
 Agents move their own tickets (skill: `notion-board`). See `CLAUDE.md` §Workflow.
+
+## Docs
+
+The prose docs live as markdown in `docs/` (authored via PR) and are mirrored to
+Notion pages under the docs home. Notion is where to **read** them; edit the
+markdown and re-sync. `scripts/notion/docs-manifest.json` is the list;
+`docs/README.md` is the link index; `scripts/notion/sync-docs.mjs` does the push
+(skill: `notion-docs`). `CLAUDE.md` is deliberately not mirrored — it's the
+agent entry point and stays in the repo.

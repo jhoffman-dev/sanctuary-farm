@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 // Sanctuary Farm — Notion board CLI.
 //
-// Config (either):
-//   .claude/notion.local.json   { "token": "ntn_…", "dbId": "<32 hex>" }
-//   env  NOTION_TOKEN  SANCTUARY_FARM_DB_ID
+// Config: .claude/notion.local.json or env — see scripts/notion/lib.mjs and docs/board.md.
 //
 // Commands:
 //   schema
@@ -18,60 +16,19 @@
 //   note <SF-123> "text"
 //   import <path.csv>     columns: Type,Title,Status,Assignee,Size,Priority,Phase,Epic,Body
 
-import { readFileSync, existsSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { dirname, resolve } from 'node:path';
-
-const API = 'https://api.notion.com/v1';
-const VERSION = '2022-06-28';
-
-function loadConfig() {
-  let token = process.env.NOTION_TOKEN;
-  let dbId = process.env.SANCTUARY_FARM_DB_ID;
-  const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
-  const local = resolve(root, '.claude/notion.local.json');
-  if ((!token || !dbId) && existsSync(local)) {
-    const j = JSON.parse(readFileSync(local, 'utf8'));
-    token = token || j.token;
-    dbId = dbId || j.dbId;
-  }
-  if (!token || !dbId) {
-    console.error(
-      'No Notion credentials. Create .claude/notion.local.json { "token", "dbId" }\n' +
-        'or set NOTION_TOKEN and SANCTUARY_FARM_DB_ID. See docs/notion-board.md.',
-    );
-    process.exit(2);
-  }
-  return { token, dbId };
-}
+import { readFileSync } from 'node:fs';
+import { loadConfig, makeApi } from '../../../scripts/notion/lib.mjs';
 
 const HELP =
   'commands: schema | list | get | create | move | assign | link | note | import\n' +
-  'see the header of this file or docs/notion-board.md';
+  'see the header of this file or docs/board.md';
 if (!process.argv[2] || ['help', '-h', '--help'].includes(process.argv[2])) {
   console.log(HELP);
   process.exit(0);
 }
 
-const { token, dbId } = loadConfig();
-
-async function api(path, method = 'GET', body) {
-  const res = await fetch(`${API}${path}`, {
-    method,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Notion-Version': VERSION,
-      'Content-Type': 'application/json',
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  const json = await res.json();
-  if (!res.ok) {
-    console.error(`Notion ${res.status}: ${json.message || JSON.stringify(json)}`);
-    process.exit(1);
-  }
-  return json;
-}
+const { token, dbId } = loadConfig({ need: ['dbId'] });
+const api = makeApi(token);
 
 // ---- property helpers -------------------------------------------------------
 
@@ -183,7 +140,7 @@ async function cmdSchema() {
   for (const [name, prop] of Object.entries(d.properties)) {
     console.log(`  ${name.padEnd(12)} ${prop.type}`);
   }
-  console.log('\nExpected (see docs/notion-board.md):');
+  console.log('\nExpected (see docs/board.md):');
   for (const [name, type] of Object.entries(want)) {
     const got = d.properties[name]?.type;
     const mark = got === type ? 'ok' : got ? `is ${got}` : 'MISSING';

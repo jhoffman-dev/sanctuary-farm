@@ -1,0 +1,20 @@
+{
+  "_comment": "Docs mirrored to Notion by sync-docs.mjs. pageId is filled in on first push; commit it. Order here is the order pages are created under the docs root.",
+  "docs": [
+    { "file": "docs/PRD.md", "title": "PRD", "pageId": null },
+    { "file": "docs/implementation-plan.md", "title": "Implementation plan", "pageId": null },
+    { "file": "docs/architecture.md", "title": "Architecture", "pageId": null },
+    { "file": "docs/curriculum.md", "title": "Curriculum", "pageId": null },
+    { "file": "docs/accessibility.md", "title": "Accessibility standard", "pageId": null },
+    { "file": "docs/performance-budget.md", "title": "Performance budget", "pageId": null },
+    { "file": "docs/threat-model.md", "title": "Kid-safety threat model", "pageId": null },
+    { "file": "docs/privacy.md", "title": "Privacy notice", "pageId": null },
+    { "file": "docs/art-direction.md", "title": "Art direction", "pageId": null },
+    { "file": "docs/sound-design.md", "title": "Sound design", "pageId": null },
+    { "file": "docs/definition-of-done.md", "title": "Definition of Done", "pageId": null },
+    { "file": "docs/secrets.md", "title": "Secrets management", "pageId": null },
+    { "file": "docs/board.md", "title": "The board — Sanctuary Farm DB", "pageId": null },
+    { "file": "docs/adr/0001-stack-choice.md", "title": "ADR-0001 — Stack choice", "pageId": null },
+    { "file": "docs/adr/0002-identity-and-save.md", "title": "ADR-0002 — Identity and save", "pageId": null }
+  ]
+}

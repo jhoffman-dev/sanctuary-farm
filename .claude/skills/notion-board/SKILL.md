@@ -6,9 +6,9 @@ description: Read, create, and move Sanctuary Farm tickets on the Notion board (
 # Notion board
 
 The single source of truth for work is the Notion database **Sanctuary Farm DB**.
-Its schema and the board columns are documented in `docs/notion-board.md`.
+Its schema and the board columns are documented in `docs/board.md`.
 
-## Setup (one-time, human — see `docs/notion-board.md` §Setup)
+## Setup (one-time, human — see `docs/board.md` §Setup)
 
 1. Jonathan creates a Notion **internal integration** and shares the database
    with it.

@@ -13,9 +13,9 @@ Size: XS / S / M · Priority: P0 (now) / P1 / P2.
 | | Count |
 | --- | --- |
 | Epics | 7 |
-| Tickets total | 61 |
-| Done | 14 |
-| Ready | 21 |
+| Tickets total | 63 |
+| Done | 15 |
+| Ready | 22 |
 | Assigned to Jonathan | 14 |
 
 ## Phase 0 — Project foundation
@@ -35,14 +35,16 @@ _P0 · agents_ — Housekeeping before feature work: docs, agents, skills, board
 | Task | Write the core skills | Done | — | S | P0 |
 | Task | Set up the agent memory convention | Done | — | XS | P0 |
 | Task | Notion board schema spec + CLI | Done | — | S | P0 |
+| Task | Docs-to-Notion sync script | Done | — | S | P0 |
 | Task | Landing page v0 (static) | Done | — | S | P0 |
 | Task | Refresh the README | Done | — | XS | P0 |
 | Task | gitignore for secrets and monorepo | Done | — | XS | P0 |
 | Task | GitHub: auth and create the repo | Ready | Jonathan | XS | P0 |
 | Task | Decide repository visibility (public vs private) | Ready | Jonathan | XS | P0 |
 | Task | Choose a license and add LICENSE | Ready | Jonathan | XS | P0 |
-| Task | Notion: create integration, share DB, add credentials | Ready | Jonathan | XS | P0 |
+| Task | Notion: create integration, share DB + a Docs page, add credentials | Ready | Jonathan | XS | P0 |
 | Task | Notion: add missing DB properties then import the backlog | Ready | Jonathan | S | P0 |
+| Task | Notion: push the docs and verify the sync | Ready | — | S | P0 |
 | Task | Firebase: auth and create the project | Ready | Jonathan | S | P0 |
 | Task | Decide GitHub Project vs Notion-only board | Ready | Jonathan | XS | P0 |
 | Task | Decide analytics stance | Ready | Jonathan | XS | P0 |
@@ -93,7 +95,9 @@ _P0 · agents_ — Housekeeping before feature work: docs, agents, skills, board
 
 **Set up the agent memory convention** — .claude/memory/ — MEMORY.md index plus one file per topic. Agents read at task start, append what the next agent needs.
 
-**Notion board schema spec + CLI** — docs/notion-board.md (schema, views, setup, flow) and .claude/skills/notion-board/notion.mjs.
+**Notion board schema spec + CLI** — docs/board.md (schema, views, setup, flow) and .claude/skills/notion-board/notion.mjs.
+
+**Docs-to-Notion sync script** — scripts/notion/sync-docs.mjs + lib.mjs — markdown docs are authored in the repo and pushed to Notion pages (Notion is where they are read). Manifest at scripts/notion/docs-manifest.json; index at docs/README.md. Needs a smoke test once the token lands.
 
 **Landing page v0 (static)** — apps/landing/ — static HTML/CSS: mission, current status checklist, future-games section. No build.
 
@@ -107,9 +111,11 @@ _P0 · agents_ — Housekeeping before feature work: docs, agents, skills, board
 
 **Choose a license and add LICENSE** — Recommendation: AGPL-3.0 — keeps derivatives open, blocks a closed commercial fork, matches free-forever. MIT for maximum reuse. Add LICENSE + a README line.
 
-**Notion: create integration, share DB, add credentials** — Follow docs/notion-board.md Setup: internal integration, share "Sanctuary Farm DB", put token + dbId in .claude/notion.local.json, run notion.mjs schema.
+**Notion: create integration, share DB + a Docs page, add credentials** — Follow docs/board.md Setup: internal integration; share "Sanctuary Farm DB" AND a new empty page (e.g. "Sanctuary Farm — Docs") with it; put token + dbId + docsRootPageId in .claude/notion.local.json; run notion.mjs schema.
 
 **Notion: add missing DB properties then import the backlog** — After credentials work: add properties schema reports missing (Type, Status, Assignee, Size, Priority, Phase, Epic relation, PR url, Unique ID prefix SF), add the four views, then notion.mjs import docs/backlog.csv.
+
+**Notion: push the docs and verify the sync** — After credentials + the Docs page exist: run node scripts/notion/sync-docs.mjs, open each created page, confirm headings / tables / code render acceptably, commit the manifest with its page ids and the updated docs/README.md. Fix mdToBlocks in scripts/notion/lib.mjs for anything mangled. AC: every manifest doc has a working Notion link.
 
 **Firebase: auth and create the project** — Interactive. firebase login; create a project; pick a project id (e.g. sanctuary-farm-app); add two Hosting sites (game, landing); enable Firestore + Functions. Hand the project id back.
 

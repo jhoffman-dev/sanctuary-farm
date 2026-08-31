@@ -6,6 +6,11 @@ from a link on any device.
 **Read first:** `docs/PRD.md` · `docs/architecture.md` · `docs/implementation-plan.md`
 · `docs/adr/`. History of the prototype: `docs/redesign-notes.md`, `docs/original-spec.md`.
 
+Those prose docs are **mirrored to Notion** — that's where humans read them; the
+markdown here is the authoring surface, changed via PR and pushed with the
+`notion-docs` skill (`docs/README.md` has the links). This file, `CLAUDE.md`, is
+the exception — it stays repo-only.
+
 > Status: the prototype in `src/` is the current alpha. The rebuild (monorepo,
 > Clean Architecture, react-three-fiber) is Phase 1+. Until Phase 1 lands, `src/`
 > is the app; after, it moves under `apps/web` and `packages/*`.
@@ -94,10 +99,15 @@ this file → human merges. Move the ticket across the board as you go (skill:
 Branch names: `feat/SF-123-short-slug`, `fix/…`, `chore/…`. One ticket per PR.
 PR description links the ticket and states what changed + how it was verified.
 
-## Agents
+## Agents & skills
 
 `.claude/agents/`: `architect`, `domain-dev`, `app-dev`, `qa`, `reviewer`,
 `devops`. Pick by the layer/task. Full briefs in each file.
+
+`.claude/skills/`: `write-ticket` (ticket shape), `notion-board` (move tickets on
+the board), `feature-workflow` (branch → gate → PR → merge), `adr` (record a
+decision), `notion-docs` (push a changed doc to Notion). The board and docs live
+in Notion — `docs/board.md`.
 
 ## Memory
 

@@ -10,5 +10,5 @@ Tooling for the Notion board ("Sanctuary Farm DB").
   `node .claude/skills/notion-board/notion.mjs import docs/backlog.csv`
   (Epics are created first so the `Epic` relation resolves).
 
-Setup and schema: `docs/notion-board.md`. After the first import, new tickets are
+Setup and schema: `docs/board.md`. After the first import, new tickets are
 created directly with `notion.mjs create …` — the CSV is just the seed.
