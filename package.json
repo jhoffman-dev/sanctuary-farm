@@ -12,11 +12,12 @@
     "typecheck": "pnpm -r --parallel typecheck",
     "lint": "oxlint",
     "boundaries": "depcruise --config .dependency-cruiser.cjs packages apps",
-    "test": "vitest run",
+    "test": "vitest run && pnpm test:functions",
     "test:coverage": "vitest run --coverage",
+    "test:functions": "pnpm --filter @sf/functions test",
     "build": "pnpm -r build",
     "e2e": "pnpm --filter @sf/web e2e",
-    "gate": "pnpm typecheck && pnpm lint && pnpm boundaries && pnpm test:coverage && pnpm build"
+    "gate": "pnpm typecheck && pnpm lint && pnpm boundaries && pnpm test:coverage && pnpm test:functions && pnpm build"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^5.0.0",
