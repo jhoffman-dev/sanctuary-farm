@@ -51,6 +51,7 @@ pnpm install
 pnpm dev             # game at http://localhost:5173
 pnpm gate            # typecheck · lint · boundaries · tests + coverage · build
 pnpm e2e             # Playwright smoke (once: pnpm --filter @sf/web exec playwright install chromium)
+pnpm test:rules      # firestore.rules against the emulator — needs Java (see firestore/README.md)
 ```
 
 Node 26 (`.nvmrc`; ≥ 22 works) · pnpm 11 · TypeScript strict · Vitest ·
