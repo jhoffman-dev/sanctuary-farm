@@ -69,8 +69,9 @@ No snapshot test as a stand-in for a behaviour test.
 | --- | --- |
 | `pnpm install` | once per checkout |
 | `pnpm dev` | Vite dev server for `apps/web` |
-| `pnpm gate` | typecheck · lint (oxlint) · boundaries (dependency-cruiser) · tests + coverage · build — must be green before hand-off |
-| `pnpm typecheck` / `pnpm lint` / `pnpm boundaries` / `pnpm test` / `pnpm build` | the gate's parts |
+| `pnpm gate` | typecheck · lint (oxlint) · boundaries (dependency-cruiser) · tests + coverage · build · size (size-limit) — must be green before hand-off |
+| `pnpm typecheck` / `pnpm lint` / `pnpm boundaries` / `pnpm test` / `pnpm build` / `pnpm size` | the gate's parts |
+| `pnpm size` | the JS/CSS budgets in `docs/performance-budget.md`, over `apps/web/dist` (needs a build first) |
 | `pnpm test:coverage` | tests with the domain ≥ 90% line threshold enforced |
 | `pnpm e2e` | Playwright smoke against `apps/web` (first: `pnpm --filter @sf/web exec playwright install chromium`) |
 | `pnpm vitest run --project domain` | one package's tests (`domain` · `application` · `persistence` · `audio` · `web`) |
