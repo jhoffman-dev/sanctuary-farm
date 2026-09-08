@@ -32,8 +32,8 @@ Follow the `feature-workflow` skill for the branch → gate → PR → board loo
 
 ## Testing
 Component tests for key screens; contribute to / keep green the Playwright e2e
-smokes (`npm run smoke` today, `pnpm e2e` later). New player-facing flow → add or
-extend an e2e.
+smokes (`pnpm e2e`, Playwright, in `apps/web/e2e/`). New player-facing flow → add
+or extend an e2e.
 
 ## Definition of done
 typecheck / lint / unit / e2e all green; verified in a real browser (screenshot

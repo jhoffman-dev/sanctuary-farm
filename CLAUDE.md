@@ -11,9 +11,10 @@ markdown here is the authoring surface, changed via PR and pushed with the
 `notion-docs` skill (`docs/README.md` has the links). This file, `CLAUDE.md`, is
 the exception — it stays repo-only.
 
-> Status: the prototype in `src/` is the current alpha. The rebuild (monorepo,
-> Clean Architecture, react-three-fiber) is Phase 1+. Until Phase 1 lands, `src/`
-> is the app; after, it moves under `apps/web` and `packages/*`.
+> Status: rebuilt from scratch on 2026-09-07. The prototype is gone (git history
+> has it); the repo is the pnpm monorepo described below. Phase 1 (the core
+> packages + a minimal `apps/web` shell) is in progress; the game screens come
+> in Phase 3 against `@sf/application`.
 
 ## Stack
 
@@ -33,7 +34,7 @@ the exception — it stays repo-only.
   interleave + tiers), curriculum, mastery. No framework, no I/O, no
   `Date.now()`, no `Math.random()` — inject a `Clock` and an `Rng`.
 - **`packages/application`** — use-cases + ports (`SaveStore`, `Clock`, `Rng`,
-  `AudioBus`, `IdProvider`). Returns plain data / events.
+  `AudioBus`; `IdProvider` arrives in Phase 4). Returns plain data / events.
 - **`packages/persistence`, `packages/audio`, `functions/`** — adapters. Thin.
 - **`apps/web`** — React + r3f. **Holds zero game rules.** If a component is
   deciding what fact comes next, it's in the wrong layer.
@@ -62,13 +63,17 @@ Full detail + the monorepo layout: `docs/architecture.md`.
 
 No snapshot test as a stand-in for a behaviour test.
 
-## Commands (current prototype; will move to pnpm scripts in Phase 1)
+## Commands (pnpm workspace, run from the repo root)
 
 | Command | What |
 | --- | --- |
-| `npm run dev` | Vite dev server (game at `/`, dev routes at `?dev=1`) |
-| `npm run typecheck` / `npm run lint` / `npm test` / `npm run build` | must all pass before hand-off |
-| `npm run smoke` | Playwright walkthrough → screenshots in `../Debugging Images/` |
+| `pnpm install` | once per checkout |
+| `pnpm dev` | Vite dev server for `apps/web` |
+| `pnpm gate` | typecheck · lint (oxlint) · boundaries (dependency-cruiser) · tests + coverage · build — must be green before hand-off |
+| `pnpm typecheck` / `pnpm lint` / `pnpm boundaries` / `pnpm test` / `pnpm build` | the gate's parts |
+| `pnpm test:coverage` | tests with the domain ≥ 90% line threshold enforced |
+| `pnpm e2e` | Playwright smoke against `apps/web` (first: `pnpm --filter @sf/web exec playwright install chromium`) |
+| `pnpm vitest run --project domain` | one package's tests (`domain` · `application` · `persistence` · `audio` · `web`) |
 
 Node is Homebrew-installed — prefix bash calls with `export PATH="/opt/homebrew/bin:$PATH"`.
 
@@ -94,7 +99,7 @@ coherent pack), there is a backend, "beat your own best" in the paddock is fine.
 Ticket (Notion board) → `architect` refines & sizes → dev implements on a branch
 with tests → `qa` verifies (incl. e2e / screenshots) → `reviewer` checks against
 this file → human merges. Move the ticket across the board as you go (skill:
-`notion-board`).
+`notion-board`, via the Notion MCP connector).
 
 Branch names: `feat/SF-123-short-slug`, `fix/…`, `chore/…`. One ticket per PR.
 PR description links the ticket and states what changed + how it was verified.
@@ -104,10 +109,11 @@ PR description links the ticket and states what changed + how it was verified.
 `.claude/agents/`: `architect`, `domain-dev`, `app-dev`, `qa`, `reviewer`,
 `devops`. Pick by the layer/task. Full briefs in each file.
 
-`.claude/skills/`: `write-ticket` (ticket shape), `notion-board` (move tickets on
-the board), `feature-workflow` (branch → gate → PR → merge), `adr` (record a
+`.claude/skills/`: `write-ticket` (ticket shape), `notion-board` (read/create/move
+tickets), `feature-workflow` (branch → gate → PR → merge), `adr` (record a
 decision), `notion-docs` (push a changed doc to Notion). The board and docs live
-in Notion — `docs/board.md`.
+in Notion and are reached through the **Notion MCP connector** — no local token
+or CLI. `docs/board.md` has the URLs and schema.
 
 ## Memory
 

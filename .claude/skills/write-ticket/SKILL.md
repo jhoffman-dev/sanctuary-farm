@@ -38,7 +38,7 @@ Acceptance criteria:   (bullet list; omit if a chore with an obvious done-state)
 - [ ] tests: <what must be covered>
 - [ ] gate green (typecheck / lint / test / build)
 
-Assignee: unassigned  (agent-doable)   OR   Jonathan  (needs a human — say why)
+Assignee: unassigned  (agent-doable)   OR   James  (needs a human — say why)
 
 Size: XS / S / M    (M → consider splitting)
 ```
@@ -47,7 +47,7 @@ Size: XS / S / M    (M → consider splitting)
 
 - Every ticket that changes behaviour lists the **tests** as an AC line.
 - If a human must do it (interactive auth, an account, a purchase, a
-  product/legal call, a physical device test), assign **Jonathan** and give the
+  product/legal call, a physical device test), assign **James** and give the
   exact steps.
 - A spike is a real ticket: timebox it, and its AC is "findings written to
   `docs/adr/NNNN-*.md` or `docs/decisions/*.md`".

@@ -1,14 +1,11 @@
 # scripts/notion
 
-Tooling for the Notion board ("Sanctuary Farm DB").
+- **`gen-backlog.mjs`** — the starter backlog as data. It was imported into the
+  Notion board once (2026-08-31) and is kept only as a record of the seed set /
+  for regenerating `docs/backlog.md` + `docs/backlog.csv`. Edit the `rows` array
+  and run `node scripts/notion/gen-backlog.mjs` to regenerate those two files.
+  Do not hand-edit them.
 
-- **`gen-backlog.mjs`** — the starter backlog lives here as data. Edit the `rows`
-  array, run `node scripts/notion/gen-backlog.mjs`, and it regenerates
-  `docs/backlog.md` (readable) and `docs/backlog.csv` (importable). Do not
-  hand-edit those two files.
-- Import into Notion with the `notion-board` skill once credentials are set:
-  `node .claude/skills/notion-board/notion.mjs import docs/backlog.csv`
-  (Epics are created first so the `Epic` relation resolves).
-
-Setup and schema: `docs/board.md`. After the first import, new tickets are
-created directly with `notion.mjs create …` — the CSV is just the seed.
+New tickets are created directly in Notion with the `notion-board` skill (Notion
+MCP connector) — not by re-importing the CSV. Board schema and setup:
+`docs/board.md`.

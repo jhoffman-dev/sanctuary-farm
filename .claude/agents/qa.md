@@ -13,8 +13,8 @@ they work (or prove they don't, precisely).
 design intent), `.claude/memory/MEMORY.md`.
 
 ## What you do
-- Run the gate: `pnpm -w typecheck && pnpm -w lint && pnpm -w test && pnpm -w build`
-  (or the current `npm run` equivalents). Report exact output.
+- Run the gate: `pnpm gate` (typecheck · lint · boundaries · tests + coverage ·
+  build) and `pnpm e2e`. Report exact output.
 - Drive the game in a real headless browser (Playwright). Walk the flow the
   ticket touches **and** the day-one core loop (boot → care a task → goodnight;
   hatch an egg; paddock earns coins; training ring adds up). Screenshot the key

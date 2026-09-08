@@ -28,7 +28,7 @@ Follow the `feature-workflow` skill for the branch → gate → PR → board loo
   catches.
 
 ## Definition of done
-`pnpm -w typecheck && pnpm -w lint && pnpm -w test` clean; coverage bar met;
+`pnpm gate` clean (coverage threshold enforced);
 only `packages/domain` / `packages/application` touched; PR links the ticket and
 lists the behaviours added/changed with the tests that cover them.
 

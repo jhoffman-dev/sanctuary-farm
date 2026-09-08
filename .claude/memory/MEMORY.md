@@ -11,4 +11,6 @@ Bigger stuff belongs elsewhere: product intent → `docs/PRD.md`, architecture �
 ## Notes
 
 - [environment.md](environment.md) — local toolchain quirks (Node via Homebrew, CLIs, auth state).
-- [prototype-gotchas.md](prototype-gotchas.md) — traps in the current `src/` prototype found the hard way.
+- [monorepo-gotchas.md](monorepo-gotchas.md) — traps in the rebuilt monorepo (scheduler state fields, vitest coverage, oxlint, worktree Bash guard, saves).
+- [prototype-gotchas.md](prototype-gotchas.md) — lessons from the retired `src/` prototype (file refs are historical).
+- [farm-game-facade.md](farm-game-facade.md) — `createFarmGame` contract gotchas: rounds stay active until `endRound`, latency is measured here, progress semantics.

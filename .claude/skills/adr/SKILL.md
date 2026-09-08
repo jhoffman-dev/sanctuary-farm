@@ -24,7 +24,7 @@ Not for: routine implementation, anything already covered by `CLAUDE.md` or
 2. Fill every section. Keep **Context** factual (the forces, not the conclusion).
    List real **Alternatives** with why each lost. **Consequences** must include
    the downsides and any new follow-up work.
-3. Status starts `Proposed`. A human (Jonathan) moves it to `Accepted`.
+3. Status starts `Proposed`. A human (James) moves it to `Accepted`.
 4. Link it from the relevant ticket and from `CLAUDE.md` / `docs/` if it changes
    a rule.
 5. Superseding a past ADR: set the old one's Status to `Superseded by NNNN` —

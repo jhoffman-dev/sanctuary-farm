@@ -5,7 +5,7 @@ Generated from `scripts/notion/gen-backlog.mjs` (source of truth) into this file
 `write-ticket` skill. Keys (SF-N) are assigned by Notion on import.
 
 **Legend** — Status: Backlog / Ready / In progress / In review / Blocked / Done ·
-Assignee: _blank_ = any agent, **Jonathan** = needs a human ·
+Assignee: _blank_ = any agent, **James** = needs a human ·
 Size: XS / S / M · Priority: P0 (now) / P1 / P2.
 
 ## At a glance
@@ -16,7 +16,7 @@ Size: XS / S / M · Priority: P0 (now) / P1 / P2.
 | Tickets total | 63 |
 | Done | 15 |
 | Ready | 22 |
-| Assigned to Jonathan | 13 |
+| Assigned to James | 13 |
 
 ## Phase 0 — Project foundation
 
@@ -39,24 +39,24 @@ _P0 · agents_ — Housekeeping before feature work: docs, agents, skills, board
 | Task | Landing page v0 (static) | Done | — | S | P0 |
 | Task | Refresh the README | Done | — | XS | P0 |
 | Task | gitignore for secrets and monorepo | Done | — | XS | P0 |
-| Task | GitHub: auth and create the repo | Ready | Jonathan | XS | P0 |
-| Task | Decide repository visibility (public vs private) | Ready | Jonathan | XS | P0 |
-| Task | Choose a license and add LICENSE | Ready | Jonathan | XS | P0 |
-| Task | Notion: create integration, share DB + a Docs page, add credentials | Ready | Jonathan | XS | P0 |
+| Task | GitHub: auth and create the repo | Ready | James | XS | P0 |
+| Task | Decide repository visibility (public vs private) | Ready | James | XS | P0 |
+| Task | Choose a license and add LICENSE | Ready | James | XS | P0 |
+| Task | Notion: create integration, share DB + a Docs page, add credentials | Ready | James | XS | P0 |
 | Task | Notion: build the board and import the backlog | Ready | — | S | P0 |
 | Task | Notion: push the docs and verify the sync | Ready | — | S | P0 |
-| Task | Firebase: auth and create the project | Ready | Jonathan | S | P0 |
-| Task | Decide GitHub Project vs Notion-only board | Ready | Jonathan | XS | P0 |
-| Task | Decide analytics stance | Ready | Jonathan | XS | P0 |
-| Task | Decide error monitoring | Ready | Jonathan | XS | P0 |
-| Task | Decide a domain name | Backlog | Jonathan | XS | P1 |
-| Task | Provide a low-end test device for QA | Backlog | Jonathan | XS | P1 |
-| Task | Privacy notice legal sanity-check | Backlog | Jonathan | S | P2 |
+| Task | Firebase: auth and create the project | Ready | James | S | P0 |
+| Task | Decide GitHub Project vs Notion-only board | Ready | James | XS | P0 |
+| Task | Decide analytics stance | Ready | James | XS | P0 |
+| Task | Decide error monitoring | Ready | James | XS | P0 |
+| Task | Decide a domain name | Backlog | James | XS | P1 |
+| Task | Provide a low-end test device for QA | Backlog | James | XS | P1 |
+| Task | Privacy notice legal sanity-check | Backlog | James | S | P2 |
 | Task | pnpm workspace skeleton | Ready | — | S | P0 |
 | Task | ESLint import-boundary rules | Ready | — | S | P0 |
 | Task | Pin Node and editor config | Ready | — | XS | P0 |
 | Task | GitHub Actions CI workflow | Backlog | — | S | P0 |
-| Task | GitHub branch protection on main | Backlog | Jonathan | XS | P0 |
+| Task | GitHub branch protection on main | Backlog | James | XS | P0 |
 | Task | firebase.json and emulator config | Backlog | — | S | P1 |
 | Task | PR preview deploy workflow | Backlog | — | S | P1 |
 | Task | Secrets management doc for agents | Ready | — | XS | P0 |
@@ -85,9 +85,9 @@ _P0 · agents_ — Housekeeping before feature work: docs, agents, skills, board
 
 **Rewrite CLAUDE.md for architecture / clean code / testing** — Requires Clean Architecture (the dependency rule), Clean Code (enforced in review), and a per-layer test bar (required to merge).
 
-**ADR-0001 — stack choice** — Records TS / React / react-three-fiber over Unity / Godot / Flutter. Status Proposed — needs Jonathan to accept.
+**ADR-0001 — stack choice** — Records TS / React / react-three-fiber over Unity / Godot / Flutter. Status Proposed — needs James to accept.
 
-**ADR-0002 — identity and save** — No-PII identity: save codes, optional auto-generated username + PIN. Status Proposed — needs Jonathan to accept; privacy sanity-check pending.
+**ADR-0002 — identity and save** — No-PII identity: save codes, optional auto-generated username + PIN. Status Proposed — needs James to accept; privacy sanity-check pending.
 
 **Write the six agent definitions** — .claude/agents/: architect, domain-dev, app-dev, qa, reviewer, devops.
 
@@ -143,7 +143,7 @@ _P0 · agents_ — Housekeeping before feature work: docs, agents, skills, board
 
 **firebase.json and emulator config** — firebase.json (two hosting targets: game, landing), .firebaserc, Firestore rules + indexes stubs, functions/ scaffold, emulator config. Blocked on the Firebase project. AC: firebase emulators:start boots.
 
-**PR preview deploy workflow** — Action: Firebase Hosting preview channel per PR, prod on merge to main. Needs a Firebase CI token in GH secrets (Jonathan). Blocked on firebase.json.
+**PR preview deploy workflow** — Action: Firebase Hosting preview channel per PR, prod on merge to main. Needs a Firebase CI token in GH secrets (James). Blocked on firebase.json.
 
 **Secrets management doc for agents** — docs/secrets.md — what secrets exist, where each lives, and the rule: never commit one, never put one in client code.
 
@@ -155,7 +155,7 @@ _P0 · agents_ — Housekeeping before feature work: docs, agents, skills, board
 
 **Definition of Done doc** — docs/definition-of-done.md — the checklist a ticket must meet. Referenced by qa and reviewer.
 
-**Curriculum design doc** — docs/curriculum.md — alpha math scope (multiplication 0–12) and planned expansions, each mapped to Common Core, with fact ordering + introduction tiers. AC: reviewed by Jonathan.
+**Curriculum design doc** — docs/curriculum.md — alpha math scope (multiplication 0–12) and planned expansions, each mapped to Common Core, with fact ordering + introduction tiers. AC: reviewed by James.
 
 **Accessibility standard doc** — docs/accessibility.md — target WCAG 2.2 AA plus game-specific rules (number-pad only, colour-blind-safe, keyboard-playable, reduced-motion, min font sizes, HUD labels). A checklist qa can run.
 
@@ -211,7 +211,7 @@ _P1 · agents_ — react-three-fiber world: camera, lighting, a controllable ani
 
 **Spike: asset pack decision** — Timebox. Compare Kenney (CC0) vs Quaternius (CC0) vs Synty POLYGON (paid) for a coherent farm set with riggable animals + a humanoid keeper. AC: an ADR with the pick, cost, licence terms.
 
-**Spike: world layout tooling decision** — Timebox. How Jonathan lays out the farm without hand-editing coordinates — Blender, Tiled, or a small in-app editor. AC: ADR with the pick and why.
+**Spike: world layout tooling decision** — Timebox. How James lays out the farm without hand-editing coordinates — Blender, Tiled, or a small in-app editor. AC: ADR with the pick and why.
 
 ## Phase 3 — Alpha parity in 3D
 
@@ -237,11 +237,11 @@ _P2 · agents_ — Landing v1, deploy pipeline, PWA, accessibility pass, playtes
 | Story | Teacher feedback form | Backlog | — | S | P2 |
 | Story | PWA / add-to-home-screen | Backlog | — | S | P2 |
 | Story | Accessibility pass | Backlog | — | M | P1 |
-| Story | Playtest with the target user | Backlog | Jonathan | S | P1 |
+| Story | Playtest with the target user | Backlog | James | S | P1 |
 
 **Landing v1** — Upgrade apps/landing from v0: real screenshots/video of the alpha, the public play link, the feedback form link, teacher note. AC: verified in browser, deployed, link previews work.
 
-**Teacher feedback form** — A way for a teacher or student to send feedback with no student data collected (no email required; free text from adults only, never shown to kids). AC: submissions land somewhere Jonathan can read; threat-model checked.
+**Teacher feedback form** — A way for a teacher or student to send feedback with no student data collected (no email required; free text from adults only, never shown to kids). AC: submissions land somewhere James can read; threat-model checked.
 
 **PWA / add-to-home-screen** — Manifest + icons + offline shell so the game opens full-screen from a home-screen icon on iPad/Chromebook. AC: installs and launches on the test device.
 

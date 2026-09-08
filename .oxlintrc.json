@@ -1,16 +1,22 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
+  "plugins": ["typescript", "oxc", "react"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
   "rules": {
+    "no-unused-vars": "error",
+    "typescript/no-explicit-any": "error",
     "react/rules-of-hooks": "error",
+    "react/react-in-jsx-scope": "off",
     "react/only-export-components": ["warn", { "allowConstantExport": true }]
   },
-  "overrides": [
-    {
-      "files": ["src/dev/routes/*.route.tsx", "src/game/gameState.tsx"],
-      "rules": {
-        "react/only-export-components": "off"
-      }
-    }
+  "ignorePatterns": [
+    "**/dist/**",
+    "**/coverage/**",
+    "**/playwright-report/**",
+    "docs/**",
+    "scripts/**"
   ]
 }

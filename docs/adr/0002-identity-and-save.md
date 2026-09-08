@@ -2,7 +2,7 @@
 
 - **Status:** accepted (pending a pre-launch privacy-lawyer sanity check)
 - **Date:** 2026-08-31
-- **Deciders:** Jonathan
+- **Deciders:** James
 
 ## Context
 

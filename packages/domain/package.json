@@ -1,0 +1,20 @@
+{
+  "name": "@sf/domain",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The rules of Sanctuary Farm: facts, the learning scheduler, mastery, economy. Pure — no framework, no I/O, no clock, no randomness.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@sf/config": "workspace:*",
+    "typescript": "~6.0.2",
+    "vitest": "^5.0.0"
+  }
+}

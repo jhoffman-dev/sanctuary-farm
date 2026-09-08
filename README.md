@@ -8,9 +8,9 @@ goodnight on time.
 **Free forever. No ads. No purchases. No personal information collected.**
 Reachable by any kid on any device from a link.
 
-> **Status:** early alpha. The prototype in `src/` is playable; the project is
-> being rebuilt on a clean architecture (monorepo, react-three-fiber, real test
-> coverage). See `docs/implementation-plan.md`.
+> **Status:** rebuilding from a clean base (2026-09-07). The learning engine,
+> saves and sound live in tested packages; the game world comes next. Work is
+> tracked on the Notion board — see `docs/board.md`.
 
 ## Start here
 
@@ -21,28 +21,40 @@ Reachable by any kid on any device from a link.
 | [`docs/architecture.md`](docs/architecture.md) | Clean Architecture layers + the dependency rule |
 | [`docs/implementation-plan.md`](docs/implementation-plan.md) | phases 0–6 |
 | [`docs/adr/`](docs/adr/) | decisions that are expensive to reverse (stack, identity) |
-| [`docs/board.md`](docs/board.md) | the Notion board + docs — schema, setup, flow |
+| [`docs/board.md`](docs/board.md) | the Notion board + docs — schema, views, flow |
 
 The prose docs are mirrored to **Notion** (that's where to read them) —
 `docs/README.md` has the links; the markdown here is the authoring surface,
-pushed with the `notion-docs` skill. Prototype-era design notes:
-`docs/redesign-notes.md`, `docs/SPEC.md`, `docs/original-spec.md`.
+pushed with the `notion-docs` skill. Prototype-era history:
+`docs/redesign-notes.md`, `docs/original-spec.md`.
 
-## Run the prototype
+## Layout
 
-```bash
-npm install
-npm run dev          # game at http://localhost:5173  (dev routes: ?dev=1)
-npm test             # vitest  (162 tests)
-npm run typecheck
-npm run lint
-npm run build        # -> dist/  (static)
-npm run smoke        # Playwright walkthrough -> screenshots in ../Debugging Images/
+```
+packages/domain        @sf/domain       the rules: facts, scheduler, mastery, economy — pure
+packages/application   @sf/application  use-cases + ports (SaveStore, Clock, Rng, AudioBus)
+packages/persistence   @sf/persistence  SaveStore adapters (localStorage now, Firestore later)
+packages/audio         @sf/audio        AudioBus adapters (Web Audio synth, silent)
+packages/config        @sf/config       shared tsconfig presets
+apps/web               @sf/web          the game — React 19 + react-three-fiber; holds zero rules
+apps/landing                            static homepage
 ```
 
-Node ≥ 20 (built on 26; Homebrew install → `export PATH="/opt/homebrew/bin:$PATH"`).
-Prototype stack: Vite 8 · React 19 · TypeScript strict · Tailwind 4 · `motion` ·
-Vitest. Inline-SVG art, Web-Audio sound, single versioned `localStorage` key.
+Dependencies point inward (`domain` → nothing … `apps/web` → `application`),
+enforced by `pnpm boundaries`. Details: `docs/architecture.md`.
+
+## Run it
+
+```bash
+export PATH="/opt/homebrew/bin:$PATH"   # Homebrew Node on this machine
+pnpm install
+pnpm dev             # game at http://localhost:5173
+pnpm gate            # typecheck · lint · boundaries · tests + coverage · build
+pnpm e2e             # Playwright smoke (once: pnpm --filter @sf/web exec playwright install chromium)
+```
+
+Node 26 (`.nvmrc`; ≥ 22 works) · pnpm 11 · TypeScript strict · Vitest ·
+Playwright · oxlint · dependency-cruiser.
 
 ## The landing page
 
@@ -51,14 +63,8 @@ Vitest. Inline-SVG art, Web-Audio sound, single versioned `localStorage` key.
 ## Agents & skills
 
 `.claude/agents/` — `architect`, `domain-dev`, `app-dev`, `qa`, `reviewer`,
-`devops`. `.claude/skills/` — `write-ticket`, `notion-board`, `adr`,
-`feature-workflow`. Cross-agent notes: `.claude/memory/`.
-
-## Parent dashboard
-
-Long-press the 🏡 sign on the farmyard, answer the math gate. Shows the 12×12
-latency heatmap, the slowest facts, and two weeks of practice + accuracy. The
-number that matters is **latency on the hard-core set** (`7×8, 6×8, …`).
+`devops`. `.claude/skills/` — `write-ticket`, `notion-board`, `notion-docs`,
+`adr`, `feature-workflow`. Cross-agent notes: `.claude/memory/`.
 
 ## Non-negotiables (full list in `CLAUDE.md`)
 

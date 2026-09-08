@@ -1,7 +1,9 @@
-# Prototype gotchas (`src/`)
+# Prototype gotchas (the old `src/`, removed 2026-09-07)
 
-Found the hard way while building the alpha. Carry the *lessons* into the rebuild;
-the file references are prototype-only.
+Found the hard way while building the alpha. The prototype is gone from the
+working tree (git history before the `chore(SF-36)` rebuild commit still has
+it: `git show main~1:src/...` until that merges, then `git log -- src`). Carry
+the *lessons* into the rebuild; the file references are prototype-only.
 
 - **Scheduler is re-entrant under React StrictMode.** `scheduler.next()` mutates
   state (recent-families ring), so StrictMode's double-invoke corrupted it. Fix

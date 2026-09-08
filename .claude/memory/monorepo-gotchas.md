@@ -1,0 +1,43 @@
+# Monorepo gotchas (the rebuild, 2026-09-07 →)
+
+- **`SchedulerState.lastServed` and `commuteCredit` are state, not closure.**
+  The prototype kept both in the scheduler closure (and lost them on reload).
+  The pure domain can only get them from state, so they are persisted fields.
+  `nextFact` / `nextFactInFamily` return a *new* state that already records the
+  serve — grade against that state, never call `next*` twice for one question.
+- **Vitest coverage + `--project` reports `0/0`.** Root coverage config collects
+  nothing when a single project is selected. Use `pnpm test:coverage` from the
+  root (all projects, thresholds enforced) or run vitest from inside the package
+  with explicit `--coverage.include='src/**/*.ts'`.
+- **oxlint + React 19:** `react/react-in-jsx-scope` is off in `.oxlintrc.json`
+  (automatic JSX runtime). Don't re-enable it.
+- **Worktree Bash guard** rejects compound scripts (multi-heredoc, `for`, long
+  `&&` chains) — one simple command per call; write files with Write/Edit.
+- **The domain throws on caller bugs; adapters validate first.** `gradeAnswer`
+  throws `RangeError` for a latency that is not a finite number ≥ 0 (the
+  application grades a backwards clock as SLOW) and `Error(/never introduced/)` for a
+  fact at box 0 — only grade the fact `next*` just served. Every table-size entry
+  point (`buildFacts`, `initialSchedulerState`, `emptyFarmSave`, `factsInFamily`,
+  `factsInTier`, and so `cardsInPlay` on a loaded state) throws `RangeError`
+  unless `maxTable` is an integer in `MIN_TABLE..MAX_TABLE_DEFAULT`; persistence
+  must reject a bad `maxTable` before handing a state to the scheduler
+  (`assertTableSize` is exported for that).
+- **Prototype saves are not migrated.** `@sf/persistence` keeps the prototype's
+  key (`sanctuary-farm/save`); a v2 blob there parses as "no save" and is
+  overwritten on the first save. Deliberate.
+- **An empty tier is *cleared*, not unmet.** `tierOf` is written for the 12×12
+  table, so a smaller `maxTable` leaves whole tiers with no facts (an 8×8 table
+  has no "has a 9" tier-4 fact). `withUnlockedTiers` treats a tier with no cards
+  in play as satisfied — anything else walls off every tier above it for good,
+  and 6×7 / 7×8 / 6×8 are never introduced. `tiers.test.ts` walks every table
+  size 1..12 to full introduction and would catch a regression.
+- **A structurally valid save can still be unplayable.** Persistence calls
+  domain `hasPlayableFact()`: unless a fact is introduced, or one can be
+  introduced *within the tiers the blob itself unlocked and outside the blocked
+  family*, the save is rejected and the game starts fresh — otherwise the first
+  `nextFact` throws `scheduler: no candidate facts` out of `startRound`.
+- **The r3f frameloop is readable from the DOM.** `<Canvas>` spreads unknown
+  props onto its container div, so `data-frameloop` / `data-testid="scene"` on
+  it survive to the page and Playwright's `reducedMotion: 'reduce'` can assert
+  the rule without touching WebGL. Component tests mock `./scene/FarmScene`;
+  don't try to fake a WebGL context in jsdom.

@@ -1,6 +1,6 @@
 # Redesign notes (post-playtest)
 
-The original spec (`SPEC.md` / `original-spec.md`) deliberately had **no economy**:
+The original spec (`original-spec.md`) deliberately had **no economy**:
 feeding *was* the quiz, coins/pellets were display-only, and eggs filled purely from
 general practice. After the user played it and got feedback from their daughter, the game
 was redesigned toward a pet-care loop. This file records what changed and why; the older
@@ -65,5 +65,9 @@ to full mastery.
 - The nest and feed-shed screens are functional but plainly styled.
 - Egg practice that triggers a hatch mid-round doesn't log that session (the hatch
   ceremony pre-empts the quiz). The answers still count.
-- `docs/SPEC.md`, `AGENTS.md`, per-track briefs still describe the original design.
 - Not deployed to Vercel.
+
+> **2026-09-07:** the prototype (`src/`) and its build docs (`SPEC.md`,
+> `AGENTS.md`, `CONTRACTS.md`, `resolved-decisions.md`, `tracks/`) were removed
+> when the rebuild started from scratch. Git history keeps them. The learning
+> engine, save-store pattern and sound recipes were ported into `packages/*`.

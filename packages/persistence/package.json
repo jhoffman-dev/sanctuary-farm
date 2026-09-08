@@ -1,0 +1,25 @@
+{
+  "name": "@sf/persistence",
+  "version": "0.0.0",
+  "private": true,
+  "description": "SaveStore adapters: localStorage now, Firestore later. Thin — they translate, they don't decide.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@sf/application": "workspace:*",
+    "@sf/domain": "workspace:*"
+  },
+  "devDependencies": {
+    "@sf/config": "workspace:*",
+    "jsdom": "^30.0.1",
+    "typescript": "~6.0.2",
+    "vitest": "^5.0.0"
+  }
+}

@@ -1,6 +1,6 @@
 ---
 name: notion-board
-description: Read, create, and move Sanctuary Farm tickets on the Notion board ("Sanctuary Farm DB"). Use to create tickets, set status as work progresses, add a note/comment, and link a PR. Requires a Notion integration token.
+description: Read, create, and move Sanctuary Farm tickets on the Notion board ("Sanctuary Farm DB"). Use to create tickets, set status as work progresses, add a note/comment, and link a PR. Uses the Notion MCP connector.
 ---
 
 # Notion board
@@ -8,42 +8,61 @@ description: Read, create, and move Sanctuary Farm tickets on the Notion board (
 The single source of truth for work is the Notion database **Sanctuary Farm DB**.
 Its schema and the board columns are documented in `docs/board.md`.
 
-## Setup (one-time, human — see `docs/board.md` §Setup)
+- **Database:** <https://app.notion.com/p/3cd672aa2c4a809ca13bddf87a2c9d64>
+- **Data source (for SQL / create):** `collection://3cd672aa-2c4a-80ec-a1ab-000b40f7e4d1`
 
-1. Jonathan creates a Notion **internal integration** and shares the database
-   with it.
-2. The token + database id go in `.claude/notion.local.json` (gitignored):
-   ```json
-   { "token": "ntn_xxx", "dbId": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" }
-   ```
-   or as env vars `NOTION_TOKEN` / `SANCTUARY_FARM_DB_ID`.
+Work the board through the **Notion MCP tools** (`notion-fetch`,
+`notion-query-data-sources`, `notion-create-pages`, `notion-update-page`,
+`notion-create-comment`). If the connector isn't available in the session,
+**do not guess** — tell James the board can't be reached, do the code work,
+and note which tickets you would have created/moved.
 
-If neither is present, **do not guess** — tell Jonathan the board can't be
-reached and proceed with the code work, noting which tickets you would have
-created/moved.
+Always `notion-fetch` the data source first in a session to get the current
+schema (exact property names and select options).
 
-## Commands
+## Common operations
 
-All via `node .claude/skills/notion-board/notion.mjs <cmd> [args]`:
+**Find tickets** — `notion-query-data-sources` in SQL mode against the data
+source. The `ID` column is `"userDefined:ID"` (Notion's Unique ID, `SF-1`…):
 
-| Command | Does |
-| --- | --- |
-| `schema` | show the DB's properties vs what the board needs |
-| `setup` | create the missing properties via the API (one-time) |
-| `list [--status Ready]` | print tickets (id, key, title, type, status, assignee) |
-| `get <SF-123>` | full ticket |
-| `create --type Task --title "..." --epic SF-1 --status Backlog --file body.md` | create a ticket; prints its key |
-| `move <SF-123> <Status>` | set Status (Backlog / Ready / In progress / In review / Done / Blocked) |
-| `assign <SF-123> <Jonathan\|unassigned>` | set Assignee |
-| `note <SF-123> "text"` | append a comment |
-| `link <SF-123> <pr-url>` | set the PR field |
+```sql
+SELECT "userDefined:ID", Name, Type, Status, Assignee
+FROM "collection://3cd672aa-2c4a-80ec-a1ab-000b40f7e4d1"
+WHERE Status = 'Ready' ORDER BY Priority, Phase
+```
+
+**Read one ticket** — `notion-fetch` with its page URL (from a query result).
+
+**Create a ticket** — `notion-create-pages` with
+`parent: { data_source_id: "3cd672aa-2c4a-80ec-a1ab-000b40f7e4d1" }`. Set
+`Name`, `Type`, `Status`, `Priority`, `Phase`, `Size`, and `Epic` (an array with
+the parent Epic's page URL). Put the ticket body in `content`. Notion assigns the
+`SF-N` id automatically — read it back with a query. Ticket shape: the
+`write-ticket` skill.
+
+**Move a ticket** — `notion-update-page`, `command: "update_properties"`,
+`properties: { "Status": "In progress" }` (Backlog / Ready / In progress / In
+review / Blocked / Done / Later). `Later` is James parking a decision — never
+pick up or move a `Later` ticket.
+
+**Assign** — `properties: { "Assignee": "James" }` or `{ "Assignee": null }`.
+
+**Add a note** — `notion-create-comment` on the ticket's page URL.
+
+**Link a PR** — `notion-update-page`, `properties: { "PR": "<url>" }` (plain `PR` — only `ID`/`URL`-named properties take the `userDefined:` prefix).
 
 ## Workflow (match `CLAUDE.md`)
 
-- Claim a ticket: `move SF-123 "In progress"`.
-- Open the PR, then: `link SF-123 <url>` and `move SF-123 "In review"`.
-- After human merge: `move SF-123 Done`.
-- Blocked on a human/decision: `move SF-123 Blocked` + `note` why + `assign` if
-  it's Jonathan's.
+- Claim a ticket: Status → `In progress`.
+- Open the PR, then: set `PR` and Status → `In review`.
+- After human merge: Status → `Done`.
+- Blocked on a human/decision: Status → `Blocked` + a comment saying why +
+  assign to James if it's his.
 
 Keep the board honest — never leave a ticket "In progress" that you've stopped.
+
+## Seeding / bulk changes
+
+`docs/backlog.csv` / `docs/backlog.md` were the one-time seed (already imported).
+Their source of truth is `scripts/notion/gen-backlog.mjs`. New tickets are
+created directly in Notion from now on — don't re-import the CSV.
