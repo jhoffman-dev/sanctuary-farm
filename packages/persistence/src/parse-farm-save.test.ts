@@ -71,6 +71,15 @@ describe('parseFarmSave', () => {
     ['no scheduler', { ...freshFarmSave(), scheduler: undefined }],
     ['a scheduler with facts as an array', withScheduler({ facts: [] })],
     ['a scheduler with a non-record fact', withScheduler({ facts: { '7x8': 5 } })],
+    ['a fact status whose id is not its key', withFact('7x8', { id: '8x7' })],
+    ['a fact status at box 2 but not introduced', withFact('7x8', { box: 2, introduced: false })],
+    ['a fact status with a negative lastLatencyMs', withFact('1x1', { lastLatencyMs: -1 })],
+    ['a fact status with six recent latencies', withFact('1x1', { recentLatencies: [1, 1, 1, 1, 1, 1] })],
+    ['a fact status with a fractional dueAt', withFact('1x1', { dueAt: 1.5 })],
+    ['a commute credit of a whole box', withScheduler({ commuteCredit: { '8x7': 1 } })],
+    ['a fractional maxTable', withScheduler({ maxTable: 6.5 })],
+    ['unlockedTiers that is not an array', withScheduler({ unlockedTiers: 1 })],
+    ['fractional coins', { ...freshFarmSave(), coins: 0.5 }],
     ['a scheduler with a string counter', withScheduler({ globalCounter: '0' })],
     ['a scheduler with non-numeric tiers', withScheduler({ unlockedTiers: ['1'] })],
     ['a scheduler missing recentFamilies', withScheduler({ recentFamilies: undefined })],
@@ -93,4 +102,9 @@ describe('parseFarmSave', () => {
 function withScheduler(overrides: Record<string, unknown>): unknown {
   const farm = freshFarmSave()
   return { ...farm, scheduler: { ...farm.scheduler, ...overrides } }
+}
+
+function withFact(id: string, overrides: Record<string, unknown>): unknown {
+  const { facts } = freshFarmSave().scheduler
+  return withScheduler({ facts: { ...facts, [id]: { ...facts[id], ...overrides } } })
 }

@@ -31,10 +31,14 @@ export function App({ game }: AppProps) {
     }
   }, [game])
 
-  const toggleMute = useCallback(async () => {
+  const toggleMute = useCallback(() => {
     if (!summary) return
-    await game.setMuted(!summary.muted)
-    refreshSummary()
+    game.setMuted(!summary.muted).then(refreshSummary, (error: unknown) => {
+      // The setting is stored with the farm, so a rejected save means the sound
+      // did not actually change. Leave the control showing what is still true
+      // rather than lying about it, and surface the failure.
+      console.error('Could not change the sound setting', error)
+    })
   }, [game, summary, refreshSummary])
 
   return (
