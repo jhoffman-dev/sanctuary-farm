@@ -22,6 +22,7 @@ is the agent entry point).
 | `docs/definition-of-done.md` — Definition of Done | [Definition of Done](https://app.notion.com/p/3d5672aa2c4a81e3b249d3d0eadd617f) |
 | `docs/secrets.md` — Secrets | [Secrets](https://app.notion.com/p/3d5672aa2c4a81579d29fec27113d844) |
 | `docs/curriculum.md` — Curriculum | [Curriculum](https://app.notion.com/p/3d5672aa2c4a811abf0fdab381a16881) |
+| `docs/accessibility.md` — Accessibility standard | [Accessibility standard](https://app.notion.com/p/3d5672aa2c4a81f98501dd18cb1a8307) |
 
 History only, not mirrored: `docs/original-spec.md` and `docs/redesign-notes.md`
 (the prototype era; the prototype itself was removed in the rebuild — see git
@@ -30,7 +31,7 @@ history before the `chore(SF-36)` commit). Notion also holds James's own
 
 ## Planned (still `Ready` tickets, not written yet)
 
-`accessibility.md` · `performance-budget.md` · `threat-model.md` · `privacy.md` · `art-direction.md` · `sound-design.md`
+`performance-budget.md` · `threat-model.md` · `privacy.md` · `art-direction.md` · `sound-design.md`
 
 Create the file via PR, then add it under the Docs page and to the table above
 (skill: `notion-docs`).
