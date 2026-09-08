@@ -1,0 +1,13 @@
+{
+  "projects": {
+    "default": "demo-sanctuary-farm"
+  },
+  "targets": {
+    "demo-sanctuary-farm": {
+      "hosting": {
+        "game": ["demo-sanctuary-farm-game"],
+        "landing": ["demo-sanctuary-farm-landing"]
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "@sf/functions",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Firebase Cloud Functions. Phase 4 adds custom auth (save code, username + PIN) here.",
+  "type": "module",
+  "main": "lib/index.js",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "serve": "pnpm build && firebase emulators:start --only functions"
+  },
+  "dependencies": {
+    "firebase-admin": "14.3.0",
+    "firebase-functions": "7.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "typescript": "~6.0.2",
+    "vitest": "^5.0.0"
+  }
+}

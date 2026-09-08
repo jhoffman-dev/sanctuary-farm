@@ -41,3 +41,6 @@ coverage
 playwright-report
 test-results
 *.tsbuildinfo
+
+# Firebase
+functions/lib

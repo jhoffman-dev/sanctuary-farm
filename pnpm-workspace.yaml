@@ -1,3 +1,9 @@
 packages:
   - packages/*
   - apps/*
+  - functions
+# Post-install scripts are denied by default (supply-chain hygiene, see
+# docs/secrets.md). These two only print notices; nothing needs them to run.
+allowBuilds:
+  '@firebase/util': false
+  protobufjs: false
