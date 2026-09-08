@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { drive } from '../../test/fixtures'
-import type { FactId } from '../facts/fact'
+import { drive, withFacts } from '../../test/fixtures'
+import type { Box, FactId } from '../facts/fact'
 import { buildFacts, factsInTier } from '../facts/table'
 import { MAX_TABLE_DEFAULT, MIN_TABLE } from '../facts/tuning'
 import { createRng } from '../rng'
@@ -13,11 +13,8 @@ const SEED = 7
 /** Fluent cycles per fact — comfortably more than introduction needs. */
 const CYCLES_PER_FACT = 40
 
-function everyFactAtBox(state: SchedulerState, box: number): SchedulerState {
-  const facts = Object.fromEntries(
-    Object.entries(state.facts).map(([id, status]) => [id, { ...status, box, introduced: box > 0 }]),
-  )
-  return { ...state, facts }
+function everyFactAtBox(state: SchedulerState, box: Box): SchedulerState {
+  return withFacts(state, Object.keys(state.facts), { box })
 }
 
 function servedFactIds(maxTable: number): Set<FactId> {

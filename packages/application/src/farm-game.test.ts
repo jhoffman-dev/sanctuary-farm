@@ -272,7 +272,7 @@ describe('answer', () => {
     expect(third.next).toBeNull()
     expect(game.currentQuestion()).toBeNull()
     expect(game.roundProgress()).toEqual({ asked: 3, total: 3, complete: true })
-    await expect(game.answer(0)).rejects.toThrow(/no question in flight/)
+    await expect(game.answer(0)).rejects.toThrow(/no longer in flight/)
   })
 
   it('throws when nothing is in flight', async () => {

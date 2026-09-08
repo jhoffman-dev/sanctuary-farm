@@ -52,7 +52,11 @@ export interface FarmGame {
   currentQuestion(): Question | null
   /** Idle (0 of 0) when no round is active. */
   roundProgress(): RoundProgress
-  /** Grades the in-flight question; rejects if there is none or the save fails. */
+  /**
+   * Grades the question that was in flight when the call was made. Rejects if
+   * there was none, if that question has since been graded and replaced (a
+   * double-tap), or if the save fails.
+   */
   answer(given: number): Promise<AnswerFeedback>
   /** Closes the round — early is fine — appends its SessionLog to the save and persists. */
   endRound(): Promise<SessionLog>
@@ -93,10 +97,9 @@ export function createFarmGame({ saveStore, clock, rng, audio }: FarmGameDeps): 
   let pendingMutations = 0
 
   /**
-   * Persisting calls run one after another, each against what the previous
-   * one committed, so a double-tap grades the question the first tap served —
-   * never the same question twice. A rejection reaches its caller through the
-   * returned promise; the queue itself carries on.
+   * Persisting calls run one after another, each against what the previous one
+   * committed, so a grade is never applied to a stale farm. A rejection reaches
+   * its caller through the returned promise; the queue itself carries on.
    */
   function serialized<T>(mutation: () => Promise<T>): Promise<T> {
     pendingMutations += 1
@@ -118,10 +121,20 @@ export function createFarmGame({ saveStore, clock, rng, audio }: FarmGameDeps): 
     return round
   }
 
-  function requireInFlight(): { round: ActiveRound; inFlight: InFlight } {
+  /**
+   * The round, once the question the caller answered is confirmed still in
+   * flight. A queued second answer() finds its question already graded and
+   * replaced; grading the replacement would score a fact the player never saw.
+   */
+  function requireStillInFlight(answered: InFlight | null): {
+    round: ActiveRound
+    inFlight: InFlight
+  } {
     const current = requireRound()
-    if (!current.inFlight) throw new Error('answer: no question in flight')
-    return { round: current, inFlight: current.inFlight }
+    if (!answered || current.inFlight !== answered) {
+      throw new Error('answer: that question is no longer in flight')
+    }
+    return { round: current, inFlight: answered }
   }
 
   /**
@@ -178,8 +191,10 @@ export function createFarmGame({ saveStore, clock, rng, audio }: FarmGameDeps): 
   }
 
   function answer(given: number): Promise<AnswerFeedback> {
+    // Captured now, not when the turn comes: this is the question on screen.
+    const tapped = round?.inFlight ?? null
     return serialized(async () => {
-      const { round: current, inFlight } = requireInFlight()
+      const { round: current, inFlight } = requireStillInFlight(tapped)
       const save = requireFarm()
       const latencyMs = latencySince(inFlight.servedAt)
       const { question, askedAt } = inFlight
