@@ -28,15 +28,15 @@ is the agent entry point).
 | `docs/privacy.md` — Privacy notice (draft) | [Privacy notice (draft)](https://app.notion.com/p/3d5672aa2c4a81219cd5c8fd8b02d271) |
 | `docs/art-direction.md` — Art direction | [Art direction](https://app.notion.com/p/3d5672aa2c4a81529810c1d09a0a4d84) |
 | `docs/sound-design.md` — Sound design | [Sound design](https://app.notion.com/p/3d5672aa2c4a817cb90ac1dde2cfeb58) |
+| `docs/firestore-backup.md` — Firestore backup strategy | [Firestore backup strategy](https://app.notion.com/p/3d5672aa2c4a815e83eec341bd398b13) |
 
 History only, not mirrored: `docs/original-spec.md` and `docs/redesign-notes.md`
 (the prototype era; the prototype itself was removed in the rebuild — see git
 history before the `chore(SF-36)` commit). Notion also holds James's own
 "Pet Sanctuary Math — Build Spec" page under Docs.
 
-## Planned (still `Ready` tickets, not written yet)
+## Adding a doc
 
-Every Phase 0 doc is written and mirrored.
-
-Create the file via PR, then add it under the Docs page and to the table above
-(skill: `notion-docs`).
+Every Phase 0 doc is written and mirrored. For a new one: create the file via
+PR, then add it under the Docs page and to the table above (skill:
+`notion-docs`).
