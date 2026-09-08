@@ -27,7 +27,7 @@ outdoor bed. A synth sheep is a cartoon; a synth breeze is a hiss.
 **When samples earn their place:** animal voices (bleat, cluck, low) and the
 ambient bed (§4). Rule for adding any sample: short (voices ≤ 1 s, bed ≤ 20 s
 seamless loop), compressed (Opus/AAC, mono, 22 kHz), decoded size counted
-against `performance-budget.md` (planned), fetched lazily after first paint,
+against `performance-budget.md`, fetched lazily after first paint,
 and one coherent set from a single source or author — no mixed-library zoo.
 
 **Decision:** synth stays for feedback and UI forever. Samples only for animals
@@ -36,7 +36,7 @@ and ambience, Phase 3+ ("Audio pass" in `implementation-plan.md`).
 ## 3. Feedback sounds
 
 Envelope for every voice: 15 ms attack to peak, exponential decay to silence,
-50 ms release tail. Frequencies are C-major (C5 E5 G5 …) so everything blends.
+50 ms release tail. The outcome sounds share C-major (C5 E5 G5 …) so they blend; the world sounds are untuned low thuds.
 
 | Name | When | Character | Current recipe |
 | --- | --- | --- | --- |
@@ -57,7 +57,7 @@ Planned, same idiom (synth, ≤ 0.5 s, character note in `recipes.ts`):
 | `coin` | coin earned in paddock / nest | Single bright ping above `correct`, so it stacks cleanly on it |
 | `purchase` | feed-shed buy | Short two-note "settled" figure (E5 → C5); the inverse of `correct` |
 
-`fluent` is the only feedback sound over 0.4 s; nothing new may exceed it.
+`fluent` (~0.55 s) and `hatch` (~0.56 s) are the longest feedback sounds; nothing new may exceed them.
 
 ## 4. Ambient bed
 
@@ -101,7 +101,7 @@ setting. A device that is muted at the OS level is the OS's decision.
   above.
 - Test with `recordingAudioBus()` (`test-fakes.ts`) at the application layer
   and with the injected fake `AudioContext` in `web-audio-bus.test.ts`.
-- Feedback sounds ≤ 0.5 s. World sounds ≤ 1 s. Only the bed loops.
+- Feedback sounds ≤ 0.6 s (`fluent` and `hatch` are the ceiling). World sounds ≤ 1 s. Only the bed loops.
 - Never more than 8 voices sounding at once, and never the same name twice
   within 50 ms; a rapid-fire pad must not turn `tap` into a drone.
 - Reduced motion does not imply reduced sound, but the two are tuned to match:
