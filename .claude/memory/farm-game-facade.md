@@ -24,8 +24,7 @@ easy to get wrong when wiring it:
   saveStore.save()`, and only then swap the in-memory state. A rejected save
   leaves the game exactly where the caller saw it (same in-flight question,
   same coins, round still open — `endRound` can be retried) and the error
-  propagates. These calls are serialised: a double-tap grades the question the
-  first tap served, never the same question twice. Because `startRound` is
+  propagates. These calls are serialised. Because `startRound` is
   synchronous and unsaved, it throws `a save is still in progress` if called
   while one of those promises is pending — always `await` them first.
 - **A backwards clock grades as SLOW, not FLUENT.** `now < servedAt` means the
@@ -42,3 +41,12 @@ easy to get wrong when wiring it:
 - Fakes for application tests live in `packages/application/src/test-fakes.ts`
   (`harness()` wires seeded RNG + settable clock + in-memory store + recording
   audio). Do not import `@sf/persistence` from application tests.
+- **`answer()` grades the question that was on screen when it was called.** The
+  in-flight question is captured synchronously at call time and re-checked by
+  identity when the serialised turn comes; if it has since been graded and
+  replaced, the call rejects with `that question is no longer in flight`. A
+  double-tap therefore grades once and rejects once — it must never grade the
+  replacement, which arrives at ~0 ms latency and would mint FLUENT coins and a
+  box promotion for a fact the player never saw. `PracticePanel` never provokes
+  it — a synchronous `inFlight` ref blocks the second tap before it reaches the
+  facade — so the rejection stays a loud programming-error signal.
