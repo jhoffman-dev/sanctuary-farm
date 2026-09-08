@@ -9,6 +9,7 @@ import type {
   SessionLog,
 } from '@sf/domain'
 import {
+  hasPlayableFact,
   MAX_RECENT_LATENCIES,
   MAX_TABLE_DEFAULT,
   MIN_TABLE,
@@ -79,7 +80,7 @@ function parseFactState(key: string, value: unknown): FactState | null {
   }
 }
 
-/** Empty is rejected too: the scheduler has nothing to serve from and throws on the first question. */
+/** Whether the map is playable is the scheduler's judgement, made in parseScheduler. */
 function parseFacts(value: unknown): Record<FactId, FactState> | null {
   if (!isRecord(value)) return null
   const facts: Record<FactId, FactState> = {}
@@ -88,7 +89,7 @@ function parseFacts(value: unknown): Record<FactId, FactState> | null {
     if (!state) return null
     facts[key] = state
   }
-  return Object.keys(facts).length === 0 ? null : facts
+  return facts
 }
 
 function parseCommuteCredit(value: unknown): Record<FactId, number> | null {
@@ -120,7 +121,7 @@ function parseScheduler(value: unknown): SchedulerState | null {
   if (!isCount(globalCounter) || !isUnlockedTiers(unlockedTiers) || !isFamilyHistory(recentFamilies)) return null
   // An unknown lastServed is harmless: it only ever stops a fact being asked twice in a row.
   if (lastServed !== null && typeof lastServed !== 'string') return null
-  return {
+  const scheduler: SchedulerState = {
     facts,
     globalCounter,
     unlockedTiers: [...unlockedTiers],
@@ -129,6 +130,9 @@ function parseScheduler(value: unknown): SchedulerState | null {
     commuteCredit,
     maxTable,
   }
+  // Structurally sound is not enough: a state the scheduler cannot serve a
+  // first question from would throw the moment a round started.
+  return hasPlayableFact(scheduler) ? scheduler : null
 }
 
 function isSessionContext(value: unknown): value is SessionContext {

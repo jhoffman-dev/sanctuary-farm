@@ -37,6 +37,7 @@ export type { Answer, Graded, GradeResult, NextFact, SchedulerState } from './sc
 export { initialSchedulerState } from './scheduler/state'
 export { nextFact, nextFactInFamily } from './scheduler/next'
 export { gradeAnswer } from './scheduler/grade'
+export { hasPlayableFact } from './scheduler/playable'
 export { familyProgress, isFactMastered, isFamilyMastered } from './scheduler/progress'
 
 export type { BuyFeedResult } from './economy/coins'
