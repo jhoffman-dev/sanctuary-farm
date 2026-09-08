@@ -12,15 +12,19 @@
     "typecheck": "pnpm -r --parallel typecheck",
     "lint": "oxlint",
     "boundaries": "depcruise --config .dependency-cruiser.cjs packages apps",
-    "test": "vitest run",
+    "test": "vitest run && pnpm test:functions",
     "test:coverage": "vitest run --coverage",
+    "test:functions": "pnpm --filter @sf/functions test",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-sanctuary-farm \"vitest run --config firestore/vitest.config.ts\"",
     "build": "pnpm -r build",
     "e2e": "pnpm --filter @sf/web e2e",
-    "gate": "pnpm typecheck && pnpm lint && pnpm boundaries && pnpm test:coverage && pnpm build"
+    "gate": "pnpm typecheck && pnpm lint && pnpm boundaries && pnpm test:coverage && pnpm test:functions && pnpm build"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@vitest/coverage-v8": "^5.0.0",
     "dependency-cruiser": "^18.2.0",
+    "firebase": "^12.18.0",
     "oxlint": "^1.79.0",
     "typescript": "~6.0.2",
     "vitest": "^5.0.0"

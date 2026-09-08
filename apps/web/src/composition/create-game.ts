@@ -12,6 +12,5 @@ export function createGame(): FarmGame {
     audio: createWebAudioBus(),
     clock: { now: () => Date.now() },
     rng: () => Math.random(),
-    ids: { newId: () => crypto.randomUUID() },
   })
 }
