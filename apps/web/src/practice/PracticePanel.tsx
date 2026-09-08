@@ -1,8 +1,6 @@
-import type { AnswerFeedback, FarmGame, Question, RoundProgress } from '@sf/application'
+import { PADDOCK_ROUND, type AnswerFeedback, type FarmGame, type Question, type RoundProgress } from '@sf/application'
 import { useCallback, useRef, useState } from 'react'
 import { NumberPad } from './NumberPad'
-
-const PADDOCK_ROUND = { context: 'paddock', questions: 5 } as const
 
 type PracticePanelProps = {
   game: FarmGame
