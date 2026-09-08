@@ -17,11 +17,14 @@
     "test:functions": "pnpm --filter @sf/functions test",
     "test:rules": "firebase emulators:exec --only firestore --project demo-sanctuary-farm \"vitest run --config firestore/vitest.config.ts\"",
     "build": "pnpm -r build",
-    "e2e": "pnpm --filter @sf/web e2e",
+    "e2e": "pnpm e2e:web && pnpm e2e:landing",
+    "e2e:web": "pnpm --filter @sf/web e2e",
+    "e2e:landing": "playwright test --config apps/landing/playwright.config.ts",
     "gate": "pnpm typecheck && pnpm lint && pnpm boundaries && pnpm test:coverage && pnpm test:functions && pnpm build"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.2",
+    "@playwright/test": "^1.63.0",
     "@vitest/coverage-v8": "^5.0.0",
     "dependency-cruiser": "^18.2.0",
     "firebase": "^12.18.0",

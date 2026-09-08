@@ -30,7 +30,7 @@
     {
       "target": "landing",
       "public": "apps/landing",
-      "ignore": ["**/.*", "README.md", "og.svg"],
+      "ignore": ["**/.*", "README.md", "og.svg", "e2e/**", "playwright.config.ts", "playwright-report/**", "test-results/**"],
       "cleanUrls": true,
       "headers": [
         {

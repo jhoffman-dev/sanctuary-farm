@@ -11,6 +11,9 @@ importers:
       '@firebase/rules-unit-testing':
         specifier: ^5.0.2
         version: 5.0.2(firebase@12.18.0)
+      '@playwright/test':
+        specifier: ^1.63.0
+        version: 1.63.0
       '@vitest/coverage-v8':
         specifier: ^5.0.0
         version: 5.0.0(vitest@5.0.0)
@@ -3183,7 +3186,7 @@ snapshots:
   '@grpc/grpc-js@1.9.16':
     dependencies:
       '@grpc/proto-loader': 0.7.15
-      '@types/node': 22.20.1
+      '@types/node': 24.13.3
 
   '@grpc/proto-loader@0.7.15':
     dependencies:

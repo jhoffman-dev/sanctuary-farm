@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="t d">
+  <!-- Share image. Source for og.png (render with headless Chromium; keep 1200x630). Palette mirrors styles.css. -->
+  <title id="t">Sanctuary Farm</title>
+  <desc id="d">A cosy farm game that teaches math fluency. Free, no ads, no sign-up.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6fb0d6"/>
+      <stop offset="0.55" stop-color="#a9d0e5"/>
+      <stop offset="1" stop-color="#fbf7f0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#sky)"/>
+
+  <!-- rolling hills -->
+  <path d="M0 470 C 220 400, 420 420, 640 460 S 1000 520, 1200 440 L1200 630 L0 630 Z" fill="#bcd98f"/>
+  <path d="M0 520 C 260 470, 520 500, 760 540 S 1080 560, 1200 520 L1200 630 L0 630 Z" fill="#4a7c3f"/>
+
+  <!-- sun -->
+  <circle cx="1030" cy="120" r="46" fill="#f4a259"/>
+
+  <!-- app icon (apps/web/public/icon.svg), scaled to 260px -->
+  <g transform="translate(860 190) scale(0.5078)">
+    <rect width="512" height="512" rx="96" fill="#f3efe4"/>
+    <rect y="330" width="512" height="182" fill="#bcd98f"/>
+    <path d="M120 300 L200 300 L200 210 L160 178 L120 210 Z" fill="#d98a5b"/>
+    <rect x="150" y="248" width="20" height="52" fill="#7a4a30"/>
+    <circle cx="330" cy="250" r="70" fill="#f4c95d"/>
+    <circle cx="308" cy="240" r="9" fill="#3a2f26"/>
+    <circle cx="352" cy="240" r="9" fill="#3a2f26"/>
+    <path d="M300 272 q30 26 60 0" stroke="#3a2f26" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <circle cx="300" cy="120" r="34" fill="#f4a259"/>
+  </g>
+
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" fill="#2b2420">
+    <text x="80" y="150" font-size="26" font-weight="700" letter-spacing="4" fill="#254520">A MATH GAME KIDS WANT TO PLAY</text>
+    <text x="80" y="255" font-size="96" font-weight="800" letter-spacing="-2">Sanctuary Farm</text>
+    <text x="80" y="330" font-size="38" fill="#5c5148">A cosy farm game that teaches math fluency.</text>
+    <text x="80" y="382" font-size="38" fill="#5c5148">Feed the animals. Type the answer. Get faster.</text>
+  </g>
+
+  <!-- badges -->
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="700" fill="#2b2420">
+    <rect x="80" y="440" width="180" height="52" rx="26" fill="#fbf7f0" stroke="#e0d5c2" stroke-width="2"/>
+    <text x="170" y="474" text-anchor="middle">Free forever</text>
+    <rect x="276" y="440" width="130" height="52" rx="26" fill="#fbf7f0" stroke="#e0d5c2" stroke-width="2"/>
+    <text x="341" y="474" text-anchor="middle">No ads</text>
+    <rect x="422" y="440" width="340" height="52" rx="26" fill="#fbf7f0" stroke="#e0d5c2" stroke-width="2"/>
+    <text x="592" y="474" text-anchor="middle">No account, no personal info</text>
+  </g>
+</svg>

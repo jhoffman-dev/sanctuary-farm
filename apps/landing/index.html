@@ -8,6 +8,42 @@
       name="description"
       content="Sanctuary Farm is a free, ad-free, no-sign-up farm game that builds real math fluency. Made by one dad for his daughter — and now for any kid with a link."
     />
+    <meta name="theme-color" content="#6fb0d6" />
+
+    <!-- Absolute URLs point at the landing Hosting site named in .firebaserc. Swap them only if a custom domain is added. -->
+    <link rel="canonical" href="https://sanctuary-farm-landing.web.app/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Sanctuary Farm" />
+    <meta property="og:title" content="Sanctuary Farm — a math game kids actually want to play" />
+    <meta
+      property="og:description"
+      content="A free, ad-free, no-sign-up farm game that builds real math fluency. Feed the animals, type the answer, get faster."
+    />
+    <meta property="og:url" content="https://sanctuary-farm-landing.web.app/" />
+    <meta property="og:image" content="https://sanctuary-farm-landing.web.app/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content="An orange sun over green rolling hills, with the Sanctuary Farm app icon — a barn and a smiling chick — beside the game's name." />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sanctuary Farm — a math game kids actually want to play" />
+    <meta
+      name="twitter:description"
+      content="A free, ad-free, no-sign-up farm game that builds real math fluency. Feed the animals, type the answer, get faster."
+    />
+    <meta name="twitter:image" content="https://sanctuary-farm-landing.web.app/og.png" />
+    <meta name="twitter:image:alt" content="An orange sun over green rolling hills, with the Sanctuary Farm app icon — a barn and a smiling chick — beside the game's name." />
+
+    <!-- All three are the same mark, copied from apps/web/public (see README).
+         The SVG is declared last because Chrome takes the last icon it
+         understands while Firefox and Safari prefer the SVG — declaring it
+         first is how the two ended up showing different marks. -->
+    <link rel="icon" href="./icon-192.png" type="image/png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="./icon-180.png" sizes="180x180" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -65,12 +101,12 @@
           <h2>Where it's at</h2>
           <p class="status-line"><strong>Status:</strong> rebuilding — the prototype taught us what works; the real 2.5D version is being built from a clean foundation.</p>
           <ul class="checklist">
-            <li class="done">Prototype played and learned from: farmyard, barn, nest, paddock, care tasks</li>
-            <li class="done">Multiplication curriculum with spaced repetition and interleaving</li>
-            <li class="wip">Clean, fully tested core (the learning engine, saves, sound) on the new base</li>
-            <li class="wip">3D world with animated animals and a walking farm keeper</li>
-            <li class="todo">Cloud save with a no-personal-info login</li>
-            <li class="todo">Public alpha link and a way to send feedback</li>
+            <li class="done"><span class="sr-only">Done: </span>Prototype played and learned from: farmyard, barn, nest, paddock, care tasks</li>
+            <li class="done"><span class="sr-only">Done: </span>Multiplication curriculum with spaced repetition and interleaving</li>
+            <li class="wip"><span class="sr-only">In progress: </span>Clean, fully tested core (the learning engine, saves, sound) on the new base</li>
+            <li class="wip"><span class="sr-only">In progress: </span>3D world with animated animals and a walking farm keeper</li>
+            <li class="todo"><span class="sr-only">Planned: </span>Cloud save with a no-personal-info login</li>
+            <li class="todo"><span class="sr-only">Planned: </span>Public alpha link and a way to send feedback</li>
           </ul>
           <p class="note">
             There's no public link yet. When the alpha is ready for other kids to
