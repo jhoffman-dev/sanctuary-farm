@@ -25,7 +25,7 @@
     {
       "target": "landing",
       "public": "apps/landing",
-      "ignore": ["**/.*", "README.md"],
+      "ignore": ["**/.*", "README.md", "e2e/**", "playwright.config.ts", "playwright-report/**", "test-results/**"],
       "cleanUrls": true,
       "headers": [
         {

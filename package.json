@@ -15,10 +15,13 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "build": "pnpm -r build",
-    "e2e": "pnpm --filter @sf/web e2e",
+    "e2e": "pnpm e2e:web && pnpm e2e:landing",
+    "e2e:web": "pnpm --filter @sf/web e2e",
+    "e2e:landing": "playwright test --config apps/landing/playwright.config.ts",
     "gate": "pnpm typecheck && pnpm lint && pnpm boundaries && pnpm test:coverage && pnpm build"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@vitest/coverage-v8": "^5.0.0",
     "dependency-cruiser": "^18.2.0",
     "oxlint": "^1.79.0",
