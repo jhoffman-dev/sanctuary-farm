@@ -32,7 +32,7 @@ pushed with the `notion-docs` skill. Prototype-era history:
 
 ```
 packages/domain        @sf/domain       the rules: facts, scheduler, mastery, economy — pure
-packages/application   @sf/application  use-cases + ports (SaveStore, Clock, Rng, AudioBus, IdProvider)
+packages/application   @sf/application  use-cases + ports (SaveStore, Clock, Rng, AudioBus)
 packages/persistence   @sf/persistence  SaveStore adapters (localStorage now, Firestore later)
 packages/audio         @sf/audio        AudioBus adapters (Web Audio synth, silent)
 packages/config        @sf/config       shared tsconfig presets
