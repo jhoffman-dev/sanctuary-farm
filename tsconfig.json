@@ -2,6 +2,7 @@
   "files": [],
   "references": [
     { "path": "packages/domain" },
+    { "path": "packages/world" },
     { "path": "packages/application" },
     { "path": "packages/persistence" },
     { "path": "packages/audio" },
