@@ -6,7 +6,7 @@
   "type": "module",
   "main": "lib/index.js",
   "engines": {
-    "node": "22"
+    "node": ">=22"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -18,7 +18,7 @@
     "firebase-functions": "7.3.2"
   },
   "devDependencies": {
-    "@types/node": "^24.13.3",
+    "@types/node": "^22.19.0",
     "typescript": "~6.0.2"
   }
 }
