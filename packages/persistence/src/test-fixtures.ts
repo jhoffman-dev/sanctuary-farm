@@ -1,25 +1,12 @@
 import type { FarmSave } from '@sf/domain'
-import { SAVE_SCHEMA_VERSION } from '@sf/domain'
+import { emptyFarmSave } from '@sf/domain'
 
-/** The smallest well-formed v3 save: a fresh farm before the first question. */
+/**
+ * A fresh farm before the first question — the real thing, so what the guard
+ * accepts here is exactly what the domain can serve from.
+ */
 export function freshFarmSave(overrides: Partial<FarmSave> = {}): FarmSave {
-  return {
-    schemaVersion: SAVE_SCHEMA_VERSION,
-    scheduler: {
-      facts: {},
-      globalCounter: 0,
-      unlockedTiers: [1],
-      recentFamilies: [],
-      lastServed: null,
-      commuteCredit: {},
-      maxTable: 12,
-    },
-    coins: 0,
-    feed: 12,
-    sessions: [],
-    settings: { muted: false, maxTable: 12 },
-    ...overrides,
-  }
+  return { ...emptyFarmSave(), ...overrides }
 }
 
 /**

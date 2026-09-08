@@ -31,12 +31,13 @@ export {
   isHardCore,
   tierOf,
 } from './facts/tuning'
-export { buildFacts, factsInFamily, factsInTier, getFact } from './facts/table'
+export { assertTableSize, buildFacts, factsInFamily, factsInTier, getFact } from './facts/table'
 
 export type { Answer, Graded, GradeResult, NextFact, SchedulerState } from './scheduler/types'
 export { initialSchedulerState } from './scheduler/state'
 export { nextFact, nextFactInFamily } from './scheduler/next'
 export { gradeAnswer } from './scheduler/grade'
+export { hasPlayableFact } from './scheduler/playable'
 export { familyProgress, isFactMastered, isFamilyMastered } from './scheduler/progress'
 
 export type { BuyFeedResult } from './economy/coins'

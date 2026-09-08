@@ -1,6 +1,12 @@
 import { expect, test, type Page } from '@playwright/test'
 
-const ROUND_LENGTH = 5
+/** How many questions the game chose for this round, read off "Question 1 of N". */
+async function readRoundLength(page: Page): Promise<number> {
+  const text = await page.getByTestId('progress').innerText()
+  const match = /Question 1 of (\d+)/.exec(text)
+  if (!match) throw new Error(`Unrecognised progress text: ${text}`)
+  return Number(match[1])
+}
 
 async function readProduct(page: Page): Promise<number> {
   const text = await page.getByTestId('question').innerText()
@@ -22,12 +28,14 @@ test('day-one loop: practise in the paddock, earn coins, coins survive a reload'
 
   await page.getByTestId('start-paddock').click()
   await expect(page.getByTestId('question')).toBeVisible()
+  const roundLength = await readRoundLength(page)
+  expect(roundLength).toBeGreaterThan(0)
 
-  for (let i = 0; i < ROUND_LENGTH; i++) {
-    await expect(page.getByTestId('progress')).toHaveText(`Question ${i + 1} of ${ROUND_LENGTH}`)
+  for (let i = 0; i < roundLength; i++) {
+    await expect(page.getByTestId('progress')).toHaveText(`Question ${i + 1} of ${roundLength}`)
     const product = await readProduct(page)
     await typeOnPad(page, product)
-    if (i < ROUND_LENGTH - 1) {
+    if (i < roundLength - 1) {
       await expect(page.getByTestId('feedback')).toBeVisible()
       await expect(page.getByTestId('feedback')).toContainText(/Fluent|Correct/)
     }
