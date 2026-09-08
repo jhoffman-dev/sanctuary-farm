@@ -24,7 +24,8 @@
     <meta property="og:image" content="https://sanctuary-farm-landing.web.app/og.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Sanctuary Farm — a cosy farm game that teaches math fluency. Free forever, no ads, no account." />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content="An orange sun over green rolling hills, with the Sanctuary Farm app icon — a barn and a smiling chick — beside the game's name." />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Sanctuary Farm — a math game kids actually want to play" />
@@ -33,11 +34,15 @@
       content="A free, ad-free, no-sign-up farm game that builds real math fluency. Feed the animals, type the answer, get faster."
     />
     <meta name="twitter:image" content="https://sanctuary-farm-landing.web.app/og.png" />
-    <meta name="twitter:image:alt" content="Sanctuary Farm — a cosy farm game that teaches math fluency. Free forever, no ads, no account." />
+    <meta name="twitter:image:alt" content="An orange sun over green rolling hills, with the Sanctuary Farm app icon — a barn and a smiling chick — beside the game's name." />
 
-    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <!-- All three are the same mark, copied from apps/web/public (see README).
+         The SVG is declared last because Chrome takes the last icon it
+         understands while Firefox and Safari prefer the SVG — declaring it
+         first is how the two ended up showing different marks. -->
     <link rel="icon" href="./icon-192.png" type="image/png" sizes="192x192" />
     <link rel="apple-touch-icon" href="./icon-180.png" sizes="180x180" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
 
     <link rel="stylesheet" href="./styles.css" />
   </head>
