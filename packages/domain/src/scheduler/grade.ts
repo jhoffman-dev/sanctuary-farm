@@ -4,16 +4,21 @@ import { MAX_RECENT_LATENCIES } from '../facts/tuning'
 import type { Card } from './cards'
 import { cardsInPlay, withStatus } from './cards'
 import { creditTwin } from './commute'
-import { classifyOutcome } from './latency'
+import { assertLatency, classifyOutcome } from './latency'
 import { boxAfter, requeueInterval } from './leitner'
 import { isFactMastered, isFamilyMastered } from './progress'
 import { withUnlockedTiers } from './tiers'
 import type { Answer, GradeResult, Graded, SchedulerState } from './types'
 
+/**
+ * Only an introduced fact can be graded: grading one at box 0 would leave it
+ * boxed but not introduced, and the scheduler only ever serves introduced facts.
+ */
 function requireCard(state: SchedulerState, factId: string): Card {
   const fact = getFact(factId)
   const status = state.facts[factId]
   if (!fact || !status) throw new Error(`gradeAnswer: unknown fact "${factId}"`)
+  if (!status.introduced) throw new Error(`gradeAnswer: fact "${factId}" was never introduced`)
   return { fact, status }
 }
 
@@ -65,16 +70,19 @@ function describe({ card, outcome, before, after }: Transition): GradeResult {
 
 /**
  * Grade one answer: classify by latency, move the Leitner box, re-queue, credit
- * the commutative twin, and unlock tiers. Throws for a fact the state does not
- * know — the application layer grades only the fact it has in flight.
+ * the commutative twin, and unlock tiers. Throws, before touching the state, for
+ * a fact the state does not know or never introduced, and for a latency that is
+ * not a finite duration — the application layer grades only the fact it has in
+ * flight, with a clock it has already clamped.
  */
 export function gradeAnswer(state: SchedulerState, answer: Answer): Graded {
+  assertLatency(answer.latencyMs)
   const card = requireCard(state, answer.factId)
   const correct = answer.given === card.fact.answer
   const outcome = classifyOutcome(correct, answer.latencyMs)
   const newBox = boxAfter(outcome, card.status.box)
   const globalCounter = state.globalCounter + 1
-  const dueAt = globalCounter + requeueInterval(outcome, card.status.box, newBox)
+  const dueAt = globalCounter + requeueInterval(outcome, newBox)
 
   const attempted = withStatus(
     { ...state, globalCounter },

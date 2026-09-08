@@ -61,7 +61,8 @@ The current recommendation is none for the alpha; if any aggregate,
 identifier-free counting is ever added, this notice must be updated first.
 
 **Cookies.** The game sets no cookies of its own and stores nothing in the
-browser beyond the save described above. Firebase Hosting, which serves the
+browser beyond the save described above and, later, a one-word graphics-quality
+preference (`low` / `high`) that identifies nothing. Firebase Hosting, which serves the
 files, may set the minimal cookies it needs to deliver the site; we do not read
 them or use them for anything.
 
@@ -89,11 +90,12 @@ identifies the child who owns it.
 **Retention and deletion.** *Proposed:* cloud saves not loaded or saved for
 **12 months** are deleted automatically. A **Delete my farm** action removes the
 cloud save, the save-code hash, and any username and PIN hash; it requires the
-save code so that nobody else can delete a child's farm. Deletion is immediate
-and permanent — we keep no backups of deleted saves beyond Firebase's own
-short-lived operational backups (period to be confirmed). A local save is
-deleted by clearing the site's data in the browser, or via the same in-game
-action.
+save code so that nobody else can delete a child's farm. Deletion removes the
+farm from the live database at once. Our own backups keep a copy for a short
+while so we can recover from our mistakes: at most **56 days** after deletion
+the farm is gone from every backup too, and nobody, including us, can restore
+it (see `firestore-backup.md`). A local save is deleted by clearing the site's
+data in the browser, or via the same in-game action.
 
 **Children under 13.** Most players are under 13. Because there are no
 accounts, no PII, and no persistent identifier used for anything other than

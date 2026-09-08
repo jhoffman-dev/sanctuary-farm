@@ -24,47 +24,65 @@ function resolveStorage(preferred: Storage | undefined): Storage | null {
   }
 }
 
-function readStoredFarm(storage: Storage | null, key: string): FarmSave | null {
-  if (!storage) return null
+function parseStoredBlob(raw: string | null): FarmSave | null {
+  if (raw === null) return null
   try {
-    const raw = storage.getItem(key)
-    return raw === null ? null : parseFarmSave(JSON.parse(raw))
+    return parseFarmSave(JSON.parse(raw))
   } catch {
-    // Unreadable storage or corrupt JSON both mean the same thing to the
-    // use-case: there is no save, start a fresh farm.
+    // Corrupt JSON means the same thing to the use-case as no blob: start a fresh farm.
     return null
   }
 }
 
 /**
- * One versioned key holding `JSON.stringify(FarmSave)`. Never throws: the
- * latest farm saved in this process is kept in memory, so play continues even
- * when the browser refuses to persist it.
+ * One versioned key holding `JSON.stringify(FarmSave)`. Storage is the source
+ * of truth — another store on the same key, or a `clear()` from elsewhere, is
+ * seen on the next `load()`. Never throws: the latest farm saved in this
+ * process is kept in memory and wins only while the browser has refused to
+ * persist it, so play continues even when a write fails.
  */
 export function createLocalSaveStore(options: LocalSaveStoreOptions = {}): SaveStore {
   const key = options.key ?? DEFAULT_SAVE_KEY
   const storage = () => resolveStorage(options.storage)
   let lastSaved: FarmSave | null = null
+  /** True while the latest write (save or clear) never reached storage, so memory is the newer copy. */
+  let memoryIsNewer = false
 
   return {
-    load: async () => lastSaved ?? readStoredFarm(storage(), key),
+    load: async () => {
+      if (memoryIsNewer) return lastSaved
+      const durable = storage()
+      if (!durable) return lastSaved
+      try {
+        return parseStoredBlob(durable.getItem(key))
+      } catch {
+        // Storage refused to be read. The copy from this session, if any, is all there is.
+        return lastSaved
+      }
+    },
     save: async (farm) => {
       lastSaved = farm
+      memoryIsNewer = true
       try {
-        storage()?.setItem(key, JSON.stringify(farm))
+        const durable = storage()
+        if (durable) {
+          durable.setItem(key, JSON.stringify(farm))
+          memoryIsNewer = false
+        }
       } catch {
-        // Quota exceeded or private mode. The in-memory copy above is the
-        // fallback, so the session carries on; only the reload is lost.
+        // Quota exceeded or private mode. The in-memory copy stays the newer
+        // one, so the session carries on; only the reload is lost.
       }
     },
     clear: async () => {
       lastSaved = null
+      memoryIsNewer = true
       try {
         storage()?.removeItem(key)
+        memoryIsNewer = false
       } catch {
-        // Same failure modes as setItem. With the memory copy gone, `load()`
-        // falls back to the stored blob, which we could not remove; nothing
-        // more can be done from here.
+        // Same failure modes as setItem. The blob we could not remove stays on
+        // disk, but this session honours the clear and loads no farm.
       }
     },
   }

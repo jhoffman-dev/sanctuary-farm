@@ -10,6 +10,18 @@ type NumberPadProps = {
 
 const DIGITS = ['7', '8', '9', '4', '5', '6', '1', '2', '3'] as const
 
+// Controls that act on Enter themselves. Taking the key from them would break
+// keyboard activation of every other button on screen, e.g. the HUD's mute.
+const ACTIVATES_ON_ENTER = 'button, a[href], summary, input, textarea, select, [contenteditable]'
+// Controls that consume typed characters, so digits and Backspace belong to them.
+const TAKES_TYPED_TEXT = 'input, textarea, select, [contenteditable]'
+
+/** True when the focused element would handle this key natively. */
+function isHandledNatively(target: EventTarget | null, key: string): boolean {
+  if (!(target instanceof Element)) return false
+  return target.closest(key === 'Enter' ? ACTIVATES_ON_ENTER : TAKES_TYPED_TEXT) !== null
+}
+
 const keyClass =
   'min-h-14 min-w-14 cursor-pointer rounded-2xl bg-white text-2xl font-bold text-stone-800 shadow ' +
   'active:translate-y-px disabled:cursor-not-allowed disabled:opacity-40 ' +
@@ -36,13 +48,10 @@ export function NumberPad({ onSubmit, disabled = false }: NumberPadProps) {
     if (disabled) return
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return
+      if (isHandledNatively(event.target, event.key)) return
       if (/^[0-9]$/.test(event.key)) appendDigit(event.key)
       else if (event.key === 'Backspace') backspace()
-      else if (event.key === 'Enter') {
-        // Stop a focused button from also firing its click on the same keystroke.
-        event.preventDefault()
-        submit()
-      }
+      else if (event.key === 'Enter') submit()
     }
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
