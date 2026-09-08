@@ -10,7 +10,9 @@ export default defineConfig({
         '**/*.test.ts',
         '**/*.test.tsx',
         '**/*.adversarial.test.ts',
-        '**/index.ts',
+        // Package entry points are re-exports only. Named one by one, because
+        // `**/index.ts` would also hide real code such as the ports.
+        'packages/*/src/index.ts',
         // Test scaffolding is not product code.
         '**/test-fakes.ts',
         '**/test-fixtures.ts',

@@ -36,8 +36,9 @@ easy to get wrong when wiring it:
   `[1, scheduler.maxTable]` — it never falls back to mixed practice.
 - `PADDOCK_ROUND` (5 questions) is exported from `@sf/application`; the shell
   must not choose its own round length.
-- `IdProvider` is still an exported port type but is no longer a
-  `FarmGameDeps` field; Phase 4 wires it when save codes land.
+- `IdProvider` is gone from `@sf/application` (SF-36 review): a port with no
+  implementation and no consumer is not a port yet. Reintroduce it in Phase 4,
+  with save codes, alongside the adapter that implements it.
 - Fakes for application tests live in `packages/application/src/test-fakes.ts`
   (`harness()` wires seeded RNG + settable clock + in-memory store + recording
   audio). Do not import `@sf/persistence` from application tests.
