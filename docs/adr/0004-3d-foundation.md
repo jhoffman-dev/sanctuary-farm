@@ -172,8 +172,9 @@ Adopt the spike's approach for the Phase 2 3D foundation:
    Portrait framing is an open ticket, not a solved problem.
 4. **Structure: pure controller, thin components.** `steering`-style modules
    with unit tests; r3f components excluded from coverage and covered by
-   Playwright, because jsdom has no WebGL context (the exclusion and its reason
-   are in `vitest.config.ts`).
+   Playwright, because jsdom has no WebGL context. (On the spike branch that
+   exclusion and its reason are in `vitest.config.ts`; Phase 2 will need the
+   same carve-out for `apps/web/src/scene/`.)
 5. **Assets: `gltf-transform optimize --compress meshopt`** with clips trimmed
    first, `metallicFactor` normalised to 0, clip names normalised to §8's, and
    the loader wired with `setMeshoptDecoder`.
