@@ -73,4 +73,52 @@ describe('NumberPad', () => {
     const digitButtons = screen.getAllByRole('button', { name: /^Digit \d$/ })
     expect(digitButtons).toHaveLength(10)
   })
+
+  describe('with keyboard focus on a button', () => {
+    it('lets Enter activate a focused button outside the pad instead of submitting', async () => {
+      const { onMute, onSubmit, user } = renderPadBesideMuteButton()
+      await user.keyboard('4')
+      screen.getByRole('button', { name: 'Mute' }).focus()
+
+      await user.keyboard('{Enter}')
+      expect(onMute).toHaveBeenCalledTimes(1)
+      expect(onSubmit).not.toHaveBeenCalled()
+      expect(entry()).toHaveTextContent(/^4$/)
+    })
+
+    it('appends the digit when Enter activates a focused digit key, without submitting', async () => {
+      const { onSubmit, user } = renderPad()
+      await user.keyboard('4')
+      screen.getByTestId('numberpad-5').focus()
+
+      await user.keyboard('{Enter}')
+      expect(entry()).toHaveTextContent(/^45$/)
+      expect(onSubmit).not.toHaveBeenCalled()
+    })
+
+    it('still takes typed digits and Backspace while a pad key has focus', async () => {
+      const { onSubmit, user } = renderPad()
+      await user.click(screen.getByTestId('numberpad-5'))
+      await user.keyboard('67{Backspace}')
+      expect(entry()).toHaveTextContent(/^56$/)
+
+      await user.click(screen.getByTestId('submit'))
+      expect(onSubmit).toHaveBeenCalledWith(56)
+    })
+  })
 })
+
+/** The pad next to an unrelated control, as it sits beside the HUD's mute button. */
+function renderPadBesideMuteButton() {
+  const onMute = vi.fn()
+  const onSubmit = vi.fn()
+  render(
+    <>
+      <button type="button" onClick={onMute}>
+        Mute
+      </button>
+      <NumberPad onSubmit={onSubmit} />
+    </>,
+  )
+  return { onMute, onSubmit, user: userEvent.setup() }
+}

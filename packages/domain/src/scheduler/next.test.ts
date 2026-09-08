@@ -145,6 +145,40 @@ describe('interleaving — never the same family three times in a row', () => {
     expect(introducedIds(after)).toHaveLength(introducedIds(state).length)
   })
 
+  it('introduces from a higher unlocked tier when the lowest tier has only the blocked family left', () => {
+    // Tiers 1–4 unlocked; 9×8 is the last un-introduced tier-4 fact and family 9 is blocked.
+    // Tier 5 (the 6s, 7s, 8s) still has other families to introduce, so one of those comes next.
+    const tiersTo4 = buildFacts()
+      .filter((fact) => fact.tier <= 4 && fact.id !== '9x8')
+      .map((fact) => fact.id)
+    const state: SchedulerState = {
+      ...withFacts(initialSchedulerState(), tiersTo4, { box: 2, dueAt: FAR_FUTURE }),
+      unlockedTiers: [1, 2, 3, 4, 5],
+      recentFamilies: [9, 9],
+    }
+    const { fact, state: after } = nextFact(state, createRng(1))
+    expect(fact.tier).toBe(5)
+    expect(fact.family).not.toBe(9)
+    expect(after.facts[fact.id]?.introduced).toBe(true)
+    expect(after.facts['9x8']?.introduced).toBe(false)
+  })
+
+  it('serves another family’s due fact instead of introducing the blocked family', () => {
+    // Review repro: recentFamilies [9, 9], 9×8 is the only introducible fact, 2×2 is due.
+    const tiersTo4 = buildFacts()
+      .filter((fact) => fact.tier <= 4 && fact.id !== '9x8')
+      .map((fact) => fact.id)
+    const waiting = withFacts(initialSchedulerState(), tiersTo4, { box: 2, dueAt: FAR_FUTURE })
+    const state: SchedulerState = {
+      ...withFact(waiting, '2x2', { dueAt: 0 }),
+      unlockedTiers: [1, 2, 3, 4],
+      recentFamilies: [9, 9],
+    }
+    const { fact, state: after } = nextFact(state, createRng(1))
+    expect(fact.id).toBe('2x2')
+    expect(after.facts['9x8']?.introduced).toBe(false)
+  })
+
   it('only a single-family board forces a repeat', () => {
     let state = initialSchedulerState(1)
     const served: number[] = []

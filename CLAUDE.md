@@ -34,7 +34,7 @@ the exception — it stays repo-only.
   interleave + tiers), curriculum, mastery. No framework, no I/O, no
   `Date.now()`, no `Math.random()` — inject a `Clock` and an `Rng`.
 - **`packages/application`** — use-cases + ports (`SaveStore`, `Clock`, `Rng`,
-  `AudioBus`, `IdProvider`). Returns plain data / events.
+  `AudioBus`; `IdProvider` arrives in Phase 4). Returns plain data / events.
 - **`packages/persistence`, `packages/audio`, `functions/`** — adapters. Thin.
 - **`apps/web`** — React + r3f. **Holds zero game rules.** If a component is
   deciding what fact comes next, it's in the wrong layer.

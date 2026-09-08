@@ -19,7 +19,8 @@ function freshFactState(id: FactId, introduced: boolean): FactState {
 
 /**
  * Fresh state: every in-range fact created, only the Anchors tier unlocked, and
- * the cold-start families already introduced at box 1 and due now.
+ * the cold-start families already introduced at box 1 and due now. Throws a
+ * RangeError (from buildFacts) for a table size outside MIN_TABLE..MAX_TABLE_DEFAULT.
  */
 export function initialSchedulerState(maxTable: number = MAX_TABLE_DEFAULT): SchedulerState {
   const facts: Record<FactId, FactState> = {}
