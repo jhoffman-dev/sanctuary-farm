@@ -12,7 +12,6 @@
     "noUnusedParameters": true,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
-    "sourceMap": true,
     "outDir": "lib",
     "rootDir": "src",
     "types": ["node"]

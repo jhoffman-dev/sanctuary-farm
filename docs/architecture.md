@@ -28,7 +28,9 @@ Firebase, or the DOM.
   RNG). ~90%+ line coverage, all fast unit tests.
 - **application** — use-cases that orchestrate the domain: `StartCareRound`,
   `GradeAnswer`, `BuyFeed`, `HatchEgg`, `AdvanceDay`, `LoadSave`, `SyncSave`.
-  Defines **ports**: `SaveStore`, `Clock`, `Rng`, `AudioBus`, `IdProvider`.
+  Defines **ports**: `SaveStore`, `Clock`, `Rng`, `AudioBus`. (`IdProvider`
+  arrives in Phase 4, with save codes — a port with no implementation and no
+  consumer is not a port yet.)
   Returns plain data / events. Unit-tested against fake adapters.
 - **infrastructure** — implementations of the ports: `LocalSaveStore`,
   `FirestoreSaveStore`, `WebAudioBus`, `SystemClock`. Thin. Integration-tested.

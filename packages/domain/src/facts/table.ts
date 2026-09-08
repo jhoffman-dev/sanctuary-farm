@@ -1,8 +1,26 @@
 import type { Fact, FactId, Tier } from './fact'
-import { MAX_TABLE_DEFAULT, factId, familyOf, isHardCore, tierOf } from './tuning'
+import { MAX_TABLE_DEFAULT, MIN_TABLE, factId, familyOf, isHardCore, tierOf } from './tuning'
 
-/** Every ordered pair a×b with 1 ≤ a,b ≤ maxTable, in (a, b) order. 7×8 and 8×7 are distinct. */
+/**
+ * Throws unless maxTable is a whole table size the 12×12 fact table can grade.
+ * Anything larger than MAX_TABLE_DEFAULT would create facts getFact() does not
+ * know, and a non-integer or unbounded value would loop forever in buildFacts.
+ */
+export function assertTableSize(maxTable: number): void {
+  if (!Number.isInteger(maxTable) || maxTable < MIN_TABLE || maxTable > MAX_TABLE_DEFAULT) {
+    throw new RangeError(
+      `maxTable must be an integer in ${MIN_TABLE}..${MAX_TABLE_DEFAULT}, got ${maxTable}`,
+    )
+  }
+}
+
+/**
+ * Every ordered pair a×b with 1 ≤ a,b ≤ maxTable, in (a, b) order. 7×8 and 8×7 are
+ * distinct. Every consumer of a table size funnels through here, so this is the
+ * one place the size is validated.
+ */
 export function buildFacts(maxTable: number = MAX_TABLE_DEFAULT): Fact[] {
+  assertTableSize(maxTable)
   const out: Fact[] = []
   for (let a = 1; a <= maxTable; a++) {
     for (let b = 1; b <= maxTable; b++) {

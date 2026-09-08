@@ -17,7 +17,9 @@ export function blockedFamily(state: SchedulerState): number | null {
 
 /**
  * Drop candidates of the blocked family. If that would leave nothing, relax and
- * return the input unchanged — a single-family board cannot interleave.
+ * return the input unchanged — a single-family board cannot interleave. Only
+ * apply this to a pool that spans every family in play; a subset (one tier, the
+ * due list) can be single-family while the board is not.
  */
 export function avoidingFamily(cards: readonly Card[], blocked: number | null): readonly Card[] {
   if (blocked === null) return cards
