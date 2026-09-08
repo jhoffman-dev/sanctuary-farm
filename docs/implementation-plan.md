@@ -1,10 +1,15 @@
 # Implementation plan
 
 Phased. Each phase is an Epic on the board; each bullet becomes a small ticket.
-Ship the current prototype as the alpha *now* and gather feedback while Phase 1–3
-happen behind it.
 
-## Phase 0 — Foundation & housekeeping  *(in progress)*
+> **2026-09-07 — reset.** The prototype was retired rather than refactored: the
+> repo restarted from a clean pnpm monorepo on the architecture in
+> `architecture.md`, porting only the learning engine, the save-store pattern
+> and the sound recipes. Phase 1 below is therefore "build the core packages"
+> rather than "extract from the prototype"; Phase 3 re-implements the screens
+> from the PRD, not from old code.
+
+## Phase 0 — Foundation & housekeeping  *(mostly done)*
 
 Project rails so the rebuild is orderly.
 
@@ -19,20 +24,22 @@ Project rails so the rebuild is orderly.
 - Decisions: license, package manager (pnpm), Node version, oldest supported
   device, domain name, asset pack, layout tooling.
 
-## Phase 1 — Clean Architecture refactor
+## Phase 1 — Clean Architecture core  *(in progress)*
 
-Extract the valuable core before building on it.
+Build the valuable core first, on the new base, before any screens.
 
 - Stand up the pnpm monorepo (`packages/*`, `apps/*`).
-- Extract `@sf/domain`: scheduler, curriculum model, mastery — pure, no framework,
-  injected clock + RNG. Port existing tests; push coverage to ~90%+.
-- Define `@sf/application`: use-cases + ports (`SaveStore`, `Clock`, `Rng`,
-  `AudioBus`, `IdProvider`).
-- `@sf/persistence`: `LocalSaveStore` (migrate the current localStorage store).
-- `@sf/audio`: `WebAudioBus` (migrate current sounds).
-- Rewire `apps/web` to consume `@sf/application` only. Delete rules from the UI.
-- Lint boundary rules enforcing the dependency direction.
-- e2e smoke suite green against the refactored 2D app (parity checkpoint).
+- `@sf/domain`: scheduler, curriculum model, mastery, economy — pure functions,
+  no framework, injected RNG. Prototype tests ported; coverage ~90%+.
+- `@sf/application`: use-cases + ports (`SaveStore`, `Clock`, `Rng`,
+  `AudioBus`, `IdProvider`). Owns "one fact in flight at a time".
+- `@sf/persistence`: `LocalSaveStore` (versioned key, never throws, fresh v3
+  schema — prototype saves are not migrated).
+- `@sf/audio`: `WebAudioBus` (the prototype's oscillator recipes).
+- `apps/web`: a minimal React + r3f shell that consumes `@sf/application`
+  only, with adapters wired in a composition root.
+- Boundary rules (dependency-cruiser) enforcing the dependency direction.
+- CI gate + Playwright e2e smoke green on the shell (boot → answer → coins).
 
 ## Phase 2 — 3D rendering foundation
 

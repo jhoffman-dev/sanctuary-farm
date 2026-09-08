@@ -5,7 +5,9 @@ here is authored via PR; after a merge, push the change to its Notion page with
 the `notion-docs` skill (Notion MCP connector). `CLAUDE.md` stays repo-only (it
 is the agent entry point).
 
-**Docs home:** [Sanctuary Farm — Docs](https://app.notion.com/p/3cd672aa2c4a814e8714e77635cc762a)
+**Project page:** [Sanctuary Farm — Student Game Project](https://app.notion.com/p/3cd672aa2c4a814e8714e77635cc762a)
+· **Docs page:** [Docs](https://app.notion.com/p/3d5672aa2c4a80ecaed8f07d0875b5aa)
+· **ADRs:** [ADR's](https://app.notion.com/p/3d5672aa2c4a809791c7dd75c84db1e9)
 
 ## Written and mirrored
 
@@ -18,11 +20,16 @@ is the agent entry point).
 | `docs/adr/0001-stack-choice.md` — ADR-0001 — Stack choice | [ADR-0001 — Stack choice](https://app.notion.com/p/3cd672aa2c4a817ba78efec138934090) |
 | `docs/adr/0002-identity-and-save.md` — ADR-0002 — Identity and save | [ADR-0002 — Identity and save](https://app.notion.com/p/3cd672aa2c4a81248dc7e3fe500b1e02) |
 
+History only, not mirrored: `docs/original-spec.md` and `docs/redesign-notes.md`
+(the prototype era; the prototype itself was removed in the rebuild — see git
+history before the `chore(SF-36)` commit). Notion also holds James's own
+"Pet Sanctuary Math — Build Spec" page under Docs.
+
 ## Planned (still `Ready` tickets, not written yet)
 
 `curriculum.md` · `accessibility.md` · `performance-budget.md` · `threat-model.md`
 · `privacy.md` · `art-direction.md` · `sound-design.md` · `definition-of-done.md`
 · `secrets.md`
 
-Create the file via PR, then add it under the docs home and to the table above
+Create the file via PR, then add it under the Docs page and to the table above
 (skill: `notion-docs`).

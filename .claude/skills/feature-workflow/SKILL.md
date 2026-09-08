@@ -24,10 +24,9 @@ One ticket → one branch → one PR. Never work on `main`.
 ## 3. Gate (must be green before PR)
 
 ```
-pnpm -w typecheck && pnpm -w lint && pnpm -w test && pnpm -w build
+pnpm gate     # typecheck · lint · boundaries · tests + coverage · build
+pnpm e2e      # Playwright smoke — required for anything player-facing
 ```
-(or the current `npm run` equivalents). For player-facing changes also run
-`npm run smoke` and eyeball the screenshots.
 
 ## 4. PR
 

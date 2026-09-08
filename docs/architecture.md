@@ -43,26 +43,32 @@ Firebase, or the DOM.
 - `infrastructure` imports: `application` (for the port types), `domain`.
 - `presentation` imports: `application`. May import `domain` **types** for
   read-models, never `domain` behaviour or `infrastructure`.
-- Enforced by lint (`import/no-restricted-paths` or an eslint boundaries plugin)
-  and by the monorepo package graph.
+- Enforced by **dependency-cruiser** (`.dependency-cruiser.cjs`, run as
+  `pnpm boundaries` in the gate and in CI) and by the monorepo package graph.
+  The one sanctioned exception: `apps/web/src/composition/` — the composition
+  root — may import adapters to wire them into the application.
 
-## Monorepo layout (target)
+## Monorepo layout
 
 ```
 sanctuary-farm/
   packages/
     domain/            @sf/domain
     application/        @sf/application
-    persistence/        @sf/persistence   (local + firestore adapters)
+    persistence/        @sf/persistence   (local now; firestore in Phase 4)
     audio/              @sf/audio
-    config/             shared tsconfig / eslint / vitest presets
+    config/             shared tsconfig presets
   apps/
     web/               the game (Vite + React + r3f)
     landing/           static marketing/status page
-  functions/           Firebase Cloud Functions (custom auth, etc.)
+  functions/           Firebase Cloud Functions (Phase 4: custom auth, etc.)
   docs/
-  .claude/             agents, skills
+  .claude/             agents, skills, agent memory
 ```
+
+Packages are consumed as TypeScript source (`main: ./src/index.ts`) — nothing is
+built except `apps/web`. The gate is `pnpm gate` (typecheck · lint · boundaries
+· tests with coverage · build) plus `pnpm e2e`.
 
 Package manager: **pnpm** workspaces. Node pinned via `.nvmrc` + `engines`.
 

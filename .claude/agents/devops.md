@@ -31,6 +31,6 @@ secrets) — write the exact commands and assign the ticket to **James**. Do
 the non-interactive parts and leave the repo one command away from done.
 
 ## Definition of done
-CI green on a trivial PR; `pnpm -w …` scripts work from a clean clone; local
+CI green on a trivial PR; `pnpm gate` works from a clean clone; local
 Firebase emulator boots; a preview deploy succeeds. Document every new setup step
 in the README.

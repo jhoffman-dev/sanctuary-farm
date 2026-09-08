@@ -15,16 +15,23 @@ prefer editing the markdown.
 
 ## Where the pages live
 
-Docs home: **Sanctuary Farm — Docs**
-<https://app.notion.com/p/3cd672aa2c4a814e8714e77635cc762a>
+Everything is under the project page **Sanctuary Farm — Student Game Project**
+(<https://app.notion.com/p/3cd672aa2c4a814e8714e77635cc762a>):
+
+- **Docs** page (parent for every mirrored doc):
+  <https://app.notion.com/p/3d5672aa2c4a80ecaed8f07d0875b5aa>
+  — page id `3d5672aa-2c4a-80ec-aed8-f07d0875b5aa`
+- **ADR's** subpage (parent for ADR pages):
+  <https://app.notion.com/p/3d5672aa2c4a809791c7dd75c84db1e9>
+  — page id `3d5672aa-2c4a-8097-91c7-dd75c84db1e9`
 
 `docs/README.md` is the link index — `{ file → Notion page }` for every mirrored
 doc. Keep it current when you add or move a page.
 
 ## Push a changed doc
 
-1. `notion-fetch` the docs-home page (or `docs/README.md`) to get the target
-   page URL for the file you changed.
+1. Look up the target page URL in `docs/README.md` (or `notion-fetch` the Docs
+   page).
 2. `notion-update-page`, `command: "replace_content"`, `new_str:` the file's
    markdown **minus its top-level `# H1`** (the Notion page title carries that).
    Notion-flavored markdown renders headings, lists, code fences, block quotes,
@@ -33,9 +40,9 @@ doc. Keep it current when you add or move a page.
 
 ## Add a new doc
 
-1. `notion-create-pages` with `parent: { page_id:
-   "3cd672aa-2c4a-814e-8714-e77635cc762a" }`, `properties: { title: "..." }`,
-   `content:` the markdown (minus the `# H1`).
+1. `notion-create-pages` with `parent: { page_id: "<Docs page id>" }` (or the
+   ADR's page id for an ADR), `properties: { title: "..." }`, `content:` the
+   markdown (minus the `# H1`).
 2. Add a row to `docs/README.md` with the new page URL.
 3. If the doc started as a `Ready` ticket ("write docs/X.md"), move that ticket
    to review/Done as usual.

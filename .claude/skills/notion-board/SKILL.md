@@ -42,7 +42,8 @@ the parent Epic's page URL). Put the ticket body in `content`. Notion assigns th
 
 **Move a ticket** — `notion-update-page`, `command: "update_properties"`,
 `properties: { "Status": "In progress" }` (Backlog / Ready / In progress / In
-review / Blocked / Done).
+review / Blocked / Done / Later). `Later` is James parking a decision — never
+pick up or move a `Later` ticket.
 
 **Assign** — `properties: { "Assignee": "James" }` or `{ "Assignee": null }`.
 

@@ -35,3 +35,9 @@ notion.local.json
 .env
 .env.*
 !.env.example
+
+# Build / test output (monorepo)
+coverage
+playwright-report
+test-results
+*.tsbuildinfo
