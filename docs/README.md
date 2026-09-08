@@ -20,6 +20,7 @@ is the agent entry point).
 | `docs/adr/0001-stack-choice.md` — ADR-0001 — Stack choice | [ADR-0001 — Stack choice](https://app.notion.com/p/3cd672aa2c4a817ba78efec138934090) |
 | `docs/adr/0002-identity-and-save.md` — ADR-0002 — Identity and save | [ADR-0002 — Identity and save](https://app.notion.com/p/3cd672aa2c4a81248dc7e3fe500b1e02) |
 | `docs/definition-of-done.md` — Definition of Done | [Definition of Done](https://app.notion.com/p/3d5672aa2c4a81e3b249d3d0eadd617f) |
+| `docs/secrets.md` — Secrets | [Secrets](https://app.notion.com/p/3d5672aa2c4a81579d29fec27113d844) |
 
 History only, not mirrored: `docs/original-spec.md` and `docs/redesign-notes.md`
 (the prototype era; the prototype itself was removed in the rebuild — see git
@@ -28,7 +29,7 @@ history before the `chore(SF-36)` commit). Notion also holds James's own
 
 ## Planned (still `Ready` tickets, not written yet)
 
-`curriculum.md` · `accessibility.md` · `performance-budget.md` · `threat-model.md` · `privacy.md` · `art-direction.md` · `sound-design.md` · `secrets.md`
+`curriculum.md` · `accessibility.md` · `performance-budget.md` · `threat-model.md` · `privacy.md` · `art-direction.md` · `sound-design.md`
 
 Create the file via PR, then add it under the Docs page and to the table above
 (skill: `notion-docs`).
