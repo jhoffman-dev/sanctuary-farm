@@ -23,6 +23,13 @@ the exception — it stays repo-only.
 - **pnpm** workspaces. Node pinned in `.nvmrc` + `engines`.
 - Firebase: Hosting (game + landing), custom Auth, Firestore, Cloud Functions.
 - Deploy: Firebase Hosting. PR previews + prod on merge.
+- **We share the Firebase project `student-games-be188` with two other games.**
+  Own Hosting sites (`sanctuary-farm`, `sanctuary-farm-landing`), own functions
+  codebase (`sanctuary-farm`), own named Firestore database (`sanctuary-farm`).
+  Deploy only with the scoped `pnpm deploy:*` scripts — a bare `firebase deploy`,
+  the `default` codebase, or rules on `(default)` would break another game.
+  Emulators run on `demo-sanctuary-farm`. Read `docs/deploy.md` before touching
+  `firebase.json` or `.firebaserc`.
 
 ## Architecture — the rule that matters
 
@@ -74,6 +81,8 @@ No snapshot test as a stand-in for a behaviour test.
 | `pnpm test:coverage` | tests with the domain ≥ 90% line threshold enforced |
 | `pnpm e2e` | Playwright smoke against `apps/web` (first: `pnpm --filter @sf/web exec playwright install chromium`) |
 | `pnpm vitest run --project domain` | one package's tests (`domain` · `application` · `persistence` · `audio` · `web`) |
+| `pnpm emulators` / `pnpm test:rules` | Firebase emulators / Firestore rules tests, both pinned to `demo-sanctuary-farm` (needs a JDK) |
+| `pnpm deploy:game` · `:landing` · `:functions` · `:rules` | the only sanctioned deploys — see `docs/deploy.md` |
 
 Node is Homebrew-installed — prefix bash calls with `export PATH="/opt/homebrew/bin:$PATH"`.
 
