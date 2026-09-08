@@ -26,6 +26,7 @@ is the agent entry point).
 | `docs/performance-budget.md` — Performance budget | [Performance budget](https://app.notion.com/p/3d5672aa2c4a8152aa5ae7e1bd8ca1db) |
 | `docs/threat-model.md` — Kid-safety threat model | [Kid-safety threat model](https://app.notion.com/p/3d5672aa2c4a816299e2eebd491df653) |
 | `docs/privacy.md` — Privacy notice (draft) | [Privacy notice (draft)](https://app.notion.com/p/3d5672aa2c4a81219cd5c8fd8b02d271) |
+| `docs/art-direction.md` — Art direction | [Art direction](https://app.notion.com/p/3d5672aa2c4a81529810c1d09a0a4d84) |
 
 History only, not mirrored: `docs/original-spec.md` and `docs/redesign-notes.md`
 (the prototype era; the prototype itself was removed in the rebuild — see git
@@ -34,7 +35,7 @@ history before the `chore(SF-36)` commit). Notion also holds James's own
 
 ## Planned (still `Ready` tickets, not written yet)
 
-`art-direction.md` · `sound-design.md`
+`sound-design.md`
 
 Create the file via PR, then add it under the Docs page and to the table above
 (skill: `notion-docs`).
