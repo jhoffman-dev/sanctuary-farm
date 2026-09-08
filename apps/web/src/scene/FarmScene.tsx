@@ -1,6 +1,6 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useEffect } from 'react'
-import { useReducedMotion } from '../a11y/use-reduced-motion'
+import { useSceneFrameloop } from '../a11y/use-scene-frameloop'
 
 const SKY = '#bfe3f5'
 const GRASS = '#8fd18a'
@@ -70,15 +70,19 @@ function FarmCamera({ sway }: { sway: boolean }) {
 
 /** The 3D world. Renders scenery only — it knows nothing about facts or coins. */
 export function FarmScene() {
-  const reducedMotion = useReducedMotion()
+  const frameloop = useSceneFrameloop()
 
   return (
     <Canvas
       shadows
-      frameloop={reducedMotion ? 'demand' : 'always'}
+      frameloop={frameloop}
       camera={{ position: CAMERA_POSITION, fov: 35 }}
       style={{ position: 'absolute', inset: 0 }}
       aria-hidden
+      // On the container div, so an e2e run can see which loop is running
+      // without reaching into WebGL.
+      data-testid="scene"
+      data-frameloop={frameloop}
     >
       <color attach="background" args={[SKY]} />
       <fog attach="fog" args={[SKY, FOG_NEAR, FOG_FAR]} />
@@ -86,7 +90,7 @@ export function FarmScene() {
       <directionalLight position={[6, 12, 5]} intensity={1.3} castShadow shadow-mapSize={[1024, 1024]} />
       <Ground />
       <Barn />
-      <FarmCamera sway={!reducedMotion} />
+      <FarmCamera sway={frameloop === 'always'} />
     </Canvas>
   )
 }
