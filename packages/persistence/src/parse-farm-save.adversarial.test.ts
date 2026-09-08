@@ -17,6 +17,23 @@ function playedSave(): FarmSave {
   return { ...farm, scheduler, coins: 7, sessions: [{ startedAt: 1, endedAt: 2, context: 'paddock', family: null, entries: [] }] }
 }
 
+/** A facts map holding one well-formed but un-introduced tier-5 fact, and nothing else. */
+function onlyUnintroduced78(): Record<string, unknown> {
+  return {
+    '7x8': {
+      id: '7x8',
+      box: 0,
+      dueAt: 0,
+      lastLatencyMs: null,
+      recentLatencies: [],
+      correctStreak: 0,
+      totalAttempts: 0,
+      totalCorrect: 0,
+      introduced: false,
+    },
+  }
+}
+
 function withScheduler(overrides: Record<string, unknown>): unknown {
   const farm = playedSave()
   return { ...farm, scheduler: { ...farm.scheduler, ...overrides } }
@@ -77,9 +94,30 @@ describe('parseFarmSave — the structural guard against a corrupt blob', () => 
   })
 
   it.each([
+    [
+      'its only fact sits in a locked tier',
+      { unlockedTiers: [1], recentFamilies: [] },
+    ],
+    [
+      'its only fact is in the blocked family and cannot be introduced',
+      { unlockedTiers: [1, 2, 3, 4, 5, 6], recentFamilies: [8, 8] },
+    ],
+  ])('rejects a save with nothing to serve because %s', (_label, overrides) => {
+    expect(parseFarmSave(withScheduler({ facts: onlyUnintroduced78(), ...overrides }))).toBeNull()
+  })
+
+  it.each([
     ['an empty fact status', withScheduler({ facts: { '1x1': {} }, maxTable: 1 })],
     ['no facts at all', withScheduler({ facts: {} })],
     ['a huge maxTable with no facts for it', withScheduler({ maxTable: 13 })],
+    [
+      'one un-introduced fact in a locked tier',
+      withScheduler({ facts: onlyUnintroduced78(), unlockedTiers: [1], recentFamilies: [] }),
+    ],
+    [
+      'one un-introduced fact in the blocked family',
+      withScheduler({ facts: onlyUnintroduced78(), recentFamilies: [8, 8] }),
+    ],
   ])('any save it accepts can be played: %s either parses as null or serves and grades without throwing', (_label, raw) => {
     const parsed = parseFarmSave(raw)
     if (parsed === null) return
