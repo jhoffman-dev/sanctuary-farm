@@ -25,7 +25,7 @@ dist-ssr
 
 # Claude Code — commit agents/skills/memory; ignore local state & secrets
 .claude/worktrees/
-.claude/*.local.json
+*.local.json
 .claude/settings.local.json
 notion.local.json
 
