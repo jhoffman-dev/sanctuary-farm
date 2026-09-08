@@ -7,8 +7,11 @@
   --paper-alt: #f3ead9;
   --grass: #4a7c3f;
   --grass-dark: #3a6231;
+  /* deeper variants exist only to hit WCAG contrast on the sky gradient / paper-alt */
+  --grass-deep: #254520;
   --sky: #6fb0d6;
   --wheat: #e6b422;
+  --wheat-deep: #946d00;
   --line: #e0d5c2;
   --radius: 12px;
 }
@@ -48,8 +51,21 @@ em { font-style: normal; color: var(--grass-dark); font-weight: 600; }
   letter-spacing: 0.15em;
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--grass-dark);
+  color: var(--grass-deep);
   margin: 0;
+}
+
+/* visually hidden, still read by screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 .lede { font-size: 1.15rem; color: var(--ink-soft); max-width: 46ch; }
 
@@ -64,7 +80,12 @@ em { font-style: normal; color: var(--grass-dark); font-weight: 600; }
   font-weight: 650;
 }
 .btn-primary { background: var(--grass); border-color: var(--grass); color: #fff; }
-.btn:focus-visible, a:focus-visible { outline: 3px solid var(--wheat); outline-offset: 2px; }
+/* two-tone ring: the white inner or the ink outer ring clears 3:1 on every surface, sky through footer */
+.btn:focus-visible, a:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 0;
+  box-shadow: 0 0 0 6px var(--ink);
+}
 
 .badges {
   list-style: none;
@@ -113,9 +134,11 @@ em { font-style: normal; color: var(--grass-dark); font-weight: 600; }
   text-align: center;
   font-weight: 700;
 }
-.checklist li.done::before { content: "✓"; color: var(--grass); }
-.checklist li.wip::before { content: "◐"; color: var(--wheat); }
-.checklist li.todo::before { content: "○"; color: var(--ink-soft); }
+/* glyphs are decorative — the .sr-only prefix in the markup carries the state; the plain
+   `content` line is the fallback for browsers without the `/ ""` alt-text syntax */
+.checklist li.done::before { content: "✓"; content: "✓" / ""; color: var(--grass); }
+.checklist li.wip::before { content: "◐"; content: "◐" / ""; color: var(--wheat-deep); }
+.checklist li.todo::before { content: "○"; content: "○" / ""; color: var(--ink-soft); }
 .note { color: var(--ink-soft); font-size: 0.95rem; }
 
 /* footer */
