@@ -31,7 +31,7 @@ export {
   isHardCore,
   tierOf,
 } from './facts/tuning'
-export { buildFacts, factsInFamily, factsInTier, getFact } from './facts/table'
+export { assertTableSize, buildFacts, factsInFamily, factsInTier, getFact } from './facts/table'
 
 export type { Answer, Graded, GradeResult, NextFact, SchedulerState } from './scheduler/types'
 export { initialSchedulerState } from './scheduler/state'
