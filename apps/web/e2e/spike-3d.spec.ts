@@ -46,6 +46,7 @@ test.describe('SF-63 — 3D foundation spike', () => {
     expect(Number(measured.silhouetteKeeper)).toBeGreaterThan(0)
     expect(Number(measured.silhouetteCow)).toBeGreaterThan(0)
     expect(Number(measured.silhouetteHorse)).toBeGreaterThan(0)
+    expect(Number(measured.silhouetteChicken)).toBeGreaterThan(0)
   })
 
   test('tapping the ground walks the keeper there and crossfades idle → walk → idle', async ({ page }) => {

@@ -14,6 +14,20 @@ on <https://quaternius.com>.
 | `cow.glb` | `Cow.gltf` (glTF) | Ultimate Animated Animal Pack — July 2021 | <https://quaternius.com/packs/ultimateanimatedanimals.html> | `https://drive.google.com/drive/folders/1uJ3N5HfB7jKTseJUNQr3N4YaN0UuEtHk` |
 | `horse.glb` | `Horse.gltf` (glTF) | Ultimate Animated Animal Pack — July 2021 | same as above | same as above |
 
+`chicken.glb` is the exception and is deliberately from a **different Quaternius
+line** — the chunky, big-headed one that art-direction §3 actually describes. It
+is in the spike as the style comparison, not as a candidate asset:
+
+| File | Model | Source | Licence shown |
+| --- | --- | --- | --- |
+| `chicken.glb` | "Chicken" by Quaternius, dated 23 Oct 2022, tagged Animated | poly.pizza mirror <https://poly.pizza/m/ineV9pU5VL> → `https://static.poly.pizza/a0001762-9352-48c3-9abd-be91e42db114.glb` | Public Domain (CC0), author Quaternius |
+
+Two caveats recorded in ADR-0003: this model is **not in any pack listed on
+quaternius.com**, and the mirror's conversion mangled its base colours (body
+`baseColorFactor` 0.289 linear — mid grey — where the vendor's own render is
+white) and left `metallicFactor` at 0.4. That is why it renders grey in the
+screenshots.
+
 ## Licence
 
 Both pack pages carry a **CC0** badge linking
@@ -49,3 +63,8 @@ Source `.gltf` (single file, embedded buffers) → `.glb`, by:
 Result: 3.1 MB / 3.6 MB / 3.0 MB of `.gltf` → 169 kB / 186 kB / 249 kB of `.glb`.
 Geometry is meshopt-compressed, so the loader must call
 `setMeshoptDecoder(MeshoptDecoder)` (see `src/spike/use-animated-gltf.ts`).
+
+`chicken.glb` took a shorter path — `gltf-transform meshopt` only (140 kB →
+42 kB), then `metallicFactor` set to 0 on every material. The `palette` pass in
+`optimize` turned its five flat colours to mud, and at `metallicFactor` 0.4 a
+scene with no environment map renders it near-black.

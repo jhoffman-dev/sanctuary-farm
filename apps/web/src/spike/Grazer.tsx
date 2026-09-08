@@ -19,14 +19,20 @@ type GrazerProps = {
   rotationY: number
   /** Offset into the loop so two animals are not in lockstep. */
   phaseSeconds: number
+  /**
+   * Clip names as the model file spells them. Quaternius uses three different
+   * conventions across its packs ("Idle", "Eating", "CharacterArmature|Idle"),
+   * which is why these are props rather than constants.
+   */
+  clips: { resting: string; busy: string }
 }
 
-/** A standing farm animal that crossfades idle ↔ eating on a timer. */
-export function Grazer({ url, name, targetHeight, position, rotationY, phaseSeconds }: GrazerProps) {
+/** A standing farm animal that crossfades between its two clips on a timer. */
+export function Grazer({ url, name, targetHeight, position, rotationY, phaseSeconds, clips }: GrazerProps) {
   const elapsed = useRef(phaseSeconds)
   const readClip = useCallback(
-    () => (elapsed.current % (IDLE_SECONDS + EATING_SECONDS) < IDLE_SECONDS ? 'Idle' : 'Eating'),
-    [],
+    () => (elapsed.current % (IDLE_SECONDS + EATING_SECONDS) < IDLE_SECONDS ? clips.resting : clips.busy),
+    [clips],
   )
 
   useFrame((_, delta) => {

@@ -15,7 +15,8 @@ const GROUND_SIZE = 200
 const FOG_NEAR = 25
 const FOG_FAR = 70
 
-/** Art-direction §2 scale rule: cow 1.3 units, horse a shade taller. */
+/** Art-direction §2 scale rule: chicken 0.5, cow 1.3, horse a shade taller. */
+const CHICKEN_HEIGHT = 0.5
 const COW_HEIGHT = 1.3
 const HORSE_HEIGHT = 1.5
 
@@ -23,7 +24,12 @@ const MODELS = {
   keeper: '/spike/keeper.glb',
   cow: '/spike/cow.glb',
   horse: '/spike/horse.glb',
+  chicken: '/spike/chicken.glb',
 } as const
+
+const NATURALISTIC_CLIPS = { resting: 'Idle', busy: 'Eating' } as const
+/** The chunky "cute" line prefixes every clip with its armature's name. */
+const CUTE_CLIPS = { resting: 'CharacterArmature|Idle', busy: 'CharacterArmature|Walk' } as const
 
 function FixedCamera() {
   const camera = useThree((state) => state.camera)
@@ -78,6 +84,7 @@ export function Spike3dScene({ session }: { session: SpikeSession }) {
           position={[-3.5, 0, -1]}
           rotationY={1.1}
           phaseSeconds={0}
+          clips={NATURALISTIC_CLIPS}
         />
         <Grazer
           url={MODELS.horse}
@@ -86,6 +93,18 @@ export function Spike3dScene({ session }: { session: SpikeSession }) {
           position={[3.2, 0, -2.4]}
           rotationY={-0.8}
           phaseSeconds={2.5}
+          clips={NATURALISTIC_CLIPS}
+        />
+        {/* Deliberately from Quaternius' other, chunky line: the ADR-0003
+            style comparison is the point of having it in frame. */}
+        <Grazer
+          url={MODELS.chicken}
+          name="Chicken"
+          targetHeight={CHICKEN_HEIGHT}
+          position={[0.9, 0, 1.6]}
+          rotationY={-2.2}
+          phaseSeconds={1.2}
+          clips={CUTE_CLIPS}
         />
       </Suspense>
       <MeasurementPump session={session} />
