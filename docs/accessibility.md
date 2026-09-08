@@ -111,15 +111,15 @@ report and tick each line with evidence.
 
 ## 5. Automated coverage
 
-The e2e suite (`pnpm e2e`, `apps/web/e2e/`) asserts, on every PR:
+The e2e suite (`pnpm e2e`, `apps/web/e2e/`) should assert the following on every PR. Today only the "number pad" row exists in `smoke.spec.ts`; the rest are planned and tracked as Phase 3 work:
 
-| Assertion | How |
-| --- | --- |
-| axe scan on boot and mid-round returns zero serious/critical violations | `@axe-core/playwright`, `AxeBuilder(page).analyze()` filtered by `impact` |
-| A paddock round completes with keyboard only | `page.keyboard.type` digits + `Enter`; no `click()` on the pad |
-| A reduced-motion run | `page.emulateMedia({ reducedMotion: 'reduce' })`; assert camera position is fixed across two frames |
-| The pad is a number pad, never a choice list | already in `smoke.spec.ts` |
-| Feedback carries text for every outcome | assert `[data-testid=feedback]` text is non-empty and `role="status"` |
+| Assertion | Status | How |
+| --- | --- | --- |
+| axe scan on boot and mid-round returns zero serious/critical violations | planned | `@axe-core/playwright`, `AxeBuilder(page).analyze()` filtered by `impact` |
+| A paddock round completes with keyboard only | planned | `page.keyboard.type` digits + `Enter`; no `click()` on the pad |
+| A reduced-motion run | planned | `page.emulateMedia({ reducedMotion: 'reduce' })`; assert camera position is fixed across two frames |
+| The pad is a number pad, never a choice list | **present** | `smoke.spec.ts` |
+| Feedback carries text for every outcome | planned | assert `[data-testid=feedback]` text is non-empty and `role="status"` |
 
 Component tests (Vitest) cover the pad's key handling and the live-region
 attributes; the e2e run is the source of truth for focus and contrast.
