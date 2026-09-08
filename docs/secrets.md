@@ -50,6 +50,9 @@ document each one here first.
 ## Guard rails
 
 - `.gitignore` (above). Review it when adding a new tool.
+- pnpm refuses post-install scripts unless a package is allow-listed in
+  `pnpm-workspace.yaml` (`allowBuilds`); a new dependency that needs one gets a
+  one-line reason there.
 - Dependabot keeps `pnpm-lock.yaml` current (SF-45); a compromised dependency
   is the likeliest way a secret leaks — review post-install scripts in updates.
 - `reviewer` checks every PR for key-shaped strings (`AIza…`, `-----BEGIN`,

@@ -1,8 +1,6 @@
-import type { AnswerFeedback, FarmGame, Question, RoundProgress } from '@sf/application'
+import { PADDOCK_ROUND, type AnswerFeedback, type FarmGame, type Question, type RoundProgress } from '@sf/application'
 import { useCallback, useRef, useState } from 'react'
 import { NumberPad } from './NumberPad'
-
-const PADDOCK_ROUND = { context: 'paddock', questions: 5 } as const
 
 type PracticePanelProps = {
   game: FarmGame
@@ -74,8 +72,9 @@ export function PracticePanel({ game, onFarmChanged }: PracticePanelProps) {
       if (inFlight.current) return
       inFlight.current = true
       setBusy(true)
-      // No catch on purpose: `answer` rejects only on a programming error (no
-      // question in flight), which should surface as an unhandled rejection.
+      // No catch on purpose: with the re-entry guard above, `answer` rejects
+      // only on a programming error (nothing in flight, or the question it was
+      // given has already been graded), which should surface loudly.
       gradeAndAdvance({ game, given, tally: tally.current })
         .then((next) => {
           tally.current = next.tally
