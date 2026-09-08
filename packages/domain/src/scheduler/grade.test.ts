@@ -96,6 +96,22 @@ describe('grading — latency is the primary promotion signal', () => {
     expect(state.facts['1x2']?.recentLatencies).toEqual([1002, 1003, 1004, 1005, 1006])
   })
 
+  it('refuses a latency that is not a finite, non-negative duration before touching the state', () => {
+    const state = withFact(initialSchedulerState(), '7x8', { box: 3 })
+    for (const latencyMs of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY, -1]) {
+      expect(() => gradeAnswer(state, { factId: '7x8', given: 56, latencyMs })).toThrow(RangeError)
+    }
+    expect(gradeAnswer(state, { factId: '7x8', given: 56, latencyMs: 0 }).result.outcome).toBe('FLUENT')
+  })
+
+  it('refuses to grade a fact that was never introduced', () => {
+    const state = initialSchedulerState()
+    expect(state.facts['7x8']?.introduced).toBe(false)
+    expect(() => gradeAnswer(state, { factId: '7x8', given: 56, latencyMs: 900 })).toThrow(
+      /fact "7x8" was never introduced/,
+    )
+  })
+
   it('throws for a fact the state does not know', () => {
     expect(() => gradeAnswer(initialSchedulerState(), { factId: '13x13', given: 1, latencyMs: 1 })).toThrow(
       /unknown fact/,
