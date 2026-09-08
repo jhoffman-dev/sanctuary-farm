@@ -32,7 +32,7 @@ pushed with the `notion-docs` skill. Prototype-era history:
 
 ```
 packages/domain        @sf/domain       the rules: facts, scheduler, mastery, economy — pure
-packages/application   @sf/application  use-cases + ports (SaveStore, Clock, Rng, AudioBus, IdProvider)
+packages/application   @sf/application  use-cases + ports (SaveStore, Clock, Rng, AudioBus)
 packages/persistence   @sf/persistence  SaveStore adapters (localStorage now, Firestore later)
 packages/audio         @sf/audio        AudioBus adapters (Web Audio synth, silent)
 packages/config        @sf/config       shared tsconfig presets
@@ -51,6 +51,7 @@ pnpm install
 pnpm dev             # game at http://localhost:5173
 pnpm gate            # typecheck · lint · boundaries · tests + coverage · build
 pnpm e2e             # Playwright smoke (once: pnpm --filter @sf/web exec playwright install chromium)
+pnpm test:rules      # firestore.rules against the emulator — needs Java (see firestore/README.md)
 ```
 
 Node 26 (`.nvmrc`; ≥ 22 works) · pnpm 11 · TypeScript strict · Vitest ·

@@ -25,15 +25,15 @@ type DueRound = {
 
 /**
  * Every due fact is the blocked family. Rather than break the interleave rule,
- * introduce a fresh fact or pull another family's soonest-due fact forward.
+ * introduce another family's fact or pull its soonest-due fact forward.
  * Null only when the board has a single family.
  */
 function pullAnotherFamilyForward(
   { state, cards, introduced }: DueRound,
   blocked: number,
 ): NextFact | null {
-  const pick = pickIntroduction(state, cards)
-  if (pick && pick.fact.family !== blocked) return serve(introduce(state, pick), pick.fact)
+  const fresh = introduceNext(state, cards)
+  if (fresh) return fresh
   const elsewhere = introduced
     .filter((card) => card.fact.family !== blocked)
     .toSorted((a, b) => a.status.dueAt - b.status.dueAt)
@@ -70,6 +70,8 @@ export function nextFact(initial: SchedulerState, rng: Rng): NextFact {
     if (fresh) return fresh
   }
   if (due.length === 0) {
+    // Nothing is due and no other family can be introduced: drill the slowest.
+    // `introduced` spans the whole board, so relaxing here means a single-family board.
     const pool = avoidingFamily(introduced, blockedFamily(state))
     return serve(state, worstRollingMean(pool).fact)
   }
@@ -88,6 +90,20 @@ function topUpRotation(state: SchedulerState, family: readonly Card[]): Schedule
 }
 
 /**
+ * Unmastered facts not asked last time; else any introduced fact not asked last
+ * time (mastered ones stand in rather than repeat the sole unmastered one); else
+ * a repeat, which only a single-fact family (the 1s) ever forces.
+ */
+function rotationCandidates(state: SchedulerState, family: readonly Card[]): readonly Card[] {
+  const introduced = family.filter((card) => card.status.introduced)
+  const notJustAsked = (cards: readonly Card[]): Card[] =>
+    cards.filter((card) => card.fact.id !== state.lastServed)
+  return [notJustAsked(needingWork(introduced)), notJustAsked(introduced), introduced].find(
+    (pool) => pool.length > 0,
+  ) ?? []
+}
+
+/**
  * The next fact for practising one family (an egg). Drives the family towards
  * mastery with variety: a rotation of its facts, never the same one twice in a row.
  * Falls back to mixed practice when the family has no facts in range.
@@ -95,10 +111,6 @@ function topUpRotation(state: SchedulerState, family: readonly Card[]): Schedule
 export function nextFactInFamily(initial: SchedulerState, family: number, rng: Rng): NextFact {
   if (cardsInFamily(initial, family).length === 0) return nextFact(initial, rng)
   const state = topUpRotation(initial, cardsInFamily(initial, family))
-  const cards = cardsInFamily(state, family)
-  const unmastered = needingWork(cards)
-  const pool = unmastered.length > 0 ? unmastered : cards.filter((card) => card.status.introduced)
-  const notJustAsked = pool.filter((card) => card.fact.id !== state.lastServed)
-  const candidates = notJustAsked.length > 0 ? notJustAsked : pool
+  const candidates = rotationCandidates(state, cardsInFamily(state, family))
   return serve(state, firstOf(candidates.toSorted(byNeed(state.globalCounter))).fact)
 }

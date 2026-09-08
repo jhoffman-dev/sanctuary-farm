@@ -26,10 +26,10 @@ export function boxAfter(outcome: Outcome, previous: Box): Box {
 }
 
 /**
- * SLOW keeps its box but comes back sooner: the smaller of the previous box's
- * interval and box 1's. Every other outcome re-queues at the new box's interval.
+ * SLOW keeps its box but comes back at box 1's interval — the shortest in the
+ * table — so a hesitant fact is seen again soon. Every other outcome re-queues
+ * at the new box's interval.
  */
-export function requeueInterval(outcome: Outcome, previous: Box, next: Box): number {
-  if (outcome === 'SLOW') return Math.min(intervalFor(previous), intervalFor(1))
-  return intervalFor(next)
+export function requeueInterval(outcome: Outcome, next: Box): number {
+  return intervalFor(outcome === 'SLOW' ? 1 : next)
 }
