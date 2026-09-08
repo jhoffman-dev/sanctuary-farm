@@ -1,26 +1,24 @@
 import type { Card } from './cards'
 import { withStatus } from './cards'
-import { avoidingFamily, blockedFamily } from './interleave'
+import { blockedFamily } from './interleave'
 import type { SchedulerState } from './types'
 
-function lowestTierWithUnintroduced(state: SchedulerState, cards: readonly Card[]): number | null {
-  const tiers = [...state.unlockedTiers].sort((a, b) => a - b)
-  return (
-    tiers.find((tier) =>
-      cards.some((card) => card.fact.tier === tier && !card.status.introduced),
-    ) ?? null
-  )
+function introducible(state: SchedulerState, blocked: number | null): (card: Card) => boolean {
+  return (card) =>
+    !card.status.introduced &&
+    state.unlockedTiers.includes(card.fact.tier) &&
+    card.fact.family !== blocked
 }
 
 /**
- * The first un-introduced fact (table order) in the lowest unlocked tier that
- * still has one, steered away from the blocked family when the tier offers a choice.
+ * The next fact to introduce: lowest unlocked tier first, table order within it.
+ * The blocked family is never chosen — introducing it would break the interleave
+ * rule — so a tier whose remaining facts are all that family is passed over for
+ * a higher unlocked tier, and null means no other family can be introduced yet.
  */
 export function pickIntroduction(state: SchedulerState, cards: readonly Card[]): Card | null {
-  const tier = lowestTierWithUnintroduced(state, cards)
-  if (tier === null) return null
-  const candidates = cards.filter((card) => card.fact.tier === tier && !card.status.introduced)
-  return avoidingFamily(candidates, blockedFamily(state))[0] ?? null
+  const candidates = cards.filter(introducible(state, blockedFamily(state)))
+  return candidates.toSorted((a, b) => a.fact.tier - b.fact.tier)[0] ?? null
 }
 
 /** Mark a card introduced at box 1 and due right now. */

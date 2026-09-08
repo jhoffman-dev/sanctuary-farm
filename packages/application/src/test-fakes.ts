@@ -4,7 +4,6 @@ import type { FarmGame } from './farm-game'
 import { createFarmGame } from './farm-game'
 import type { AudioBus, SoundName } from './ports/audio-bus'
 import type { Clock } from './ports/clock'
-import type { IdProvider } from './ports/id-provider'
 import type { SaveStore } from './ports/save-store'
 
 export type FakeClock = Clock & {
@@ -66,11 +65,6 @@ export function recordingAudioBus(): RecordingAudioBus {
   }
 }
 
-export function sequentialIds(): IdProvider {
-  let count = 0
-  return { newId: () => `id-${++count}` }
-}
-
 export type Harness = {
   game: FarmGame
   clock: FakeClock
@@ -94,7 +88,6 @@ export function harness({ farm = null, seed = 1, startAt = 0 }: HarnessOptions =
     clock,
     rng: createRng(seed),
     audio,
-    ids: sequentialIds(),
   })
   return { game, clock, saveStore, audio }
 }

@@ -28,7 +28,7 @@ camera-rig ticket, not a contract.
 | Framing | camera pans to follow the keeper with a wide dead zone; hotspot scenes re-frame by a single eased move, never a cut | Gentle; the world never lurches on an answer |
 
 **One contiguous farm** (~30 × 30 units walkable, crossing ≤ 8 s) with the seven
-hotspots from the PRD: barn, feed shed, nest hollow, paddock, training ring,
+hotspots from the implementation plan: barn, feed shed, nest hollow, paddock, training ring,
 pond + petting zoo, farmhouse. Fog in the sky colour hides the edge.
 
 **Scale rule.** 1 unit = 1 m. Keeper 1.6 units, chunky (~3 heads tall). Chicken
@@ -91,7 +91,7 @@ Rules that constrain it (`accessibility.md` §2):
 
 | Light | Value | Notes |
 | --- | --- | --- |
-| Key | one warm directional, `#FFF1D6`, intensity ≈ 1.3 from `[6, 12, 5]`, 1024² shadow map | As in `FarmScene.tsx`; the only shadow caster |
+| Key | one warm directional, intensity ≈ 1.3 from `[6, 12, 5]`, 1024² shadow map; colour `#FFF1D6` proposed | Position, intensity and shadow map as in `FarmScene.tsx` (which still uses default white); the only shadow caster |
 | Ambient | hemisphere, sky `#BFE3F5` over ground `#8FD18A`, ≈ 0.75 | Soft; lifts shadows so faces read |
 | Rim | subtle, baked into the material (fresnel / matcap), **not** a second light | Separates animals from grass at no draw cost |
 
@@ -149,8 +149,8 @@ keeper at 1.6 units? Measure draw calls and texture memory against
 - **One pack only.** No mixing sources, even for one prop; model a missing prop
   in Blender in the pack's style instead.
 - **glTF/GLB only**, Y-up, 1 unit = 1 m, origin at the feet / base, facing −Z.
-- Power-of-two textures within `performance-budget.md` (until it lands: one
-  ≤ 1024² atlas per pack, no per-model textures). Draco/meshopt compression on.
+- Power-of-two textures within `performance-budget.md`: one ≤ 1024² atlas per
+  pack, no per-model textures. Draco/meshopt compression on.
 - Animation clips baked into the model file, named `idle`, `walk`, `carry`,
   `pet`, `dance` (keeper) and `idle`, `walk`, `eat`, `happy` (animals).
 - Location and naming: `apps/web/public/models/<category>/<name>.glb`, kebab-

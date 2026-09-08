@@ -110,7 +110,7 @@ file names or `build.rollupOptions.output.manualChunks`):
   { "name": "shell", "path": "dist/assets/index-*.js", "limit": "100 kB", "gzip": true },
   { "name": "world", "path": "dist/assets/FarmScene-*.js", "limit": "350 kB", "gzip": true },
   { "name": "css",   "path": "dist/assets/*.css", "limit": "30 kB", "gzip": true },
-  { "name": "first-hotspot assets", "path": "public/models/farm/**", "limit": "2.5 MB" }
+  { "name": "first-hotspot assets", "path": "public/models/**", "limit": "2.5 MB" }
 ]
 ```
 
@@ -136,10 +136,10 @@ than an N4000). Assertions, all `error`: `largest-contentful-paint ≤ 4000`,
 | JS | one chunk, 1,094 kB raw / ~300 kB gz, three.js inside | shell 100 kB gz, world 350 kB gz | **3× over** the shell ceiling; would pass as a world chunk |
 | CSS | 13.6 kB raw / 3.5 kB gz | 30 kB gz | ok |
 | Code-splitting | none; `<Canvas>` mounts before the save loads | practice first | not met |
-| Frameloop / DPR | always-on; no DPR cap | demand when idle; cap 1.5 | not met |
+| Frameloop / DPR | always unless reduced motion (then demand); no DPR cap | demand when idle; cap 1.5 | not met |
 | Reduced motion | camera sway off | also skips ceremonies | partial |
 | Scene | 3 meshes, 2 lights, 1 shadow map | scene table | trivially ok |
-| Gate | typecheck · lint · boundaries · tests · build · e2e | + size-limit + LHCI | not met |
+| Gate | `pnpm gate` (typecheck · lint · boundaries · tests · build) + `pnpm e2e` | + size-limit + LHCI | not met |
 
 ### First three actions for Phase 2
 
