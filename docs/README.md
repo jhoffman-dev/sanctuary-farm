@@ -35,9 +35,8 @@ History only, not mirrored: `docs/original-spec.md` and `docs/redesign-notes.md`
 history before the `chore(SF-36)` commit). Notion also holds James's own
 "Pet Sanctuary Math — Build Spec" page under Docs.
 
-## Planned (still `Ready` tickets, not written yet)
+## Adding a doc
 
-Every Phase 0 doc is written and mirrored.
-
-Create the file via PR, then add it under the Docs page and to the table above
-(skill: `notion-docs`).
+Every Phase 0 doc is written and mirrored. For a new one: create the file via
+PR, then add it under the Docs page and to the table above (skill:
+`notion-docs`).

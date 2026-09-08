@@ -125,7 +125,8 @@ lists backups daily and logs `ERROR` if the newest is older than 26 h.
 - [ ] Put the retention numbers into `privacy.md`, kid- and parent-readable.
 
 Open questions: is a 56-day shadow on a deletion promise to a child too long
-(shortening weekly retention costs disaster coverage, not money)? Should saves
-carry a `schemaVersion` so an older backup can be migrated forward on import?
+(shortening weekly retention costs disaster coverage, not money)? Saves already
+carry `schemaVersion` (3) — who runs the forward migration when an older backup
+is imported, and where does that code live?
 Does a restored database need the custom-auth token secret rotated, or is that
 independent (depends on the Phase 4 auth design)?
