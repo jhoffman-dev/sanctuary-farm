@@ -1,3 +1,4 @@
+import { PADDOCK_ROUND } from '@sf/application'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
@@ -30,15 +31,15 @@ async function answerWith(user: ReturnType<typeof userEvent.setup>, value: strin
 }
 
 describe('PracticePanel', () => {
-  it('starts a five-question paddock round and shows the first question', async () => {
+  it("starts the application's paddock round and shows the first question", async () => {
     const { game, user } = renderPanel()
     expect(screen.queryByTestId('question')).not.toBeInTheDocument()
 
     await user.click(screen.getByTestId('start-paddock'))
 
-    expect(game.calls.startRound).toEqual([{ context: 'paddock', questions: 5 }])
+    expect(game.calls.startRound).toEqual([PADDOCK_ROUND])
     expect(screen.getByTestId('question')).toHaveTextContent('7 × 8 = ?')
-    expect(screen.getByTestId('progress')).toHaveTextContent('Question 1 of 5')
+    expect(screen.getByTestId('progress')).toHaveTextContent(`Question 1 of ${PADDOCK_ROUND.questions}`)
   })
 
   it('sends the typed answer to the game and shows fluent feedback with the next question', async () => {

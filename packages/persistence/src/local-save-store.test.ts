@@ -118,10 +118,31 @@ describe('createLocalSaveStore — storage failures', () => {
     await expect(store.load()).resolves.toBeNull()
   })
 
-  it('clear resolves when removeItem throws', async () => {
+  it('clear resolves when removeItem throws, and this session then loads no farm', async () => {
     const store = createLocalSaveStore({ storage: createFailingStorage(['removeItem']) })
     await store.save(freshFarmSave())
     await expect(store.clear()).resolves.toBeUndefined()
+    await expect(store.load()).resolves.toBeNull()
+  })
+
+  it('a later successful save takes over from the in-memory copy kept after a failed one', async () => {
+    const storage = createMemoryStorage()
+    let refuse = true
+    const flaky: Storage = {
+      ...storage,
+      setItem: (key, value) => {
+        if (refuse) throw new Error('quota')
+        storage.setItem(key, value)
+      },
+    }
+    const store = createLocalSaveStore({ storage: flaky })
+    await store.save(freshFarmSave({ coins: 1 }))
+    refuse = false
+    await store.save(freshFarmSave({ coins: 2 }))
+
+    await createLocalSaveStore({ storage }).save(freshFarmSave({ coins: 3 }))
+
+    await expect(store.load()).resolves.toMatchObject({ coins: 3 })
   })
 
   it('works where localStorage does not exist at all', async () => {
