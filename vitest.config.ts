@@ -20,6 +20,17 @@ export default defineConfig({
         // Wiring only: the entry point and the composition root hold no rules to cover.
         'apps/web/src/main.tsx',
         'apps/web/src/composition/**',
+        // SF-63 spike (throwaway branch, not for merge). Its pure modules —
+        // steering, model-fit, frame-stats, texture-memory, spike-session — are
+        // unit-tested and stay in coverage; the r3f components are WebGL-only
+        // and are covered by `e2e/spike-3d.spec.ts` in headless Chromium
+        // instead, because jsdom has no WebGL context to render them in.
+        'apps/web/src/spike/*.tsx',
+        'apps/web/src/spike/use-animated-gltf.ts',
+        'apps/web/src/spike/use-keyboard-direction.ts',
+        'apps/web/src/spike/clip-crossfade.ts',
+        'apps/web/src/spike/camera-rig.ts',
+        'apps/web/src/spike/silhouette.ts',
       ],
       reporter: ['text-summary', 'html'],
       thresholds: {
