@@ -15,7 +15,9 @@ Project rails so the rebuild is orderly.
 
 - Notion board schema + views; agent access.
 - GitHub repo + CI (typecheck / lint / test on PR) + branch protection.
-- Firebase project + Hosting (two sites: game, landing).
+- Firebase: two Hosting sites (game, landing) in the shared `student-games-be188`
+  project, plus our own functions codebase and named Firestore database
+  (`docs/deploy.md`).
 - Docs: PRD, architecture, ADRs (this set).
 - `CLAUDE.md`: Clean Architecture + Clean Code + coverage rules.
 - Agent roster (`.claude/agents/`), skills (`.claude/skills/`), agent memory.
