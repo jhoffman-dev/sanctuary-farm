@@ -129,6 +129,33 @@ describe('startRound', () => {
     expect(game.currentQuestion()).toBeNull()
   })
 
+  it('rejects a family outside [1, maxTable] with a RangeError instead of falling back to mixed practice', async () => {
+    const { game } = await loadedGame({ farm: emptyFarmSave(5) })
+    expect(() => game.startRound({ context: 'egg', questions: 3, family: 6 })).toThrow(RangeError)
+    expect(() => game.startRound({ context: 'paddock', questions: 3, family: 0 })).toThrow(RangeError)
+    expect(() => game.startRound({ context: 'egg', questions: 3, family: 5 })).not.toThrow()
+  })
+
+  it('refuses to start while a save is still in progress, so the commit cannot overwrite the served question', async () => {
+    const { game, saveStore } = await loadedGame({ farm: { ...emptyFarmSave(), coins: 10 } })
+    let release: () => void = () => undefined
+    const saveStarted = new Promise<void>((started) => {
+      saveStore.save = () =>
+        new Promise<void>((resolve) => {
+          release = resolve
+          started()
+        })
+    })
+
+    const buying = game.buyFeed()
+    await saveStarted
+
+    expect(() => game.startRound({ context: 'paddock', questions: 1 })).toThrow(/save is still in progress/)
+    release()
+    await buying
+    expect(() => game.startRound({ context: 'paddock', questions: 1 })).not.toThrow()
+  })
+
   it('reports idle progress when no round is active', async () => {
     const { game } = await loadedGame()
     expect(game.roundProgress()).toEqual({ asked: 0, total: 0, complete: false })

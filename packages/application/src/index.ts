@@ -13,5 +13,6 @@ export type {
   RoundPlan,
   RoundProgress,
 } from './read-models'
+export { PADDOCK_ROUND } from './round-presets'
 export type { FarmGame, FarmGameDeps } from './farm-game'
 export { createFarmGame } from './farm-game'

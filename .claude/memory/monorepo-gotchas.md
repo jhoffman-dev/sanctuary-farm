@@ -13,6 +13,15 @@
   (automatic JSX runtime). Don't re-enable it.
 - **Worktree Bash guard** rejects compound scripts (multi-heredoc, `for`, long
   `&&` chains) — one simple command per call; write files with Write/Edit.
+- **The domain throws on caller bugs; adapters validate first.** `gradeAnswer`
+  throws `RangeError` for a latency that is not a finite number ≥ 0 (the
+  application grades a backwards clock as SLOW) and `Error(/never introduced/)` for a
+  fact at box 0 — only grade the fact `next*` just served. Every table-size entry
+  point (`buildFacts`, `initialSchedulerState`, `emptyFarmSave`, `factsInFamily`,
+  `factsInTier`, and so `cardsInPlay` on a loaded state) throws `RangeError`
+  unless `maxTable` is an integer in `MIN_TABLE..MAX_TABLE_DEFAULT`; persistence
+  must reject a bad `maxTable` before handing a state to the scheduler
+  (`assertTableSize` is exported for that).
 - **Prototype saves are not migrated.** `@sf/persistence` keeps the prototype's
   key (`sanctuary-farm/save`); a v2 blob there parses as "no save" and is
   overwritten on the first save. Deliberate.
