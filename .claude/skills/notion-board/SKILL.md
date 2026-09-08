@@ -49,7 +49,7 @@ pick up or move a `Later` ticket.
 
 **Add a note** — `notion-create-comment` on the ticket's page URL.
 
-**Link a PR** — `notion-update-page`, `properties: { "userDefined:PR": "<url>" }`.
+**Link a PR** — `notion-update-page`, `properties: { "PR": "<url>" }` (plain `PR` — only `ID`/`URL`-named properties take the `userDefined:` prefix).
 
 ## Workflow (match `CLAUDE.md`)
 
