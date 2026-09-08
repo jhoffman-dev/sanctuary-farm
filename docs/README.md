@@ -19,8 +19,9 @@ is the agent entry point).
 | `docs/board.md` — The board — Sanctuary Farm DB | [The board — Sanctuary Farm DB](https://app.notion.com/p/3cd672aa2c4a81da9d1ed7d9485ef7f6) |
 | `docs/adr/0001-stack-choice.md` — ADR-0001 — Stack choice | [ADR-0001 — Stack choice](https://app.notion.com/p/3cd672aa2c4a817ba78efec138934090) |
 | `docs/adr/0002-identity-and-save.md` — ADR-0002 — Identity and save | [ADR-0002 — Identity and save](https://app.notion.com/p/3cd672aa2c4a81248dc7e3fe500b1e02) |
-| `docs/adr/0003-asset-pack.md` — ADR-0003 — Asset pack (SF-64) | not yet mirrored |
-| `docs/adr/0004-3d-foundation.md` — ADR-0004 — 3D foundation (SF-63) | not yet mirrored |
+| `docs/adr/0003-asset-pack.md` — ADR-0003 — Asset pack (proposed, SF-64) | to mirror under ADR's after merge (skill: `notion-docs`) |
+| `docs/adr/0004-3d-foundation.md` — ADR-0004 — 3D foundation (proposed, SF-63) | to mirror under ADR's after merge (skill: `notion-docs`) |
+| `docs/adr/0005-world-layout-tooling.md` — ADR-0005 — World layout tooling (proposed, SF-65) | to mirror under ADR's after merge (skill: `notion-docs`) |
 | `docs/definition-of-done.md` — Definition of Done | [Definition of Done](https://app.notion.com/p/3d5672aa2c4a81e3b249d3d0eadd617f) |
 | `docs/secrets.md` — Secrets | [Secrets](https://app.notion.com/p/3d5672aa2c4a81579d29fec27113d844) |
 | `docs/curriculum.md` — Curriculum | [Curriculum](https://app.notion.com/p/3d5672aa2c4a811abf0fdab381a16881) |
