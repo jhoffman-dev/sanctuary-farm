@@ -2,6 +2,7 @@ import type { FarmSave } from '@sf/domain'
 import { createRng, emptyFarmSave, FEED_BUNDLE_PRICE, STARTING_FEED } from '@sf/domain'
 import { describe, expect, it } from 'vitest'
 import { createFarmGame } from './farm-game'
+import type { Clock } from './ports/clock'
 import type { Question } from './read-models'
 import type { FakeSaveStore } from './test-fakes'
 import { fakeClock, fakeSaveStore, harness, recordingAudioBus } from './test-fakes'
@@ -16,6 +17,20 @@ async function loadedGame(options: Parameters<typeof harness>[0] = {}) {
   const built = harness(options)
   await built.game.load()
   return built
+}
+
+/**
+ * A clock that moves on every reading. A fixed one hides a queued call grading
+ * a question it never saw, because that grade lands at 0 ms — free fluency.
+ */
+function advancingClock(stepMs: number): Clock {
+  let elapsed = 0
+  return {
+    now: () => {
+      elapsed += stepMs
+      return elapsed
+    },
+  }
 }
 
 /** A store whose save() rejects on demand, so persistence failure can be injected mid-round. */
@@ -92,19 +107,46 @@ describe('out-of-order use of the facade', () => {
     expect(saveStore.stored()?.scheduler.facts[question.factId]?.totalAttempts).toBe(1)
   })
 
-  it('two answer() calls issued without awaiting grade two different questions, never one twice', async () => {
+  it('two answer() calls issued without awaiting grade the tapped question once, and reject the second', async () => {
     const { game, saveStore } = await loadedGame()
     const first = game.startRound({ context: 'paddock', questions: 3 })
-    // A double-tap. Nothing moves until the store accepts the first answer, so the
-    // second call cannot see its question up front; it runs once the first commits.
-    const [fa, fb] = await Promise.all([
+    // A double-tap: both calls answer the question on screen. By the time the
+    // second runs, that question has been graded and replaced, so there is
+    // nothing left for it to grade.
+    const [fa, fb] = await Promise.allSettled([
       game.answer(correctAnswerTo(first)),
       game.answer(correctAnswerTo(first)),
     ])
-    expect(fa.question.factId).toBe(first.factId)
-    expect(fb.question).toBe(fa.next)
-    expect(fb.question.index).toBe(1)
-    expect(saveStore.stored()?.scheduler.globalCounter).toBe(2)
+
+    expect(fa.status).toBe('fulfilled')
+    expect(fb).toMatchObject({ status: 'rejected', reason: expect.any(Error) })
+    expect(saveStore.stored()?.scheduler.globalCounter).toBe(1)
+    expect(saveStore.stored()?.coins).toBe(2)
+  })
+
+  it('a double-tap does not promote or mint against the next question, on a clock that keeps moving', async () => {
+    const saveStore = fakeSaveStore()
+    const game = createFarmGame({
+      saveStore,
+      clock: advancingClock(FLUENT_MS),
+      rng: createRng(1),
+      audio: recordingAudioBus(),
+    })
+    await game.load()
+    const first = game.startRound({ context: 'paddock', questions: 3 })
+
+    await Promise.allSettled([
+      game.answer(correctAnswerTo(first)),
+      game.answer(correctAnswerTo(first)),
+    ])
+
+    const graded = Object.values(saveStore.stored()?.scheduler.facts ?? {}).filter(
+      (status) => status.totalAttempts > 0,
+    )
+    expect(graded.map((status) => status.id)).toEqual([first.factId])
+    expect(graded[0]?.box).toBe(2)
+    expect(saveStore.stored()?.coins).toBe(2)
+    expect(game.roundProgress()).toEqual({ asked: 2, total: 3, complete: false })
   })
 
   it('load() a second time mid-round does not throw and leaves no round active', async () => {
