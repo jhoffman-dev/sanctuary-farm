@@ -27,8 +27,8 @@
     "@playwright/test": "^1.63.0",
     "@vitest/coverage-v8": "^5.0.0",
     "dependency-cruiser": "^18.2.0",
-    "firebase": "^12.18.0",
-    "oxlint": "^1.79.0",
+    "firebase": "^12.19.0",
+    "oxlint": "^1.82.0",
     "typescript": "~6.0.2",
     "vitest": "^5.0.0"
   }
