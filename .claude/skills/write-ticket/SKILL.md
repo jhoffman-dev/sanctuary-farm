@@ -38,7 +38,7 @@ Acceptance criteria:   (bullet list; omit if a chore with an obvious done-state)
 - [ ] tests: <what must be covered>
 - [ ] gate green (typecheck / lint / test / build)
 
-Assignee: unassigned  (agent-doable)   OR   James  (needs a human — say why)
+Assignee: unassigned  (agent-doable)   OR   jhoffman-dev  (needs James — say why)
 
 Size: XS / S / M    (M → consider splitting)
 ```
@@ -47,14 +47,16 @@ Size: XS / S / M    (M → consider splitting)
 
 - Every ticket that changes behaviour lists the **tests** as an AC line.
 - If a human must do it (interactive auth, an account, a purchase, a
-  product/legal call, a physical device test), assign **James** and give the
+  product/legal call, a physical device test), assign **James** (`jhoffman-dev`) and give the
   exact steps.
 - A spike is a real ticket: timebox it, and its AC is "findings written to
   `docs/adr/NNNN-*.md` or `docs/decisions/*.md`".
-- Link the Epic. Link related ADRs.
+- Link the Epic (as a GitHub sub-issue). Link related ADRs.
 - Don't restate `CLAUDE.md` in the ticket — reference it.
 
 ## Then
 
-Create it on the board with the `notion-board` skill and set Status = `Backlog`
-(or `Ready` if it's unblocked and next).
+A ticket is a **GitHub issue** titled `[SF-n] <title>`. Create it with the
+`github-board` skill: milestone = its phase, labels for type / priority / size,
+sub-issue of its Epic, added to the "Sanctuary Farm Project" with Status =
+`Backlog` (or `Ready` if it's unblocked and next).
