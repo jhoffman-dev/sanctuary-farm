@@ -60,8 +60,8 @@ merges only green PRs. If an item doesn't apply, the PR says why.
 ## 6. The paperwork
 
 - [ ] PR body links the ticket and follows `.github/pull_request_template.md`.
-- [ ] Notion ticket is **In review** with the PR linked; **Done** after merge
-      (skill: `notion-board`).
+- [ ] PR body says `Closes #<issue>`; the issue's project Status is **In review**,
+      and the merge closes it (skill: `github-board`).
 - [ ] A changed doc under `docs/` is pushed to its Notion page after merge
       (skill: `notion-docs`); a new doc is added to `docs/README.md`.
 - [ ] A new env var, secret, or setup step is in `docs/secrets.md` / `README.md`.
