@@ -209,7 +209,7 @@ flat field and not enough for the farm:
   with three.js. Draw calls, not triangles, will be the budget we hit first.
 - **Negative / unresolved:** no device run (SF-34), no Mixamo, no portrait
   answer, and the chosen asset pack is now ADR-0003's problem rather than a
-  settled input.
+  settled input. *(2026-10-07: settled — ADR-0003 accepted Kenney.)*
 - **Follow-ups:** the pathfinding ticket above; the camera/portrait ticket; a
   draw-call ticket (shadow-caster culling, fewer material slots); and the
   performance-budget items that are still not implemented — DPR cap 1.5,
