@@ -4,12 +4,12 @@ import type { Group } from 'three'
 import { AnimatedModel } from './AnimatedModel'
 import { SCREEN_TO_WORLD_YAW } from './camera-rig'
 import { SILHOUETTE_KEY } from './silhouette'
+import type { KeeperCast } from './spike-cast'
 import type { SpikeSession } from './spike-session'
-import { advance, clipForSpeed, desiredVelocity, rotateAroundY, turnToward, yawOf, type GroundVector } from './steering'
+import { advance, clipForSpeed, desiredVelocity, rotateAroundY, turnToward, yawOf, type GroundVector, type LocomotionClip } from './steering'
 import { useKeyboardDirection } from './use-keyboard-direction'
 
-/** Art-direction §2: keeper 1.6 units, crossing a ~30-unit farm in ≤ 8 s. */
-const KEEPER_HEIGHT = 1.6
+/** Art-direction §2: crossing a ~30-unit farm in ≤ 8 s. */
 const WALK_SPEED = 1.9
 const TURN_RADIANS_PER_SECOND = 9
 const ARRIVE_RADIUS = 0.08
@@ -20,11 +20,12 @@ const WALK_SPEED_THRESHOLD = 0.05
  * The tap-to-move keeper: walks to the last tapped point, turns to face where
  * it is going, and crossfades idle ↔ walk on its own speed.
  */
-export function Keeper({ url, session }: { url: string; session: SpikeSession }) {
+export function Keeper({ cast, session }: { cast: KeeperCast; session: SpikeSession }) {
   const group = useRef<Group>(null)
   const keyboard = useKeyboardDirection()
-  const clip = useRef<string>('Idle')
-  const readClip = useCallback(() => clip.current, [])
+  const clip = useRef<LocomotionClip>('Idle')
+  // The session reports the locomotion state; the model is asked for its own spelling of it.
+  const readClip = useCallback(() => cast.clips[clip.current], [cast])
 
   useFrame((_, delta) => {
     const node = group.current
@@ -61,7 +62,7 @@ export function Keeper({ url, session }: { url: string; session: SpikeSession })
 
   return (
     <group ref={group} userData={{ [SILHOUETTE_KEY]: 'Keeper' }}>
-      <AnimatedModel url={url} targetHeight={KEEPER_HEIGHT} clipName={readClip} />
+      <AnimatedModel url={cast.url} targetHeight={cast.targetHeight} clipName={readClip} />
     </group>
   )
 }

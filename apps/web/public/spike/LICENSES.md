@@ -68,3 +68,32 @@ Geometry is meshopt-compressed, so the loader must call
 42 kB), then `metallicFactor` set to 0 on every material. The `palette` pass in
 `optimize` turned its five flat colours to mud, and at `metallicFactor` 0.4 a
 scene with no environment map renders it near-black.
+
+## `kenney/` — Kenney Cube Pets + Mini Characters (ADR-0003 correction)
+
+Added 2026-10-07 for the 64-px silhouette test (`?spike=3d&pack=kenney`,
+`e2e/spike-kenney.spec.ts`). Downloaded **2026-10-07** from kenney.nl.
+
+| File | Source model | Pack (version, creation date) | Pack page | Download |
+| --- | --- | --- | --- | --- |
+| `kenney/animal-cow.glb` | `Models/GLB format/animal-cow.glb` | Cube Pets (2.0), 26-03-2026 | <https://kenney.nl/assets/cube-pets> | `https://kenney.nl/media/pages/assets/cube-pets/44e58e945f-1774520254/kenney_cube-pets_1.0.zip` |
+| `kenney/animal-pig.glb` | `Models/GLB format/animal-pig.glb` | same | same | same |
+| `kenney/animal-hog.glb` | `Models/GLB format/animal-hog.glb` | same | same | same |
+| `kenney/animal-chick.glb` | `Models/GLB format/animal-chick.glb` | same | same | same |
+| `kenney/character-male-a.glb` | `Models/GLB format/character-male-a.glb` | Mini Characters (1.0), 17-07-2024 | <https://kenney.nl/assets/mini-characters> | `https://kenney.nl/media/pages/assets/mini-characters/bfc7e272b4-1774770718/kenney_mini-characters.zip` |
+
+Licence, quoted from each pack's `License.txt`:
+
+> License: (Creative Commons Zero, CC0)
+> http://creativecommons.org/publicdomain/zero/1.0/
+>
+> You can use this content for personal, educational, and commercial purposes.
+>
+> Support by crediting 'Kenney' or 'www.kenney.nl' (this is not a requirement)
+
+What was done to them: `npx @gltf-transform/cli@4.5.0 optimize <in> <out>
+--compress meshopt --texture-compress false --simplify false` — the same step
+as the Quaternius files. Each source `.glb` references its pack's shared
+`Textures/colormap.png` (512 × 512) by URI; `optimize` embeds that atlas into
+every output, so each `.glb` carries its own copy (49–52 kB per animal,
+70 kB for the keeper). Every clip is kept; `metallicFactor` is already 0.

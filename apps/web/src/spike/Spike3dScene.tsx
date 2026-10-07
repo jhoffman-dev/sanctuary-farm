@@ -4,6 +4,7 @@ import { CAMERA_FOV, CAMERA_LOOK_AT, CAMERA_POSITION } from './camera-rig'
 import { Grazer } from './Grazer'
 import { Keeper } from './Keeper'
 import { MeasurementPump } from './MeasurementPump'
+import type { SpikeCast } from './spike-cast'
 import type { SpikeSession } from './spike-session'
 
 /** Art-direction §4 tokens, repeated so the spike does not depend on the app. */
@@ -14,22 +15,6 @@ const GRASS = '#8fd18a'
 const GROUND_SIZE = 200
 const FOG_NEAR = 25
 const FOG_FAR = 70
-
-/** Art-direction §2 scale rule: chicken 0.5, cow 1.3, horse a shade taller. */
-const CHICKEN_HEIGHT = 0.5
-const COW_HEIGHT = 1.3
-const HORSE_HEIGHT = 1.5
-
-const MODELS = {
-  keeper: '/spike/keeper.glb',
-  cow: '/spike/cow.glb',
-  horse: '/spike/horse.glb',
-  chicken: '/spike/chicken.glb',
-} as const
-
-const NATURALISTIC_CLIPS = { resting: 'Idle', busy: 'Eating' } as const
-/** The chunky "cute" line prefixes every clip with its armature's name. */
-const CUTE_CLIPS = { resting: 'CharacterArmature|Idle', busy: 'CharacterArmature|Walk' } as const
 
 function FixedCamera() {
   const camera = useThree((state) => state.camera)
@@ -58,10 +43,10 @@ function Ground({ session }: { session: SpikeSession }) {
 }
 
 /**
- * The SF-63 spike scene: a rigged keeper you tap to move, two animated farm
- * animals, and the fixed three-quarter camera from art-direction §2.
+ * The SF-63 spike scene: a rigged keeper you tap to move, the cast's animated
+ * farm animals, and the fixed three-quarter camera from art-direction §2.
  */
-export function Spike3dScene({ session }: { session: SpikeSession }) {
+export function Spike3dScene({ session, cast }: { session: SpikeSession; cast: SpikeCast }) {
   return (
     <Canvas
       shadows
@@ -76,36 +61,10 @@ export function Spike3dScene({ session }: { session: SpikeSession }) {
       <FixedCamera />
       <Ground session={session} />
       <Suspense fallback={null}>
-        <Keeper url={MODELS.keeper} session={session} />
-        <Grazer
-          url={MODELS.cow}
-          name="Cow"
-          targetHeight={COW_HEIGHT}
-          position={[-3.5, 0, -1]}
-          rotationY={1.1}
-          phaseSeconds={0}
-          clips={NATURALISTIC_CLIPS}
-        />
-        <Grazer
-          url={MODELS.horse}
-          name="Horse"
-          targetHeight={HORSE_HEIGHT}
-          position={[3.2, 0, -2.4]}
-          rotationY={-0.8}
-          phaseSeconds={2.5}
-          clips={NATURALISTIC_CLIPS}
-        />
-        {/* Deliberately from Quaternius' other, chunky line: the ADR-0003
-            style comparison is the point of having it in frame. */}
-        <Grazer
-          url={MODELS.chicken}
-          name="Chicken"
-          targetHeight={CHICKEN_HEIGHT}
-          position={[0.9, 0, 1.6]}
-          rotationY={-2.2}
-          phaseSeconds={1.2}
-          clips={CUTE_CLIPS}
-        />
+        <Keeper cast={cast.keeper} session={session} />
+        {cast.grazers.map((grazer) => (
+          <Grazer key={grazer.name} {...grazer} />
+        ))}
       </Suspense>
       <MeasurementPump session={session} />
     </Canvas>
