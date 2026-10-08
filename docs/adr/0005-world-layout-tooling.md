@@ -1,9 +1,9 @@
-# ADR-0005: World layout tooling — a hand-authored, schema-checked layout file
+# ADR-0005: World layout tooling — a procedural tile world with authored overrides
 
 - **Status:** proposed (James decides)
-- **Date:** 2026-09-08
-- **Deciders:** James (sole developer, working with AI agents)
-- **Ticket:** SF-65 "Spike: world layout tooling decision"
+- **Date:** 2026-09-08; revised 2026-10-08
+- **Deciders:** James Hoffman (sole developer, working with AI agents)
+- **Ticket:** SF-65 "Spike: world layout tooling decision"; revised for SF-87 (#118)
 
 ## Context
 
@@ -39,9 +39,17 @@ Forces:
   have.
 - **Small world.** Seven hotspots, a few dozen props, one farm. Land expansion
   and a second map are Phase 6+. Tooling should fit today's size and not
-  pre-pay for a level editor we may never need.
+  pre-pay for a level editor we may never need. *(Superseded 2026-10-08:
+  expansion is now a requirement — see the next force.)*
 - **James** is a C#/TS developer with Unity side-project experience: comfortable
   in a 3D editor, equally comfortable editing a data file with hot reload.
+
+- **Expansion and visual editing (added 2026-10-08).** James Hoffman: *"the
+  game needs to be expandable so we need to have a procedural process for
+  laying ground and building tiles. I would like a way to visually adjust
+  things myself at times."* Land is going to grow, and James wants to place
+  things by eye, not by typing coordinates. On the same day: **Kenney assets
+  only** (no Synty), **GLB-native only, no format conversions** (ADR-0003).
 
 ### What was checked online (2026-09-08)
 
@@ -92,15 +100,89 @@ Forces:
 
 ## Decision
 
-**The farm layout is a hand-authored, schema-checked JSON file, owned by a
-small framework-free package and rendered by `apps/web` — not a Blender scene,
-not JSX props, not a bespoke editor.** GUI tooling is additive and optional:
-a dev-only in-browser tweak mode that emits the same JSON (Phase 2, timeboxed),
-and — only if James asks for it — a one-way Blender → JSON import script.
-Blender stays what `art-direction.md` already makes it: the tool for **models**
-(face kit, missing props), never the source of truth for **placement**.
+> **Revised 2026-10-08** after James's requirement above. The first version of
+> this ADR (2026-09-08) chose option D on its own: one hand-placed JSON file of
+> coordinates. That version cannot grow with the land, so it is superseded.
+> The options table below is kept as written, with a note on what changed.
 
-### Why this and not the others — weighted comparison
+**The farm is a procedural tile world: generated tiles from (world seed,
+rules), plus a small authored overrides file on top. James edits it in an
+in-browser world editor that saves that overrides file. The world grows by
+adding fixed-size chunks.** It is still plain, schema-checked data owned by the
+framework-free `@sf/world` package and rendered by `apps/web`. It is not a
+Blender scene, not JSX props, and not a hand-placed coordinate list. Blender
+stays the tool for **models** only (the gaps in ADR-0003's inventory), never
+for **placement**. Every piece is a Kenney GLB, loaded as shipped. There is no
+Synty and no format conversion (James, 2026-10-08).
+
+The three parts:
+
+1. **Data = generate(seed, rules) + overrides.** The world is never stored
+   tile by tile. `buildTileWorld({ seed, anchors, overrides, rngFor }, chunks)`
+   rebuilds it deterministically every time:
+   - **Anchors.** The seven hotspots come from `layouts/farm.json` (SF-74),
+     snapped to multi-tile footprints with an entrance and an arrival tile.
+   - **Rules.** These are pure TypeScript with an injected `Rng`. The
+     generator lays a path network joining every arrival (grid routing around
+     footprints and water). It fences the paddock and training ring with
+     autotiled fences and one gate facing the path. It puts placeholder
+     wall, door and roof parts on the barn, shed and farmhouse until those
+     structures are sourced. It may add a small pond, and it scatters decor
+     by zone with keep-clear space around paths, gates and arrivals.
+   - **Overrides.** `layouts/overrides.json` is a small diff with ops
+     `set-ground`, `place-structure`, `remove-structure`, `place-decor`,
+     `remove-decor` and `move-hotspot`. It is parsed by `parseWorldOverrides`,
+     which never throws, the same contract as `parseFarmLayout`. A
+     `move-hotspot` applies before generation, so paths re-route to the new
+     arrival. Every other edit applies after generation, in file order.
+     Because the overrides are an input to the build and not a patch on its
+     output, regenerating, or changing the seed, never loses one of James's
+     edits.
+2. **Editing = the in-browser world editor** (#105, now P1). It is dev-only,
+   behind `import()` on a query flag, and seen through the real game camera.
+   James can paint ground, place and remove pieces, and drag hotspots. Every
+   action becomes an edit in the overrides file, which the editor saves for an
+   agent or James to commit. Agents can still edit the same file by hand from
+   a ticket. This is option C's GUI, promoted from "timeboxed tweak mode" to
+   the main way James adjusts the world, but writing a diff rather than the
+   whole world.
+3. **Expansion = chunks.** Tiles are 1 unit, because the Kenney kits are
+   authored on a 1 × 1 tile and 1 unit = 1 m. Chunks are 16 × 16 tiles,
+   addressed by integer chunk coordinates, so the ~30 × 30 farm starts on the
+   four chunks round the origin.
+   - A chunk is built only from (seed, anchors, overrides, chunk coordinate),
+     never from which other chunks exist. Adding land therefore never changes
+     land already built.
+   - Paths cross chunk edges at connectors chosen from (seed, edge) alone, so
+     the chunks on both sides agree and new land meets a path stub that was
+     already waiting.
+
+The world package knows **piece kinds, never file paths**:
+- ground: `grass`, `dirt`, `path`, `water`;
+- autotiled: `fence` and `path`, each with the roles `end`, `straight`,
+  `corner`, `tee` and `cross`, plus `fence-gate`;
+- building parts: `building-wall`, `building-wall-door`,
+  `building-wall-window`, `building-roof`;
+- decor: `tree`, `tree-tall`, `bush`, `rock`, `crate`, `barrel`, `hay-bale`,
+  `crop`;
+- one `hotspot:<id>` per hotspot.
+
+An adapter in `apps/web` maps each `PieceId` to a Kenney GLB from ADR-0003's
+inventory. Typed as `Record<PieceId, string>`, a new kind fails the build
+until it is mapped.
+
+### Why this and not the others — weighted comparison (2026-09-08)
+
+The table scores the options as they stood on 2026-09-08, for a fixed world of
+seven hotspots. **What changed on 2026-10-08:** land expansion moved from
+"Phase 6+, maybe" to a requirement, and James asked to adjust the world
+visually himself. Under that requirement, D's weakness becomes decisive: by
+its own consequences it "may outgrow a hand-edited file". C's GUI stops being
+optional. E's tile model turns out to be right for the ground, even though the
+Tiled editor is still the wrong tool. The revised decision keeps D's strengths:
+plain JSON, a never-throws parser, a gate that tests the rules, and diffs an
+agent can make. It shrinks the hand-edited part to a diff, and adopts C's
+editor to write it.
 
 Weights (1–5) say how much a criterion matters here; cells score 1–5.
 
@@ -120,12 +202,16 @@ Theatre.js is not in the table: it sequences animation and camera moves over
 time; it does not place a barn. It is also dormant (above). If we ever want
 authored cinematics (hatch ceremony camera), revisit it then — separately.
 
-Option C scores close to D because it *is* D plus a GUI. The difference is the
-build cost and the temptation to make the editor a project. So the decision is
-D now, with C's cheapest 20 % (a dev-only tweak mode) as a timeboxed Phase 2
-ticket, and the rest of C never unless the tweak mode proves insufficient.
+Option C scored close to D because it *is* D plus a GUI; in 2026-09 the GUI
+did not earn its build cost. Under the 2026-10-08 requirement it does. It
+also costs less than C as scored, because the editor writes a small diff over
+generated tiles. It does not hand-place a whole world.
 
-### The layout file
+### The hotspot layout file (SF-74, unchanged in role)
+
+The tile world sits on top of this file: `farm.json` still says where the
+seven hotspots are, and the generator reads them as anchors. The sketch below
+is the 2026-09 proposal; the shipped schema is in PR #25.
 
 **Location.** A new infrastructure-tier package `packages/world` (`@sf/world`):
 
@@ -143,10 +229,11 @@ packages/world/
 Why a package and not `apps/web/public/`: package tests (and later e2e helpers)
 import it as data through the public entry; Vite bundles the JSON into the
 world chunk (a few KB — no extra request, validated at build); and the
-dependency rule is enforceable. `@sf/world` depends on `@sf/application` for the
-**type** `HotspotId` only — the application owns *which* hotspots exist (that is
-game vocabulary), the layout owns *where* they are. `domain` and `application`
-never import `@sf/world`.
+dependency rule is enforceable. *(As built: `@sf/world` depends on nothing —
+`HotspotId` lives in `@sf/world`, since nothing else defined it — and is in
+the same dependency tier as `domain`. `domain` and `application` never import
+`@sf/world`.)* The tile world adds `src/tile-*.ts`, the generator, the
+overrides parser and `layouts/overrides.json` to the same package.
 
 **Who loads it.** The composition root, `apps/web/src/composition/`, calls
 `loadFarmLayout()` and passes the `WorldLayout` into the scene as a prop /
@@ -246,13 +333,21 @@ rather than a schema library, so `@sf/world` stays dependency-free.
   follow-up: a dev-only `?layout=edit` mode behind `import()` with drei
   `TransformControls` on hotspots/props that copies the resulting JSON to the
   clipboard for an agent to commit. If that slice is not enough, this ADR is
-  revisited rather than the editor quietly growing.
-- **D. Hand-authored JSON + schema + preview** — chosen.
+  revisited rather than the editor quietly growing. *(2026-10-08: revisited.
+  The editor is now #105, P1, and writes the overrides diff.)*
+- **D. Hand-authored JSON + schema + preview.** Chosen on 2026-09-08. Its
+  data discipline (plain JSON, never-throws parser, rule tests) carries into
+  the revised decision. Its "hand-place every coordinate" model does not
+  scale to expansion, so it now covers only the seven hotspot anchors
+  (`farm.json`).
 - **E. Tiled.** Free, open JSON, agents can edit it, and it was on the original
   ticket. But it models a 2D tile grid; our farm is free-placed 3D with heights,
   Y-rotations and camera anchors that would all live in custom properties, the
   editor shows no 3D preview, and tile-layer CSV arrays diff badly. It would
-  add a vocabulary without removing any work.
+  add a vocabulary without removing any work. *(2026-10-08: the tile grid
+  idea is adopted for the ground, generated rather than painted, and stored as
+  overrides rather than full tile arrays. The Tiled editor is still not used:
+  it has no 3D preview and no game camera.)*
 - **Theatre.js.** Solves camera and animation sequencing, not layout, and has
   had no release since 2024. Not a fit for this decision; possibly for
   cinematics later.
@@ -262,39 +357,61 @@ rather than a schema library, so `@sf/world` stays dependency-free.
 
 ## Consequences
 
-- **Positive:** every layout change is a reviewable JSON diff an agent can make
-  from a ticket; art-direction rules become failing tests instead of review
-  comments; `domain`/`application` stay Three.js-free; per-hotspot loading and
-  instancing fall out of the data shape; zero licence cost and no dependency on
-  a one-maintainer tool; Blender is not excluded, just not the source of truth.
-- **Negative / cost:** James's "a bit to the left" loop is numbers-and-reload
-  until the tweak mode lands; hand-placing a few dozen props by coordinate is
-  tedious (mitigated: agents do the first pass, tweak mode adjusts); the parser
-  and its tests are ~a day of agent work that a GUI tool would have given us
-  for free; a second farm or land expansion (Phase 6+) may outgrow a
-  hand-edited file.
-- **Follow-ups (Phase 2 tickets, in order):**
-  1. `@sf/world` package: types, parser, `hotspotContaining`, `farm.json` v1
-     with the seven hotspots placed per `art-direction.md` §2, full test set
-     listed above; dependency-cruiser rules updated. (S)
-  2. `FarmScene` renders from the layout: ground, paths, hotspot models,
-     instanced props, trigger volumes, camera anchors; composition root loads
-     it; hard-coded `Barn` removed; component test on a fixture layout. Depends
-     on the asset-pack ADR for real GLBs (placeholders until then). (M)
-  3. Dev-only layout tweak mode (`?layout=edit`, lazy-loaded, excluded from
-     the production `size-limit` chunks): drag hotspots/props, copy JSON.
-     Timebox 1 day; if it needs more, stop and note why here. (S)
-  4. Optional, only on request: `scripts/layout-from-glb.ts` — Blender empties
-     + extras → `farm.json`. (S)
-  5. Tap-to-move / navmesh (already a Phase 2 bullet) derives its walkable
-     area from `ground` minus hotspot footprints in this file — note the
-     dependency when that ticket is written.
-- **What would make us revisit:** more than one farm or a land expansion that
-  needs hundreds of placements (then Blender-authored, script-imported layouts
-  become worth their cost); James finds the JSON + tweak-mode loop too slow
-  after a real playtest week; Triplex or a successor gains a data-driven /
-  headless mode that edits JSON rather than JSX; a maintained r3f scene-graph
-  editor with a stable file format appears.
+- **Positive:**
+  - The world grows a chunk at a time, and existing land never shifts.
+    Tests prove this: adding chunks leaves every existing tile unchanged.
+  - James adjusts things by eye in the editor, and his edits survive every
+    regeneration and seed change, because they are an input to the build.
+  - Each change is a small JSON diff of edits, not thousands of tiles, so it
+    reviews well and an agent can still make it from a ticket.
+  - Determinism is tested: the same seed and overrides always give the same
+    world, and it survives a JSON round trip.
+  - The rules are tested on the generated world: every hotspot is reachable
+    along paths, each pen has exactly one gate on the path, and no decor sits
+    on paths, gates or footprints.
+  - `@sf/world` stays framework-free in the domain tier; no file paths leak
+    into it.
+  - Autotiling gives fences and paths the right Kenney piece and rotation for
+    free.
+- **Negative / cost:**
+  - A generator, an autotiler and an overrides parser are more code than one
+    hand-edited file (SF-87 is M-sized), and the generator's look depends on
+    tuning rules rather than placing things directly.
+  - The editor (#105) is real work: it moves from a 1-day timebox to a P1
+    story.
+  - A tile grid snaps everything to 1 unit, and quarter-turn rotation is
+    all autotiling gives. A free-angle prop needs a non-tile placement later
+    (revisit if it comes up).
+  - Changing a rule regenerates every untouched tile. That is intended, but a
+    change can move a tree James liked unless he pinned it with an override.
+  - The placeholder building parts stand in for the barn, shed and farmhouse
+    until those are sourced (ADR-0003 gaps).
+- **Follow-ups:**
+  1. **#118 (SF-87)**: tile world in `@sf/world`. Chunks, seeded generator,
+     autotiling, authored overrides and their parser. In review as PR #119,
+     stacked on PR #25 (SF-74, the hotspot layout package).
+  2. **#104 (SF-75)**: `FarmScene` renders from the world. It renders a
+     `TileWorld` instead of hand-placed props, with one `InstancedMesh` per
+     piece id, and keeps the camera anchors and triggers from `farm.json`.
+     It also adds the Kenney GLB adapter in `apps/web`: a
+     `Record<PieceId, string>` onto the ADR-0003 inventory, with GLBs loaded
+     as shipped.
+  3. **#105 (SF-76)**: in-browser world editor, now P1. It is dev-only and
+     lazy-loaded, and lets James paint ground, place and remove pieces and
+     drag hotspots. It saves `layouts/overrides.json` and reports a
+     `parseWorldOverrides` failure, never writing a file the game cannot load.
+  4. Tap-to-move / navmesh derives its walkable area from the tile world:
+     path and grass tiles, minus structures and water. Note the dependency
+     when that ticket is written.
+  5. Optional, only on request: a Blender → overrides import. It is not
+     planned, since the editor covers placement.
+- **What would make us revisit:**
+  - the world needs free placement off the grid at scale;
+  - generation becomes too slow to run on load (today it builds four chunks
+    in milliseconds, but measure on a low-end phone once the adapter exists);
+  - James finds the editor plus overrides loop too slow after a real playtest
+    week;
+  - a maintained r3f scene editor appears that edits data, not JSX.
 
 ## Facts not confirmed online
 
