@@ -26,7 +26,8 @@ const SHARED_ON_PURPOSE: readonly (readonly string[])[] = [
 /** Art-direction §2 heights, plus the two extra pets (bunny, dog) sized between chick and pig. */
 const GROUND_TILES = new Set<string>(['grass', 'dirt', 'water', 'path:end', 'path:straight', 'path:corner', 'path:tee', 'path:cross'] satisfies PieceId[])
 
-const SPECIES_HEIGHT = { cow: 1.3, pig: 0.9, hog: 0.9, chick: 0.5, bunny: 0.6, dog: 0.7 } as const
+/** Art-direction §2; the dog is 0.67 so size alone parts it from the pig, hog and chick (§3). */
+const SPECIES_HEIGHT = { cow: 1.3, pig: 0.9, hog: 0.9, chick: 0.5, bunny: 0.6, dog: 0.67 } as const
 
 describe('the Kenney piece catalogue', () => {
   it('maps exactly the tile world\'s PieceId vocabulary, no more', () => {

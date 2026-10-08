@@ -4,6 +4,7 @@ import { Cache, type Object3D } from 'three'
 import { type GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { atlasWarmUp } from './atlas-warm-up'
 import { AtlasTextureRegistry } from './share-atlas-textures'
+import { tintModel } from './tint-model'
 
 // Kenney GLBs reference their kit's atlas by URI. With the cache on, every GLB
 // of a kit resolves that URI to one fetch and one decoded image, which is what
@@ -15,7 +16,8 @@ const atlases = new AtlasTextureRegistry()
 /** Shared by every caller, so the world, the ghosts and the catalogue warm each atlas exactly once. */
 const warmUp = atlasWarmUp((url) => new GLTFLoader().loadAsync(url))
 
-export type ModelSource = { readonly url: string; readonly atlasUrl: string }
+/** `tint`: the catalogue's per-species recolour (art-direction §3), applied once the GLB loads. */
+export type ModelSource = { readonly url: string; readonly atlasUrl: string; readonly tint?: string }
 
 /**
  * Loads each GLB once (suspending until all arrive) and shares each kit's atlas
@@ -28,6 +30,10 @@ export type ModelSource = { readonly url: string; readonly atlasUrl: string }
 export function useKenneyModels(sources: readonly ModelSource[]): ReadonlyMap<string, Object3D> {
   use(warmUp.ready(sources))
   const urls = useMemo(() => [...new Set(sources.map((source) => source.url))], [sources])
+  const tints = useMemo(
+    () => new Map(sources.flatMap((source) => (source.tint === undefined ? [] : [[source.url, source.tint] as const]))),
+    [sources],
+  )
   const loaded = useLoader(GLTFLoader, urls)
   return useMemo(() => {
     const scenes = new Map<string, Object3D>()
@@ -37,11 +43,13 @@ export function useKenneyModels(sources: readonly ModelSource[]): ReadonlyMap<st
         const gltf = gltfs[index]
         if (!gltf) throw new Error(`GLTFLoader returned nothing for ${url}`)
         atlases.share(gltf.scene)
+        const tint = tints.get(url)
+        if (tint !== undefined) tintModel(gltf.scene, tint)
         // Object3D's own `animations` slot: clips travel with the scene and with every clone of it.
         gltf.scene.animations = gltf.animations
         scenes.set(url, gltf.scene)
       })
     record(loaded)
     return scenes
-  }, [urls, loaded])
+  }, [urls, tints, loaded])
 }
