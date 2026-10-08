@@ -15,6 +15,7 @@ export class KeeperTelemetry {
   #yaw = 0
   #cue: TileCoord | null = null
   #cuesShown = 0
+  #pose = 0
   readonly #clipsSeen: LocomotionClip[] = ['idle']
 
   constructor(position: GroundPoint) {
@@ -49,6 +50,11 @@ export class KeeperTelemetry {
     return this.#cuesShown
   }
 
+  /** Radians the skeleton is off its bind pose (`SkeletonPose`): zero means no clip is reaching it. */
+  get pose(): number {
+    return this.#pose
+  }
+
   /** Each clip change in order, e.g. idle → walk → idle; only the most recent are kept. */
   get clipsSeen(): readonly LocomotionClip[] {
     return this.#clipsSeen
@@ -69,6 +75,10 @@ export class KeeperTelemetry {
   cueing(tile: TileCoord | null): void {
     this.#cue = tile
     if (tile) this.#cuesShown += 1
+  }
+
+  posed(offsetFromBind: number): void {
+    this.#pose = offsetFromBind
   }
 
   playing(clip: LocomotionClip): void {

@@ -54,4 +54,11 @@ describe('KeeperTelemetry, facing and cues', () => {
     expect(telemetry.cue).toEqual({ x: 31, z: 2 })
     expect(telemetry.cuesShown).toBe(2)
   })
+
+  it('tells how far the skeleton is off its bind pose', () => {
+    const telemetry = new KeeperTelemetry({ x: 0, z: 0 })
+    expect(telemetry.pose).toBe(0)
+    telemetry.posed(0.6)
+    expect(telemetry.pose).toBe(0.6)
+  })
 })
