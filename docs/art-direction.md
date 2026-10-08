@@ -33,7 +33,10 @@ hotspots from the implementation plan: barn, feed shed, nest hollow, paddock, tr
 pond + petting zoo, farmhouse. Fog in the sky colour hides the edge.
 
 **Scale rule.** 1 unit = 1 m. Keeper 1.6 units, chunky (~3 heads tall). Chicken
-0.5, sheep / pig 0.9, cow 1.3; barn ≈ 3 × 2.5 × 3.3. At the alpha camera the
+0.5, sheep / pig / hog 0.9, cow 1.3; the catalogue's bunny 0.6 and dog 0.67 (the
+dog under 0.69 so size parts it from the pigs — §3); barn ≈ 3 × 2.5 × 3.3. The
+hog matches the pig rather than towering over it: Kenney's hog is a pig in another
+colour, and colour, not size, tells the two apart. At the alpha camera the
 keeper is ≈ 165 px tall at 1080p and ≈ 100 px on a 640-px phone, so animals land
 at 50–130 px — nothing the kid must recognise is under 0.5 units. The SF-75 home
 camera is 1.5× further out, so until the camera rig follows the keeper and
@@ -42,9 +45,46 @@ the chick ≈ 35 px — legibility is the rig ticket's job to win back.
 
 ## 3. Shape language
 
-- **Readable silhouette at 64 px.** Every animal and hotspot must be identifiable
-  as a black silhouette at 64 px — that is the rendered size on the smallest
-  supported device. Test by screenshotting at 360 × 640.
+- **Identifiable at 64 px by colour, size and shape together.** 64 px is the
+  rendered size on the smallest supported device. Pass criterion: a child can
+  name each animal and hotspot from a 64-px **colour** render. Each species has
+  a distinct body colour (§4) that stays apart under deuteranopia, protanopia
+  and tritanopia simulation, keeps its §2 size, and keeps its distinguishing
+  features chunky (cow horns, pig snout). This replaced the shape-only
+  black-silhouette rule, which Kenney's cube animals fail (ADR-0003).
+
+  **The rule, as tested** (`apps/web/src/world-assets/animal-identification.test.ts`):
+  every pair of animals differs in dominant body colour by **ΔE00 ≥ 20** (CIEDE2000,
+  on the albedo drawn — atlas texel × tint) for normal vision **and** each
+  dichromacy (Machado 2009, severity 1), **or** in height by **≥ 30 %**. Why 20:
+  Kenney paints one body in shades up to 7–15 apart (the hog's most), so a pair
+  must sit clear of the spread inside any one animal to read as two colours, not
+  as light and shade; at 10 the pig and Kenney's untinted hog (9.7 under
+  tritanopia) would nearly pass, and they are the pair that shares a pen. The e2e
+  `apps/web/e2e/animal-identification.dev.spec.ts` renders each animal alone at
+  the game camera's angle, shrinks it to 64 × 64 on a 360 × 640 screen, re-checks
+  the size order and the colours actually drawn, and saves the sheets below.
+
+  | pair | normal | deutan | protan | tritan | height ratio | parted by |
+  | --- | --- | --- | --- | --- | --- | --- |
+  | cow / pig | 25.7 | 12.8 | 17.4 | 27.0 | 1.44 | size |
+  | cow / hog | 39.6 | 37.9 | 40.2 | 41.4 | 1.44 | both |
+  | cow / chick | 32.5 | 32.8 | 33.5 | 23.9 | 2.60 | both |
+  | cow / bunny | 39.7 | 38.6 | 42.3 | 39.1 | 2.17 | both |
+  | cow / dog | 45.0 | 44.9 | 44.8 | 44.7 | 1.94 | both |
+  | pig / hog | 27.4 | 25.8 | 29.0 | 22.4 | 1.00 | colour |
+  | pig / chick | 45.5 | 30.1 | 39.7 | 11.2 | 1.80 | size |
+  | pig / bunny | 31.1 | 27.7 | 35.1 | 17.2 | 1.50 | size |
+  | pig / dog | 38.5 | 33.6 | 30.0 | 36.6 | 1.34 | both |
+  | hog / chick | 39.1 | 35.1 | 37.1 | 29.7 | 1.80 | both |
+  | hog / bunny | 12.0 | 12.0 | 11.1 | 9.1 | 1.50 | size |
+  | hog / dog | 21.8 | 16.8 | 11.8 | 22.2 | 1.34 | size |
+  | chick / bunny | 31.6 | 25.7 | 29.7 | 25.1 | 1.20 | colour |
+  | chick / dog | 49.9 | 51.0 | 48.0 | 47.0 | 1.34 | both |
+  | bunny / dog | 28.8 | 27.9 | 22.2 | 30.9 | 1.12 | colour |
+
+  ![Each animal at 64 px, in colour](img/animal-id-64px.png)
+  ![The same, simulated deuteranopia](img/animal-id-64px-deuteranopia.png)
 - **Rounded and chunky.** No thin details: no fence wire, no whiskers, no
   spindly legs. Legs and ears are stubs; roofs, troughs and eggs are fat.
 - **Low-poly, flat-shaded, palette-atlas textured** (not soft-textured). Why:
@@ -80,6 +120,22 @@ theme file **and** the 3D palette atlas are generated from the same list).
 | **plum** | `#5B4B8A` | UI accent 3: focus ring, secondary (white on it, 7.5:1) |
 | cream | `#FFF7E6` | cards, pad keys |
 | ink | `#2F2A26` | all text (13.3:1 on cream) |
+
+**Animal body colours** (§3). Kenney's atlas colour unless a tint is listed; a
+tint is multiplied into the GLB's material when it loads (`kenney-catalogue.ts`),
+so the files stay unmodified (ADR-0003). A multiply can only darken a texel.
+
+| Species | Body (as drawn) | Tint | Why |
+| --- | --- | --- | --- |
+| cow | `#dcdce9` white | — | |
+| pig | `#e38cb2` pink | — | |
+| hog | `#8e5f54` boar brown | `#b3ccff` | Kenney's hog brown is 9.7 from the pig under tritanopia |
+| chick | `#ffc256` yellow | — | |
+| bunny | `#b2633b` rust | `#d9ccb3` | Kenney's bunny brown is 16 from the chick under tritanopia, at nearly its size |
+| dog | `#525557` slate | `#66b3ff` | Kenney's dog is the bunny's brown (ΔE 0.5) at nearly its size |
+
+A tint also colours the whites of the eyes (the hog's and the dog's read pale
+blue); a body-only recolour would need a shader, not a tint.
 
 Rules that constrain it (`accessibility.md` §2):
 
@@ -169,7 +225,7 @@ keeper at 1.6 units? Measure draw calls and texture memory against
 1. Is a ≈ US$50 Synty purchase acceptable if the spike needs it, and are you
    comfortable with its EULA for a web-delivered game?
 2. Which is the oldest supported device? It fixes the texture and triangle
-   limits and the 64-px silhouette baseline.
+   limits and the 64-px identification baseline (§3).
 3. Landscape only for the alpha, or must portrait phones frame the farm too?
 4. Is the prototype keeper's cowboy hat canon? (your daughter's verdict decides.)
 5. Fantasy animals (Phase 6) — should the pack pick already weigh whether
