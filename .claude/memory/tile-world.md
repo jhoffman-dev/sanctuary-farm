@@ -2,9 +2,9 @@
 
 - **World = generate(seed, anchors) + overrides.** `buildTileWorld(spec, chunks)`
   is pure; `spec.rngFor` is an injected `RngFactory`. apps/web may import
-  only domain *types*, so its composition root passes its own mulberry32
-  (`composition/seeded-rng.ts`, tested draw-for-draw against `@sf/domain`'s
-  `createRng`); `@sf/world` tests use `seededRngFactory` from `test-fixtures.ts`. Never store generated
+  only domain *types*, so its composition root passes the domain's
+  `createRng` as re-exported by `@sf/application` (never a copy);
+  `@sf/world` tests use `seededRngFactory` from `test-fixtures.ts`. Never store generated
   tiles; store the seed, the chunk list and `layouts/overrides.json`.
 - **Grid:** `TILE_SIZE` 1 unit (Kenney kits are 1 × 1), `CHUNK_SIZE` 16. North
   is −Z; rotations are `QuarterTurns` clockwise from above.
