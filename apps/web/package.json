@@ -47,6 +47,7 @@
     "@sf/audio": "workspace:*",
     "@sf/domain": "workspace:*",
     "@sf/persistence": "workspace:*",
+    "@sf/world": "workspace:*",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "three": "^0.185.1"

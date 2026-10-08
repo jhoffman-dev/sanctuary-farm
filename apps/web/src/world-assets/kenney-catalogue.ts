@@ -1,5 +1,6 @@
-import { type Anchor, fitPiece, type NativeBounds, type PieceFit, type QuarterTurns, type Rest, scaleToHeight } from './piece-fit'
-import type { AnimalSpecies, KeeperVariant, PieceId } from './piece-kinds'
+import type { PieceId, QuarterTurns } from '@sf/world'
+import { type Anchor, fitPiece, type NativeBounds, type PieceFit, type Rest, scaleToHeight } from './piece-fit'
+import type { AnimalSpecies, KeeperVariant } from './piece-kinds'
 
 /**
  * Which Kenney GLB draws each piece kind, and how to sit it on the tile grid.
@@ -281,7 +282,7 @@ const HOTSPOTS = {
   'hotspot:farmhouse': STRUCTURES['building-wall-door'],
 }
 
-/** Keyed by the tile world's `PieceId` strings; retype as `Record<PieceId, …>` from `@sf/world` once SF-87 merges. */
+/** Keyed by the tile world's `PieceId`: a kind `@sf/world` adds fails the build until it is mapped here. */
 export const KENNEY_CATALOGUE: Readonly<Record<PieceId, PieceModel>> = {
   ...GROUND,
   ...AUTOTILES,

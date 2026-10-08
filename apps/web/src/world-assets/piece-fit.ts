@@ -4,13 +4,13 @@
  * is tested once and every entry derives its numbers the same way.
  */
 
+import type { QuarterTurns } from '@sf/world'
+
 export type Vec3 = readonly [number, number, number]
 
 /** Axis-aligned bounds of the whole GLB scene in its own units, read from its accessors. */
 export type NativeBounds = { readonly min: Vec3; readonly max: Vec3 }
 
-/** Quarter turns clockwise seen from above, the tile world's rotation unit. */
-export type QuarterTurns = 0 | 1 | 2 | 3
 
 /**
  * three.js turns counter-clockwise about +Y, so a clockwise quarter turn is a
