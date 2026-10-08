@@ -151,9 +151,30 @@ describe('App', () => {
 
     await user.click(screen.getByTestId('arrive-paddock'))
 
-    expect(screen.getByTestId('question')).toHaveTextContent(/\d+ × \d+ = \?/)
+    expect(await screen.findByTestId('question')).toHaveTextContent(/\d+ × \d+ = \?/)
     expect(screen.getByTestId('progress')).toHaveTextContent('Question 1 of 5')
     expect(screen.queryByTestId('start-paddock')).not.toBeInTheDocument()
+  })
+
+  it('opens practice on an arrival that lands while the mute setting is still saving', async () => {
+    const { game, saveStore } = playableGame()
+    const user = renderApp(game)
+    await screen.findByTestId('start-paddock')
+    let landSave = () => {}
+    const save = saveStore.save.bind(saveStore)
+    vi.spyOn(saveStore, 'save').mockImplementationOnce(
+      (farm) => new Promise<void>((resolve) => (landSave = () => void save(farm).then(resolve))),
+    )
+    const consoleError = vi.spyOn(console, 'error')
+
+    await user.click(screen.getByTestId('mute'))
+    await user.click(screen.getByTestId('arrive-paddock'))
+    expect(screen.queryByTestId('question')).not.toBeInTheDocument()
+    landSave()
+
+    expect(await screen.findByTestId('question')).toHaveTextContent(/\d+ × \d+ = \?/)
+    expect(saveStore.stored()?.settings.muted).toBe(true)
+    expect(consoleError).not.toHaveBeenCalled()
   })
 
   it('keeps the question on screen when the keeper arrives at the paddock mid-round', async () => {
@@ -175,7 +196,7 @@ describe('App', () => {
 
     await user.click(screen.getByTestId('arrive-barn'))
 
-    expect(screen.getByTestId('coming-soon')).toHaveTextContent('The barn is coming soon!')
+    expect(await screen.findByTestId('coming-soon')).toHaveTextContent('The barn is coming soon!')
     expect(screen.queryByTestId('question')).not.toBeInTheDocument()
     expect(game.roundProgress().total).toBe(0)
   })

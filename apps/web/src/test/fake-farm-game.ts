@@ -92,6 +92,8 @@ export function createFakeFarmGame(options: FakeFarmGameOptions): FakeFarmGame {
       calls.setMuted.push(muted)
       fake.summaryValue = { ...fake.summaryValue, muted }
     },
+    // The fake saves nothing, so there is never a save to wait for.
+    whenSaved: async () => undefined,
   }
   return fake
 }

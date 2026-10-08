@@ -36,15 +36,17 @@ export function App({ game, loadWorld }: AppProps) {
     (hotspot: HotspotId) => {
       // Before the farm has loaded there is no round to start; the keeper just stands there.
       if (!summary) return
-      try {
-        const outcome = arrivals.arriveAt(hotspot)
-        setComingSoon(outcome.kind === 'coming-soon' ? hotspot : null)
-        if (outcome.kind === 'practice' && outcome.started) setRoundsOpened((count) => count + 1)
-      } catch (error: unknown) {
-        // The game refuses a round while a save is still landing. Nothing is
-        // lost — the start button still works — so say so and carry on.
-        console.error('Could not open the paddock round on arrival', error)
-      }
+      arrivals.arriveAt(hotspot).then(
+        (outcome) => {
+          setComingSoon(outcome.kind === 'coming-soon' ? hotspot : null)
+          if (outcome.kind === 'practice' && outcome.started) setRoundsOpened((count) => count + 1)
+        },
+        (error: unknown) => {
+          // The arrival already waits out any save in flight, so this is a
+          // programming error. Nothing is lost — the start button still works.
+          console.error('Could not open the paddock round on arrival', error)
+        },
+      )
     },
     [arrivals, summary],
   )

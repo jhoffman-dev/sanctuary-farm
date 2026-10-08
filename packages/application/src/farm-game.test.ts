@@ -8,6 +8,7 @@ import {
 } from '@sf/domain'
 import { describe, expect, it } from 'vitest'
 import type { Question } from './read-models'
+import { PADDOCK_ROUND } from './round-presets'
 import { harness } from './test-fakes'
 
 const FLUENT_MS = 1500
@@ -397,5 +398,47 @@ describe('setMuted', () => {
     expect(audio.isMuted()).toBe(false)
     expect(saveStore.stored()?.settings).toEqual({ muted: false, maxTable: 12 })
     expect(saveStore.saved).toHaveLength(2)
+  })
+})
+
+describe('whenSaved', () => {
+  it('resolves at once when nothing is saving', async () => {
+    const { game } = await loadedGame()
+
+    await expect(game.whenSaved()).resolves.toBeUndefined()
+  })
+
+  it('waits for every save queued so far, so a round can start straight after', async () => {
+    const { game, saveStore } = await loadedGame()
+    void game.setMuted(true)
+    void game.setMuted(false)
+
+    await game.whenSaved()
+
+    expect(saveStore.saved).toHaveLength(2)
+    expect(() => game.startRound(PADDOCK_ROUND)).not.toThrow()
+  })
+
+  it('also waits for a save queued while it was waiting', async () => {
+    const { game, saveStore } = await loadedGame()
+    const first = game.setMuted(true)
+    const waiting = game.whenSaved()
+    void first.then(() => game.setMuted(false))
+
+    await waiting
+
+    expect(saveStore.saved).toHaveLength(2)
+    expect(game.summary().muted).toBe(false)
+  })
+
+  it('resolves, not rejects, when the save it waited for failed', async () => {
+    const { game, saveStore } = await loadedGame()
+    saveStore.save = async () => {
+      throw new Error('disk full')
+    }
+    const saving = game.setMuted(true)
+
+    await expect(game.whenSaved()).resolves.toBeUndefined()
+    await expect(saving).rejects.toThrow('disk full')
   })
 })

@@ -19,17 +19,22 @@ const PRACTICE_PLACE = 'paddock'
 
 export type HotspotArrivals = {
   /**
-   * The keeper has stopped at `place`. Starts the paddock round through the
-   * game when none is running; throws what `FarmGame.startRound` throws (a
-   * save still in progress).
+   * The keeper has stopped at `place`. At the paddock, waits for any save
+   * still landing (a mute toggle, the last answer) and then starts the round
+   * when none is running. Rejects with what `FarmGame.startRound` throws
+   * otherwise (the farm not loaded).
    */
-  arriveAt(place: string): ArrivalOutcome
+  arriveAt(place: string): Promise<ArrivalOutcome>
 }
 
-export function createHotspotArrivals(game: Pick<FarmGame, 'startRound' | 'roundProgress'>): HotspotArrivals {
+export function createHotspotArrivals(
+  game: Pick<FarmGame, 'startRound' | 'roundProgress' | 'whenSaved'>,
+): HotspotArrivals {
   return {
-    arriveAt(place) {
+    async arriveAt(place) {
       if (place !== PRACTICE_PLACE) return { kind: 'coming-soon', place }
+      await game.whenSaved()
+      // Checked after the wait: the start button may have opened a round meanwhile.
       // An active round reports its planned total; an idle game reports 0 of 0.
       if (game.roundProgress().total > 0) return { kind: 'practice', started: false }
       game.startRound(PADDOCK_ROUND)

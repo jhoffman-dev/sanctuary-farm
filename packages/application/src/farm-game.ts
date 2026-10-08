@@ -62,6 +62,12 @@ export interface FarmGame {
   endRound(): Promise<SessionLog>
   buyFeed(): Promise<BuyFeedOutcome>
   setMuted(muted: boolean): Promise<void>
+  /**
+   * Resolves once no save is in progress — every persisting call queued so
+   * far has landed or failed — so `startRound` can follow it directly. Never
+   * rejects: a failed save is its own caller's to handle.
+   */
+  whenSaved(): Promise<void>
 }
 
 /** The farm and round as they will stand once the store has accepted the farm. */
@@ -109,6 +115,13 @@ export function createFarmGame({ saveStore, clock, rng, audio }: FarmGameDeps): 
     }
     queue = result.then(settle, settle)
     return result
+  }
+
+  async function whenSaved(): Promise<void> {
+    // The queue itself never rejects (see serialized).
+    await queue
+    // Another save may have joined the queue while that one landed.
+    if (pendingMutations > 0) await whenSaved()
   }
 
   function requireFarm(): FarmSave {
@@ -249,5 +262,6 @@ export function createFarmGame({ saveStore, clock, rng, audio }: FarmGameDeps): 
     endRound,
     buyFeed,
     setMuted,
+    whenSaved,
   }
 }

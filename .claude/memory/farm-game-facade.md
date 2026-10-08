@@ -27,6 +27,10 @@ easy to get wrong when wiring it:
   propagates. These calls are serialised. Because `startRound` is
   synchronous and unsaved, it throws `a save is still in progress` if called
   while one of those promises is pending — always `await` them first.
+  When the caller does not hold those promises (the keeper arriving at the
+  paddock just after a mute toggle), `await game.whenSaved()` first: it
+  resolves once nothing is queued, never rejects, and `createHotspotArrivals`
+  uses it so an arrival mid-save still opens practice (SF-89).
 - **A backwards clock grades as SLOW, not FLUENT.** `now < servedAt` means the
   real latency is unknown; the facade substitutes `FLUENT_MAX_MS` (game rule:
   latency drives mastery, so no free fluency / 2 coins). A stalled clock (0 ms)
