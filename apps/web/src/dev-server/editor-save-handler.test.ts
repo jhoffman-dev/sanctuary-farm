@@ -134,7 +134,7 @@ describe('handleEditorSave', () => {
       JSON.stringify({
         schemaVersion: 1,
         // Sizes differ by save, so an in-place write over a longer one would leave a torn tail.
-        edits: Array.from({ length: (12 - save) * 150 }, (_, at) => ({ op: 'remove-decor', at: { x: at, z: save } })),
+        edits: Array.from({ length: (12 - save) * 150 }, (_edit, at) => ({ op: 'remove-decor', at: { x: at, z: save } })),
       }),
     )
     const answers = await Promise.all(bodies.map((body) => post('/__editor/overrides', body)))

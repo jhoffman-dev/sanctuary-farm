@@ -2,7 +2,7 @@ import type { Chunk, PlacedHotspot, Tile } from '@sf/world'
 import { CHUNK_SIZE } from '@sf/world'
 import { describe, expect, it } from 'vitest'
 import type { PieceFit } from '../world-assets'
-import { footprintCentre, groupPieces, hotspotMarkers, keepUnchangedGroups, pieceTransform } from './piece-placement'
+import { footprintCentre, groupPieces, hotspotMarkers, keepUnchangedGroups, pieceGroupKeeper, pieceTransform } from './piece-placement'
 
 const fit = (overrides: Partial<PieceFit> = {}): PieceFit => ({
   rotationOffset: 0,
@@ -147,5 +147,12 @@ describe('keepUnchangedGroups', () => {
     const after = keepUnchangedGroups(before, turned)
     expect(after).toEqual(turned)
     expect(after[0]?.placements).not.toBe(before[0]?.placements)
+  })
+
+  it('remembers what it returned last, for a component to keep across renders', () => {
+    const keep = pieceGroupKeeper()
+    const first = keep(groupPieces([chunkWith(0, 0, { 1: fence })]))
+    const again = keep(groupPieces([chunkWith(0, 0, { 1: fence })]))
+    expect(again[0]?.placements).toBe(first[0]?.placements)
   })
 })
