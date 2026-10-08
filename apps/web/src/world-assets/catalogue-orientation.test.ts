@@ -36,12 +36,20 @@ describe('catalogue orientation at rotation 0', () => {
     for (const [x] of vertices) expect(Math.abs(x)).toBeLessThan(0.05)
   })
 
-  it('fence:corner hugs the south and west edges, so its ends head north and east', () => {
-    // An edge-fence arc from Fantasy Town: it joins north and east, but 0.46
-    // off the centre line — which is why the entry is a placeholder.
+  it('fence:corner meets the centre lines of its north and east neighbours, where the straights run', () => {
+    // Fantasy Town's arc is an edge fence 0.46 off the centre line; shifted
+    // onto the centre lines its ends overlap the neighbouring straights, so a
+    // pen corner joins instead of leaving a gap.
     const vertices = placed(KENNEY_CATALOGUE['fence:corner'])
-    expect(mean(vertices.map(([x]) => x))).toBeLessThan(0)
-    expect(mean(vertices.map(([, , z]) => z))).toBeGreaterThan(0)
+    const northmost = Math.min(...vertices.map(([, , z]) => z))
+    const eastmost = Math.max(...vertices.map(([x]) => x))
+    const northEnd = vertices.filter(([, , z]) => z < northmost + 0.02)
+    const eastEnd = vertices.filter(([x]) => x > eastmost - 0.02)
+    expect(Math.abs(mean(northEnd.map(([x]) => x)))).toBeLessThan(0.01)
+    expect(Math.abs(mean(eastEnd.map(([, , z]) => z)))).toBeLessThan(0.01)
+    // The arc bows towards the south-west, so the pen's inside is north-east.
+    expect(mean(vertices.map(([x]) => x))).toBeGreaterThan(0)
+    expect(mean(vertices.map(([, , z]) => z))).toBeLessThan(0)
   })
 
   it.each(['building-wall', 'building-wall-door', 'building-wall-window', 'hotspot:barn'] as const)(
