@@ -11,6 +11,8 @@ const DRAW_CALL_TARGET = 100
 const DRAW_CALL_CEILING = 150
 const WORLD_READY_MS = 30_000
 const WALK_MS = 15_000
+/** Two cold world loads plus a walk; a cold headless browser on a loaded machine needs the room. */
+const LONG_TEST_MS = 90_000
 
 type Reading = { drawCalls: number; fps: number }
 
@@ -66,6 +68,7 @@ test.describe('quality tiers at 1280 × 800', () => {
   })
 
   test('the low tier draws under the draw-call target, and fewer than the high tier', async ({ page }) => {
+    test.setTimeout(LONG_TEST_MS)
     await page.goto('/?perf=1&quality=high')
     const high = await settledReading(page)
     await page.goto('/?perf=1&quality=low')
@@ -83,6 +86,7 @@ test.describe('quality tiers at 1280 × 800', () => {
   })
 
   test('the low tier rests on demand, draws every frame while the keeper walks, and rests again', async ({ page }) => {
+    test.setTimeout(LONG_TEST_MS)
     await page.goto('/?perf=1&quality=low')
     const scene = page.getByTestId('scene')
     await expect(page.getByTestId('keeper-probe')).toHaveAttribute('data-tile', /-?\d+,-?\d+/, { timeout: WORLD_READY_MS })
