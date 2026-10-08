@@ -1,9 +1,10 @@
 # `@sf/world` tile world (SF-87, issue #118, ADR-0005)
 
 - **World = generate(seed, anchors) + overrides.** `buildTileWorld(spec, chunks)`
-  is pure; `spec.rngFor` is an injected `RngFactory` (the composition root
-  passes `@sf/domain`'s `createRng` — `@sf/world` may not import domain, so
-  tests use `seededRngFactory` from `test-fixtures.ts`). Never store generated
+  is pure; `spec.rngFor` is an injected `RngFactory`. apps/web may import
+  only domain *types*, so its composition root passes its own mulberry32
+  (`composition/seeded-rng.ts`, tested draw-for-draw against `@sf/domain`'s
+  `createRng`); `@sf/world` tests use `seededRngFactory` from `test-fixtures.ts`. Never store generated
   tiles; store the seed, the chunk list and `layouts/overrides.json`.
 - **Grid:** `TILE_SIZE` 1 unit (Kenney kits are 1 × 1), `CHUNK_SIZE` 16. North
   is −Z; rotations are `QuarterTurns` clockwise from above.
@@ -19,3 +20,13 @@
 - **No file paths in `@sf/world`.** The `apps/web` adapter maps `PieceId`
   (`'fence:corner'`, `'hotspot:barn'`, …) to Kenney GLBs; type that map as
   `Record<PieceId, string>` so a new kind fails the build until mapped.
+- **Rendering (SF-75, `apps/web/src/scene/`).** The world is built once, in
+  the lazy `build-farm-world` chunk, and handed to `FarmScene`. Ground is one
+  vertex-coloured mesh per chunk (`ground-surface.ts`) — paths and water are
+  colours/heights in it, never Kenney models (patches leave gaps, road tiles
+  seam). Structures and decor are one `InstancedMesh` per `PieceId` for the
+  *whole world*, not per chunk: draw calls are the budget line we hit first.
+  Hotspot markers are drawn only on `open` footprints; fenced/building ones
+  are marked by their gate/door. `?perf=1` publishes draw calls, FPS and
+  hotspot screen positions as `data-*` on `[data-testid=perf-probe]`;
+  `?view=overview|paddock-corner` cameras exist in dev builds only.

@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './App'
 import { createGame } from './composition/create-game'
+import { loadFarmWorld } from './composition/load-farm-world'
 import { isAssetCatalogueRoute } from './scene/asset-catalogue-route'
 import { LazyAssetCatalogue } from './scene/LazyAssetCatalogue'
 import './index.css'
@@ -14,5 +15,5 @@ if (!root) throw new Error('index.html is missing the #root element')
 const showAssetCatalogue = import.meta.env.DEV && isAssetCatalogueRoute(window.location.search)
 
 createRoot(root).render(
-  <StrictMode>{showAssetCatalogue ? <LazyAssetCatalogue /> : <App game={createGame()} />}</StrictMode>,
+  <StrictMode>{showAssetCatalogue ? <LazyAssetCatalogue /> : <App game={createGame()} loadWorld={loadFarmWorld} />}</StrictMode>,
 )

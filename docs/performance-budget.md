@@ -107,7 +107,10 @@ Target is what we build to; ceiling fails the gate or blocks a merge.
 chunk is `FarmScene-*.js` because `scene/LazyFarmScene.tsx` imports
 `./FarmScene`. The `?assets=1` catalogue (SF-82) also lazy-loads three, but it
 exists in dev builds only (SF-75), so in production three + r3f stay inside
-`FarmScene-*.js`. If the name ever changes, `size-limit` fails on the
+`FarmScene-*.js`. Since SF-75 the world line also sums the tile world it draws:
+`@sf/world` in `tile-world-*.js` (named in `vite.config.ts`) and the composition
+root's `build-farm-world-*.js`, both fetched with the scenery, never with the
+shell. If a name ever changes, `size-limit` fails on the
 unmatched path rather than silently measuring less. The limits are this doc's **ceilings**, not its targets, so the
 gate fails on a regression and a merge is still the place to argue about a
 number between target and ceiling:

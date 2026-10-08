@@ -10,5 +10,13 @@ export default defineConfig({
     // `pnpm size`; this only stops a raw-byte warning about a chunk we already
     // measure. Keep it just above the world chunk so a new dependency still shouts.
     chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        // `@sf/world` (generator + layouts) is shared by the world chunk and the
+        // world-building chunk; left to itself the bundler names it after its
+        // directory (`src-*.js`). A fixed name keeps the size-limit path stable.
+        manualChunks: (id) => (id.includes('/packages/world/') ? 'tile-world' : undefined),
+      },
+    },
   },
 })

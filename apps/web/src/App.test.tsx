@@ -58,8 +58,11 @@ function playableGame(): { game: FarmGame; audio: RecordingAudioBus; saveStore: 
   return { game, audio, saveStore }
 }
 
+/** The scene is mocked out above, so the world is never asked for. */
+const unusedWorldLoader = () => new Promise<never>(() => {})
+
 function renderApp(game: FarmGame) {
-  render(<App game={game} />)
+  render(<App game={game} loadWorld={unusedWorldLoader} />)
   return userEvent.setup()
 }
 

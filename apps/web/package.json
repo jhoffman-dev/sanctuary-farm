@@ -20,8 +20,12 @@
       "gzip": true
     },
     {
-      "name": "world (three, r3f, the farm scene)",
-      "path": "dist/assets/FarmScene-*.js",
+      "name": "world (three, r3f, the farm scene, the tile-world generator)",
+      "path": [
+        "dist/assets/FarmScene-*.js",
+        "dist/assets/tile-world-*.js",
+        "dist/assets/build-farm-world-*.js"
+      ],
       "limit": "350 kB",
       "gzip": true
     },
