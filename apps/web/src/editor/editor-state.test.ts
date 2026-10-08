@@ -1,4 +1,4 @@
-import { type Tile, type TileCoord, type TileWorld, hotspotAt, tileOf, tilesOfChunk } from '@sf/world'
+import { CHUNK_SIZE, type Tile, type TileCoord, type TileWorld, chunkOf, hotspotAt, tileOf, tilesOfChunk } from '@sf/world'
 import { describe, expect, it } from 'vitest'
 import { type EditorAction, type EditorState, createEditorReducer, initialEditorState, pendingChanges } from './editor-state'
 import { testSession } from './test-fixtures'
@@ -44,6 +44,23 @@ describe('the editor reducer', () => {
     expect(tileOf(undone.world, first)?.ground.kind).toBe('grass')
     expect(pendingChanges(undone)).toBe(0)
     expect(tileOf(reduce(undone, { type: 'redo' }).world, first)?.ground.kind).toBe('dirt')
+  })
+
+  it('rebuilds only the painted chunk, keeping every other chunk object as it was', () => {
+    // A tile off the chunk's edges: its neighbours, which autotile against it, are all in its own chunk.
+    const interior = bareGrassTiles(start.world, 2000).find((at) => {
+      const local = { x: at.x - chunkOf(at).cx * CHUNK_SIZE, z: at.z - chunkOf(at).cz * CHUNK_SIZE }
+      return local.x > 0 && local.z > 0 && local.x < CHUNK_SIZE - 1 && local.z < CHUNK_SIZE - 1
+    })
+    if (!interior) throw new Error('no interior bare grass tile in the test farm')
+    const painted = run(dirt, { type: 'apply-tool', at: interior, continuing: false })
+    expect(tileOf(painted.world, interior)?.ground.kind).toBe('dirt')
+    const edited = chunkOf(interior)
+    painted.world.chunks.forEach((chunk, index) => {
+      const sameAsBefore = chunk === start.world.chunks[index]
+      expect(sameAsBefore, `chunk ${chunk.coord.cx},${chunk.coord.cz}`).toBe(!(chunk.coord.cx === edited.cx && chunk.coord.cz === edited.cz))
+    })
+    expect(painted.world.hotspots).toBe(start.world.hotspots)
   })
 
   it('makes one drag one undo step', () => {
