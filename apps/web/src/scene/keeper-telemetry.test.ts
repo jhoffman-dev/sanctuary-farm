@@ -32,3 +32,26 @@ describe('KeeperTelemetry', () => {
     expect(telemetry.clipsSeen.at(-1)).toBe('idle')
   })
 })
+
+describe('KeeperTelemetry, facing and cues', () => {
+  it('follows which way the keeper faces', () => {
+    const telemetry = new KeeperTelemetry({ x: 0, z: 0 })
+    expect(telemetry.yaw).toBe(0)
+    telemetry.turnedTo(1.25)
+    expect(telemetry.yaw).toBe(1.25)
+  })
+
+  it('shows a cue while it lasts and counts every cue shown', () => {
+    const telemetry = new KeeperTelemetry({ x: 0, z: 0 })
+    expect(telemetry.cue).toBeNull()
+    expect(telemetry.cuesShown).toBe(0)
+
+    telemetry.cueing({ x: 30, z: 2 })
+    expect(telemetry.cue).toEqual({ x: 30, z: 2 })
+    telemetry.cueing(null)
+    telemetry.cueing({ x: 31, z: 2 })
+
+    expect(telemetry.cue).toEqual({ x: 31, z: 2 })
+    expect(telemetry.cuesShown).toBe(2)
+  })
+})

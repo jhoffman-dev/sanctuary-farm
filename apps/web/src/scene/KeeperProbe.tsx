@@ -1,5 +1,5 @@
 import { useFrame } from '@react-three/fiber'
-import { tileAt } from '@sf/world'
+import { type TileCoord, tileAt } from '@sf/world'
 import { type RefObject, useRef } from 'react'
 import { Matrix4 } from 'three'
 import type { KeeperTelemetry } from './keeper-telemetry'
@@ -17,10 +17,15 @@ function rounded(value: number): string {
   return value.toFixed(3)
 }
 
+function tileText(tile: TileCoord | null): string {
+  return tile ? `${tile.x},${tile.z}` : ''
+}
+
 /**
- * `?perf=1`: puts the keeper's position, tile, clip and destination on the
- * DOM, with the camera's view-projection matrix so a browser test can turn a
- * tile into a point to tap — how Playwright reads a WebGL scene (ADR-0004).
+ * `?perf=1`: puts the keeper's position, facing, tile, clip, destination
+ * and any "can't get there" cue on the DOM, with the camera's ground
+ * position and view-projection matrix so a browser test can turn a tile into
+ * a point to tap — how Playwright reads a WebGL scene (ADR-0004).
  */
 export function KeeperProbe({ target, telemetry }: KeeperProbeProps) {
   const sinceLast = useRef(0)
@@ -30,11 +35,12 @@ export function KeeperProbe({ target, telemetry }: KeeperProbeProps) {
     const element = target.current
     if (!element) return
     sinceLast.current += delta
-    const { position, destination, clip, clipsSeen } = telemetry
+    const { position, destination, clip, clipsSeen, yaw, cue, cuesShown } = telemetry
     const tile = tileAt([position.x, position.z])
-    // A change of tile, clip or destination is published at once: under reduced
-    // motion the loop draws on demand, and the frame that arrives may be the last.
-    const signature = `${tile.x},${tile.z}|${clip}|${destination ? `${destination.x},${destination.z}` : ''}`
+    // A change of tile, clip, destination, cue or (coarse) facing is published at
+    // once: under reduced motion the loop draws on demand, and the frame that
+    // arrives or finishes turning may be the last.
+    const signature = `${tile.x},${tile.z}|${clip}|${tileText(destination)}|${tileText(cue)}|${cuesShown}|${yaw.toFixed(1)}`
     if (sinceLast.current < PUBLISH_EVERY_SECONDS && signature === lastPublished.current) return
     sinceLast.current = 0
     lastPublished.current = signature
@@ -45,7 +51,11 @@ export function KeeperProbe({ target, telemetry }: KeeperProbeProps) {
       tile: `${tile.x},${tile.z}`,
       clip,
       clipsSeen: clipsSeen.join(','),
-      destination: destination ? `${destination.x},${destination.z}` : '',
+      destination: tileText(destination),
+      yaw: rounded(yaw),
+      cue: tileText(cue),
+      cuesShown: String(cuesShown),
+      camera: `${rounded(camera.position.x)},${rounded(camera.position.z)}`,
       viewProjection: JSON.stringify(viewProjection.current.elements.map((value) => Number(value.toFixed(6)))),
       viewport: `${size.width}x${size.height}`,
     })

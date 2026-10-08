@@ -54,7 +54,8 @@ export function yawFacing(direction: GroundPoint): number {
   return Math.atan2(-direction.x, -direction.z)
 }
 
-function turnToward(current: number, desired: number, maxTurn: number): number {
+/** `current` turned toward `desired` the short way round, by at most `maxTurn`. */
+export function turnToward(current: number, desired: number, maxTurn: number): number {
   const turn = shortestTurn(current, desired)
   return current + Math.sign(turn) * Math.min(Math.abs(turn), maxTurn)
 }

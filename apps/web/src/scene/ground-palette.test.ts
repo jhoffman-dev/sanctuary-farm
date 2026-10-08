@@ -1,19 +1,9 @@
 import type { GroundPiece } from '@sf/world'
 import { describe, expect, it } from 'vitest'
-import type { Rgb } from './ground-surface'
+import { contrast } from '../test/contrast'
 import { surfaceOf } from './ground-palette'
 
 const PATH: GroundPiece = { kind: 'path', role: 'straight', rotation: 0 }
-
-/** WCAG relative luminance from the linear channels a vertex colour holds. */
-function luminance([r, g, b]: Rgb): number {
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b
-}
-
-function contrast(one: Rgb, other: Rgb): number {
-  const [light, dark] = [luminance(one), luminance(other)].sort((a, b) => b - a) as [number, number]
-  return (light + 0.05) / (dark + 0.05)
-}
 
 /** Far enough apart in lightness to tell apart without relying on hue (colour-blind-safe, CLAUDE.md rule 8). */
 const DISTINCT = 1.4

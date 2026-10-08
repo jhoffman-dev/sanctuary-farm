@@ -12,6 +12,9 @@ export class KeeperTelemetry {
   #position: GroundPoint
   #clip: LocomotionClip = 'idle'
   #destination: TileCoord | null = null
+  #yaw = 0
+  #cue: TileCoord | null = null
+  #cuesShown = 0
   readonly #clipsSeen: LocomotionClip[] = ['idle']
 
   constructor(position: GroundPoint) {
@@ -31,6 +34,21 @@ export class KeeperTelemetry {
     return this.#destination
   }
 
+  /** Radians about +Y, as `KeeperWalk.yaw`. */
+  get yaw(): number {
+    return this.#yaw
+  }
+
+  /** The tile showing the "can't get there" cue, while it shows. */
+  get cue(): TileCoord | null {
+    return this.#cue
+  }
+
+  /** How many cues have been shown, so a test cannot miss one that came and went between two looks. */
+  get cuesShown(): number {
+    return this.#cuesShown
+  }
+
   /** Each clip change in order, e.g. idle → walk → idle; only the most recent are kept. */
   get clipsSeen(): readonly LocomotionClip[] {
     return this.#clipsSeen
@@ -42,6 +60,15 @@ export class KeeperTelemetry {
 
   headingFor(destination: TileCoord | null): void {
     this.#destination = destination
+  }
+
+  turnedTo(yaw: number): void {
+    this.#yaw = yaw
+  }
+
+  cueing(tile: TileCoord | null): void {
+    this.#cue = tile
+    if (tile) this.#cuesShown += 1
   }
 
   playing(clip: LocomotionClip): void {

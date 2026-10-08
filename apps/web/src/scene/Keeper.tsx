@@ -1,5 +1,5 @@
 import { useFrame, useThree } from '@react-three/fiber'
-import { KEEPER_SPEED, type TileCoord, type TileWorld, planWalk, tileAt, tileCentre } from '@sf/world'
+import { hotspotArrivedAt, KEEPER_SPEED, type TileCoord, type TileWorld, tileAt, tileCentre } from '@sf/world'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimationMixer, type Group, type Object3D } from 'three'
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js'
@@ -7,11 +7,13 @@ import type { PieceModel } from '../world-assets'
 import { HOME_VIEW } from './camera-views'
 import { ClipCrossfade } from './clip-crossfade'
 import { findClipNamed } from './idle-clip'
+import { turnOnTheSpot, yawTowardCamera } from './keeper-facing'
 import { clipFor, followRoute, type KeeperWalk, stepWalk } from './keeper-walk'
 import type { KeeperTelemetry } from './keeper-telemetry'
 import { cameraForward, heldDirection, routeForKeys } from './keyboard-step'
 import { PlacedPiece } from './PlacedPiece'
-import { TargetMarker } from './TargetMarker'
+import { respondToTap } from './tap-response'
+import { TargetMarker, UnreachableCue } from './TargetMarker'
 import { useGroundTaps } from './use-ground-taps'
 import { useHeldKeys } from './use-held-keys'
 
@@ -27,6 +29,9 @@ type KeeperProps = {
   /** The keeper has stopped walking, on this tile. */
   onStopped: (tile: TileCoord) => void
 }
+
+/** A cue on screen; `id` restarts it when the same tile is tapped again. */
+type Cue = { readonly tile: TileCoord; readonly id: number }
 
 /** Keys walk screen-relative to the game's one camera; following only slides it, never turns it. */
 const FORWARD = cameraForward(HOME_VIEW)
@@ -66,25 +71,56 @@ export function Keeper({ world, model, scene, start, reducedMotion, telemetry, o
   const body = useRef<Group>(null)
   const walk = useRef(start)
   const steeredByKeys = useRef(false)
+  /** The yaw to turn to on the spot after arriving at a hotspot; null when not turning. */
+  const facing = useRef<number | null>(null)
   const [destination, setDestination] = useState<TileCoord | null>(null)
+  const [cue, setCue] = useState<Cue | null>(null)
+  const camera = useThree((state) => state.camera)
   const invalidate = useThree((state) => state.invalidate)
   const held = useHeldKeys(invalidate)
 
   const onTap = useCallback(
     (tapped: TileCoord) => {
       const here = tileAt([walk.current.position.x, walk.current.position.z])
-      const route = planWalk(world, here, tapped)
-      if (!route) return
-      walk.current = followRoute(walk.current, route)
-      steeredByKeys.current = false
-      const goal = route.at(-1) ?? null
-      telemetry.headingFor(goal)
-      setDestination(goal)
+      const response = respondToTap({ world, from: here, tapped })
+      if (response.kind === 'unreachable') {
+        telemetry.cueing(response.tapped)
+        setCue((shown) => ({ tile: response.tapped, id: (shown?.id ?? 0) + 1 }))
+      } else {
+        walk.current = followRoute(walk.current, response.route)
+        steeredByKeys.current = false
+        facing.current = null
+        telemetry.headingFor(response.goal)
+        setDestination(response.goal)
+      }
       invalidate()
     },
     [world, telemetry, invalidate],
   )
   useGroundTaps(onTap)
+
+  const onCueDone = useCallback(() => {
+    telemetry.cueing(null)
+    setCue(null)
+    // One more frame on an on-demand loop, so the cue's last fade is drawn away and the probe sees it end.
+    invalidate()
+  }, [telemetry, invalidate])
+
+  /** Arriving at a hotspot, she turns to look out at the player as the panel opens. */
+  function faceCameraIfArrived(tile: TileCoord) {
+    if (!hotspotArrivedAt(world, tile)) return
+    const { position, yaw } = walk.current
+    facing.current = yawTowardCamera({ keeper: position, camera: { x: camera.position.x, z: camera.position.z }, current: yaw })
+  }
+
+  /** True on every frame she turned, the last one included. */
+  function turnToFace(delta: number): boolean {
+    if (facing.current === null || walk.current.waypoints.length > 0) return false
+    const turn = turnOnTheSpot({ yaw: walk.current.yaw, desired: facing.current, delta, reducedMotion })
+    walk.current = { ...walk.current, yaw: turn.yaw }
+    if (turn.done) facing.current = null
+    return true
+  }
 
   function stepByKeys(): boolean {
     const screen = heldDirection(held.current)
@@ -94,6 +130,7 @@ export function Keeper({ world, model, scene, start, reducedMotion, telemetry, o
     if (!route) return false
     walk.current = followRoute(walk.current, route)
     steeredByKeys.current = true
+    facing.current = null
     telemetry.headingFor(null)
     setDestination(null)
     return true
@@ -105,20 +142,24 @@ export function Keeper({ world, model, scene, start, reducedMotion, telemetry, o
     const step = stepWalk(walk.current, { delta, speed: KEEPER_SPEED })
     walk.current = step.walk
     if (step.arrived && !stepByKeys()) {
+      const stoppedOn = tileAt([step.walk.position.x, step.walk.position.z])
       telemetry.headingFor(null)
       setDestination(null)
-      onStopped(tileAt([step.walk.position.x, step.walk.position.z]))
+      faceCameraIfArrived(stoppedOn)
+      onStopped(stoppedOn)
     }
+    const turning = turnToFace(delta)
     const clip = clipFor(step.speed, reducedMotion)
     crossfade.fadeTo(clip)
     // Reduced motion holds the pose instead of playing it (game rule 8).
     mixer.update(reducedMotion ? 0 : delta)
     body.current?.position.set(step.walk.position.x, 0, step.walk.position.z)
-    body.current?.rotation.set(0, step.walk.yaw, 0)
+    body.current?.rotation.set(0, walk.current.yaw, 0)
     telemetry.movedTo(step.walk.position)
+    telemetry.turnedTo(walk.current.yaw)
     telemetry.playing(clip)
-    // One more frame after arriving, so everything that reads the keeper sees it stopped.
-    if (walk.current.waypoints.length > 0 || step.arrived) invalidate()
+    // One more frame after arriving or turning, so everything that reads the keeper sees it settled.
+    if (walk.current.waypoints.length > 0 || step.arrived || turning) invalidate()
   })
 
   return (
@@ -127,6 +168,7 @@ export function Keeper({ world, model, scene, start, reducedMotion, telemetry, o
         <PlacedPiece model={model} object={object} position={[0, 0, 0]} />
       </group>
       {destination && <TargetMarker at={tileCentre(destination)} />}
+      {cue && <UnreachableCue key={cue.id} at={tileCentre(cue.tile)} reducedMotion={reducedMotion} onDone={onCueDone} />}
     </>
   )
 }
