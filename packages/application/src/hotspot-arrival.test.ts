@@ -45,11 +45,17 @@ describe('arriving at a hotspot', () => {
     },
   )
 
-  it('passes on the game’s refusal when a save is still in progress', async () => {
-    const { game, arrivals } = await loadedArrivals()
+  // Arriving just after toggling mute used to hit startRound's "save still in
+  // progress" guard, and the keeper stood at the gate with nothing opening.
+  it('waits for a save still landing, then opens practice', async () => {
+    const { game, arrivals, saveStore } = await loadedArrivals()
     const saving = game.setMuted(true)
 
-    expect(() => arrivals.arriveAt('paddock')).toThrow(/save is still in progress/)
+    const arriving = arrivals.arriveAt('paddock')
+
+    await expect(arriving).resolves.toEqual({ kind: 'practice', started: true })
     await saving
+    expect(saveStore.stored()?.settings.muted).toBe(true)
+    expect(game.roundProgress()).toEqual({ asked: 1, total: PADDOCK_ROUND.questions, complete: false })
   })
 })
