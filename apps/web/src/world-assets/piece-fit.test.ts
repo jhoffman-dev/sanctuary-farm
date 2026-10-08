@@ -42,6 +42,20 @@ describe('fitPiece', () => {
   })
 })
 
+describe('fitPiece shift', () => {
+  it('moves the placed model by the shift in world terms, whatever the catalogue turn', () => {
+    for (const quarterTurns of [0, 1, 2, 3] as const) {
+      const fit = fitPiece({ bounds: { min: [0, 0, 0], max: [1, 1, 1] }, scale: 1, quarterTurns, rest: 'base', anchor: 'origin', shift: { x: 0.3, z: -0.2 } })
+      // Where the model's origin lands: its offset turned through rotationOffset, as PlacedPiece does.
+      const cos = Math.cos(fit.rotationOffset)
+      const sin = Math.sin(fit.rotationOffset)
+      const { x, z } = fit.modelOffset
+      expect(x * cos + z * sin).toBeCloseTo(0.3, 12)
+      expect(-x * sin + z * cos).toBeCloseTo(-0.2, 12)
+    }
+  })
+})
+
 describe('scaleToHeight', () => {
   it('scales a model to the target height whatever its base', () => {
     expect(scaleToHeight({ min: [0, -2, 0], max: [1, 2, 1] }, 1.6)).toBeCloseTo(0.4, 12)
