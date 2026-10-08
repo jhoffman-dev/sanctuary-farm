@@ -5,7 +5,10 @@ import type { Rgb, Surface } from './ground-surface'
 /**
  * Ground colours, sampled from the Kenney atlases under each kit's own ground
  * piece so the surface matches the models standing on it: Mini Forest's
- * `patch-grass` and `patch-dirt`, Fantasy Town's `road`. Paths are coloured
+ * `patch-grass` and `patch-dirt`. Paths are Fantasy Town's light sand swatch
+ * (`#f1d0b1`), not its blue-grey `road`, which read as canals beside the grass
+ * (PR #121): packed earth, warm and lighter than both grass and the dirt pens,
+ * so a path reads as walkable by lightness alone. Paths are coloured
  * into the surface rather than drawn as `road` models: the road tiles showed a
  * seam at every tile edge and cost a draw (and a shadow draw) per chunk. Water
  * has no atlas piece in these kits (ADR-0003 gap), so it is a calm blue-green.
@@ -13,7 +16,7 @@ import type { Rgb, Surface } from './ground-surface'
 const GROUND_HEX = {
   grass: '#76bc88',
   dirt: '#ea9168',
-  path: '#a0a8c9',
+  path: '#f1d0b1',
   water: '#5fb7b0',
 } as const satisfies Record<GroundPiece['kind'], string>
 
