@@ -3,7 +3,7 @@
  * The save endpoint against the real filesystem: a POST round-trips to a file
  * in a temporary layouts directory, and every refusal leaves the file alone.
  */
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -127,6 +127,32 @@ describe('handleEditorSave', () => {
   it('accepts a save with no Origin: browsers always send one on POST, so that is a local tool, not a page', async () => {
     const { answer } = await post('/__editor/overrides', VALID, [], { host: DEV_HOST, 'content-type': 'application/json' })
     expect(answer.status).toBe(200)
+  })
+
+  it('serialises overlapping saves: the file is whole and holds the save that arrived last', async () => {
+    const bodies = Array.from({ length: 12 }, (_, save) =>
+      JSON.stringify({
+        schemaVersion: 1,
+        // Sizes differ by save, so an in-place write over a longer one would leave a torn tail.
+        edits: Array.from({ length: (12 - save) * 150 }, (_, at) => ({ op: 'remove-decor', at: { x: at, z: save } })),
+      }),
+    )
+    const answers = await Promise.all(bodies.map((body) => post('/__editor/overrides', body)))
+    expect(answers.map(({ answer }) => answer.status)).toEqual(bodies.map(() => 200))
+    const last = prepareEditorSave('overrides', bodies.at(-1) ?? '')
+    if (!last.ok) throw new Error(last.reason)
+    expect(await readFile(join(layoutsDir, 'overrides.json'), 'utf8')).toBe(last.contents)
+    expect(await readdir(layoutsDir)).toEqual(['overrides.json'])
+  })
+
+  it('leaves no temporary file behind when the write fails part way', async () => {
+    // A directory where the file should be: the temp file is written, then the rename onto it fails.
+    await rm(join(layoutsDir, 'overrides.json'))
+    await mkdir(join(layoutsDir, 'overrides.json', 'blocked'), { recursive: true })
+    const { response: res } = response()
+    const save = handleEditorSave(request('POST', '/__editor/overrides', ORIGINAL), res, { layoutsDir, prepare: prepareEditorSave })
+    await expect(save).rejects.toThrow()
+    expect(await readdir(layoutsDir)).toEqual(['overrides.json'])
   })
 
   it('fails loudly when the directory cannot be written', async () => {
