@@ -17,13 +17,14 @@ export function HorizonGrass() {
   )
 }
 
-export function Sun() {
+/** `castShadow` off is the low tier: no shadow pass, about half the draw calls (ADR-0004). */
+export function Sun({ castShadow = true }: { castShadow?: boolean }) {
   const half = SHADOW_HALF_EXTENT
   return (
     <directionalLight
       position={[10, 18, 8]}
       intensity={1.3}
-      castShadow
+      castShadow={castShadow}
       shadow-mapSize={[1024, 1024]}
       shadow-camera-left={-half}
       shadow-camera-right={half}

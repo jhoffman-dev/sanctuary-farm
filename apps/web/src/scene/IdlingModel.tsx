@@ -12,14 +12,16 @@ type IdlingModelProps = {
   /** The loaded GLB scene; this component draws its own clone, so the original stays untouched. */
   scene: Object3D
   at: Placement
+  /** Play the idle clip; off holds the pose (the low tier, so a still farm can stop drawing). */
+  animate?: boolean
 }
 
 /**
  * An animal or the keeper standing still and breathing: its own copy of the
- * model playing the `idle` clip. Under reduced motion the frameloop is
- * `demand`, so the clip holds its first frame.
+ * model playing the `idle` clip. With `animate` off it holds the clip's
+ * first frame, whatever frames the loop happens to draw.
  */
-export function IdlingModel({ model, scene, at }: IdlingModelProps) {
+export function IdlingModel({ model, scene, at, animate = true }: IdlingModelProps) {
   // SkeletonUtils, not Object3D.clone: the keeper is skinned, and a plain clone would share its skeleton.
   const object = useMemo(() => {
     const copy = clone(scene)
@@ -40,7 +42,7 @@ export function IdlingModel({ model, scene, at }: IdlingModelProps) {
     }
   }, [mixer, object, model.url])
 
-  useFrame((_, delta) => mixer.update(delta))
+  useFrame((_, delta) => mixer.update(animate ? delta : 0))
 
   return <PlacedPiece model={model} object={object} position={[at.x, 0, at.z]} rotation={at.rotation} />
 }
