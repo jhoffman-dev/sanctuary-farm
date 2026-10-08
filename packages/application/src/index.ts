@@ -13,5 +13,7 @@ export type {
   RoundProgress,
 } from './read-models'
 export { PADDOCK_ROUND } from './round-presets'
+export type { ArrivalOutcome, HotspotArrivals } from './hotspot-arrival'
+export { createHotspotArrivals } from './hotspot-arrival'
 export type { FarmGame, FarmGameDeps } from './farm-game'
 export { createFarmGame } from './farm-game'
