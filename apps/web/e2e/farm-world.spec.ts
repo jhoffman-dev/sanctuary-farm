@@ -4,7 +4,9 @@ import { saveDocImage } from './doc-image'
 // SF-75: the farm scene draws the procedural tile world. `?perf=1` makes the
 // scene publish renderer.info, its frame rate and every hotspot's screen
 // position onto `data-*` attributes (the ADR-0004 spike's technique), which
-// is how a browser test reads a WebGL canvas.
+// is how a browser test reads a WebGL canvas. `?quality=high` pins the full
+// look (shadows on): headless Chromium renders in software, which the tier
+// probe would otherwise put on the low tier (SF-80, `quality-tiers.spec.ts`).
 
 /** docs/performance-budget.md: draw calls, target 100, ceiling 150. */
 const DRAW_CALL_CEILING = 150
@@ -47,7 +49,7 @@ test.describe('the farm world at the §2 camera, 1280 × 800', () => {
 
   test('renders the tile world with no errors, every hotspot in frame, inside the draw-call budget', async ({ page }, testInfo) => {
     const errors = collectErrors(page)
-    await page.goto('/?perf=1')
+    await page.goto('/?perf=1&quality=high')
     await expect(page.locator('canvas')).toBeVisible()
 
     const probe = await readSettledProbe(page)
@@ -75,7 +77,7 @@ test.describe('the farm world on a phone, 360 × 640', () => {
 
   test('renders the tile world with no errors', async ({ page }, testInfo) => {
     const errors = collectErrors(page)
-    await page.goto('/?perf=1')
+    await page.goto('/?perf=1&quality=high')
     const probe = await readSettledProbe(page)
 
     expect(errors).toEqual([])

@@ -19,7 +19,7 @@ test.describe('a player who has asked for reduced motion', () => {
   })
 })
 
-test('by default the farm animates', async ({ page }) => {
-  await page.goto('/')
+test('on the high tier the farm animates', async ({ page }) => {
+  await page.goto('/?quality=high')
   await expect(page.getByTestId('scene')).toHaveAttribute('data-frameloop', 'always')
 })
