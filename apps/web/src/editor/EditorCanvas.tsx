@@ -83,7 +83,7 @@ function LandOutlines({ land, tool, hover }: { land: readonly ChunkCoord[]; tool
       ))}
       {offered.map((chunk) => {
         const lit = hovered?.cx === chunk.cx && hovered.cz === chunk.cz
-        return <RectMarker key={`new ${chunk.cx},${chunk.cz}`} rect={chunkRect(chunk)} colour={COLOURS.newLand} opacity={lit ? 0.35 : 0.08} />
+        return <RectMarker key={`new ${chunk.cx},${chunk.cz}`} rect={chunkRect(chunk)} colour={COLOURS.newLand} opacity={lit ? 0.4 : 0.18} />
       })}
     </group>
   )
