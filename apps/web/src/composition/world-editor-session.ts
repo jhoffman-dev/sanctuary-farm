@@ -1,6 +1,6 @@
+import { createRng } from '@sf/application'
 import { anchorsFromLayout, loadFarmLayout, loadWorldOverrides, loadWorldSettings } from '@sf/world'
 import type { WorldEditorSession } from '../editor/editor-session'
-import { createSeededRng } from './seeded-rng'
 
 /** A fresh unsigned 32-bit seed for "Random seed". The browser's CSPRNG is the adapter; nothing here needs to be reproducible. */
 function randomSeed(): number {
@@ -13,7 +13,7 @@ export function worldEditorSession(): WorldEditorSession {
   return {
     anchors: anchorsFromLayout(loadFarmLayout()),
     saved: { settings: loadWorldSettings(), overrides: loadWorldOverrides() },
-    rngFor: createSeededRng,
+    rngFor: createRng,
     randomSeed,
   }
 }

@@ -74,6 +74,7 @@ No snapshot test as a stand-in for a behaviour test.
 | `pnpm size` | the JS/CSS budgets in `docs/performance-budget.md`, over `apps/web/dist` (needs a build first) |
 | `pnpm test:coverage` | tests with the domain ≥ 90% line threshold enforced |
 | `pnpm e2e` | Playwright smoke against `apps/web` (first: `pnpm --filter @sf/web exec playwright install chromium`) |
+| `UPDATE_DOC_IMAGES=1 pnpm e2e` | same, and refresh the tracked screenshots in `docs/img/` (a normal run writes them only under `apps/web/test-results/`) |
 | `pnpm vitest run --project domain` | one package's tests (`domain` · `application` · `persistence` · `audio` · `web`) |
 
 Node is Homebrew-installed — prefix bash calls with `export PATH="/opt/homebrew/bin:$PATH"`.
