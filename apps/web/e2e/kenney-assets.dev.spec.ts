@@ -1,14 +1,14 @@
 import { expect, test } from '@playwright/test'
+import { saveDocImage } from './doc-image'
 
 /** Kits the catalogue draws from; each one's atlas must arrive exactly once. */
 const KITS = ['cube-pets', 'mini-characters', 'fantasy-town-kit', 'survival-kit', 'mini-forest', 'food-kit']
 /** Every Kenney atlas is 512 × 512; nothing else in the scene allocates a texture that size. */
 const ATLAS_SIDE = 512
-const SCREENSHOT = '../../docs/img/kenney-catalogue.png'
 
 test.use({ viewport: { width: 1280, height: 800 } })
 
-test('every catalogue GLB loads, and each kit atlas is fetched once and uploaded once', async ({ page }) => {
+test('every catalogue GLB loads, and each kit atlas is fetched once and uploaded once', async ({ page }, testInfo) => {
   const consoleErrors: string[] = []
   page.on('console', (message) => {
     if (message.type() === 'error') consoleErrors.push(message.text())
@@ -50,5 +50,5 @@ test('every catalogue GLB loads, and each kit atlas is fetched once and uploaded
     type: 'placed sizes (x, y, z world units)',
     description: (await catalogue.getAttribute('data-sizes')) ?? '',
   })
-  await page.screenshot({ path: SCREENSHOT })
+  await saveDocImage(page, testInfo, { name: 'kenney-catalogue.png' })
 })

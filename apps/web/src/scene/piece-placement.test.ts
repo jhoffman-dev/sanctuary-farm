@@ -2,7 +2,7 @@ import type { Chunk, PlacedHotspot, Tile } from '@sf/world'
 import { CHUNK_SIZE } from '@sf/world'
 import { describe, expect, it } from 'vitest'
 import type { PieceFit } from '../world-assets'
-import { footprintCentre, groupPieces, hotspotMarkers, pieceTransform } from './piece-placement'
+import { footprintCentre, groupPieces, hotspotMarkers, keepUnchangedGroups, pieceGroupKeeper, pieceTransform } from './piece-placement'
 
 const fit = (overrides: Partial<PieceFit> = {}): PieceFit => ({
   rotationOffset: 0,
@@ -125,5 +125,34 @@ describe('hotspotMarkers', () => {
       hotspot({ id: 'nest', style: 'open' }),
     ])
     expect(markers.map((marker) => marker.pieceId)).toEqual(['hotspot:nest'])
+  })
+})
+
+describe('keepUnchangedGroups', () => {
+  const fence = { ground: { kind: 'grass' }, structure: { kind: 'fence', role: 'straight', rotation: 0 } } as const satisfies Tile
+  const tree = { ground: { kind: 'grass' }, decor: { kind: 'tree', rotation: 0 } } as const satisfies Tile
+
+  it('keeps the placements array of every piece type an edit did not move, so its instanced mesh is kept', () => {
+    const before = groupPieces([chunkWith(0, 0, { 1: fence, 2: tree })])
+    const after = keepUnchangedGroups(before, groupPieces([chunkWith(0, 0, { 1: fence, 2: tree, 3: tree })]))
+    const placementsOf = (groups: typeof before, pieceId: string) => groups.find((group) => group.pieceId === pieceId)?.placements
+    expect(placementsOf(after, 'fence:straight')).toBe(placementsOf(before, 'fence:straight'))
+    expect(placementsOf(after, 'tree')).not.toBe(placementsOf(before, 'tree'))
+    expect(placementsOf(after, 'tree')).toHaveLength(2)
+  })
+
+  it('treats a turned piece as moved, and keeps types that appear or vanish as they are', () => {
+    const before = groupPieces([chunkWith(0, 0, { 1: fence })])
+    const turned = groupPieces([chunkWith(0, 0, { 1: { ...fence, structure: { ...fence.structure, rotation: 1 } }, 2: tree })])
+    const after = keepUnchangedGroups(before, turned)
+    expect(after).toEqual(turned)
+    expect(after[0]?.placements).not.toBe(before[0]?.placements)
+  })
+
+  it('remembers what it returned last, for a component to keep across renders', () => {
+    const keep = pieceGroupKeeper()
+    const first = keep(groupPieces([chunkWith(0, 0, { 1: fence })]))
+    const again = keep(groupPieces([chunkWith(0, 0, { 1: fence })]))
+    expect(again[0]?.placements).toBe(first[0]?.placements)
   })
 })

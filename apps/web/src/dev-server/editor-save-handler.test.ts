@@ -3,7 +3,7 @@
  * The save endpoint against the real filesystem: a POST round-trips to a file
  * in a temporary layouts directory, and every refusal leaves the file alone.
  */
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -16,8 +16,12 @@ const ORIGINAL = '{\n  "schemaVersion": 1,\n  "edits": []\n}\n'
 
 type Answer = { status: number; body: Record<string, unknown> }
 
-function request(method: string, url: string, body = ''): IncomingMessage {
-  return Object.assign(Readable.from([Buffer.from(body)]), { method, url }) as unknown as IncomingMessage
+const DEV_HOST = 'localhost:5173'
+/** What the editor page's own `fetch` sends. */
+const EDITOR_HEADERS = { host: DEV_HOST, origin: `http://${DEV_HOST}`, 'content-type': 'application/json' }
+
+function request(method: string, url: string, body = '', headers: Record<string, string> = EDITOR_HEADERS): IncomingMessage {
+  return Object.assign(Readable.from([Buffer.from(body)]), { method, url, headers }) as unknown as IncomingMessage
 }
 
 function response(): { response: ServerResponse; answer: Promise<Answer> } {
@@ -44,9 +48,14 @@ afterEach(async () => {
   await rm(layoutsDir, { recursive: true, force: true })
 })
 
-async function post(url: string, body: string, written: string[] = []): Promise<{ handled: boolean; answer: Answer }> {
+async function post(
+  url: string,
+  body: string,
+  written: string[] = [],
+  headers: Record<string, string> = EDITOR_HEADERS,
+): Promise<{ handled: boolean; answer: Answer }> {
   const { response: res, answer } = response()
-  const handled = await handleEditorSave(request('POST', url, body), res, {
+  const handled = await handleEditorSave(request('POST', url, body, headers), res, {
     layoutsDir,
     prepare: prepareEditorSave,
     onWritten: (path) => written.push(path),
@@ -88,6 +97,62 @@ describe('handleEditorSave', () => {
   it('leaves every other request to the rest of the server', async () => {
     const { response: res } = response()
     expect(await handleEditorSave(request('POST', '/src/main.tsx'), res, { layoutsDir, prepare: prepareEditorSave })).toBe(false)
+  })
+
+  const VALID = JSON.stringify({ schemaVersion: 1, edits: [{ op: 'remove-decor', at: { x: 1, z: 1 } }] })
+
+  it('refuses a body that is not declared JSON with a 415, so no cross-site simple POST can save', async () => {
+    for (const contentType of ['text/plain', 'application/x-www-form-urlencoded', 'multipart/form-data; boundary=x']) {
+      const { answer } = await post('/__editor/overrides', VALID, [], { ...EDITOR_HEADERS, 'content-type': contentType })
+      expect(answer.status).toBe(415)
+    }
+    const { answer } = await post('/__editor/overrides', VALID, [], { host: DEV_HOST, origin: `http://${DEV_HOST}` })
+    expect(answer.status).toBe(415)
+    expect(await readFile(join(layoutsDir, 'overrides.json'), 'utf8')).toBe(ORIGINAL)
+  })
+
+  it('accepts JSON with a charset', async () => {
+    const { answer } = await post('/__editor/overrides', VALID, [], { ...EDITOR_HEADERS, 'content-type': 'application/json; charset=utf-8' })
+    expect(answer.status).toBe(200)
+  })
+
+  it('refuses a save from any other origin with a 403, leaving the file as it was', async () => {
+    for (const origin of ['http://evil.example', 'http://localhost:3000', 'null']) {
+      const { answer } = await post('/__editor/overrides', VALID, [], { ...EDITOR_HEADERS, origin })
+      expect(answer.status).toBe(403)
+    }
+    expect(await readFile(join(layoutsDir, 'overrides.json'), 'utf8')).toBe(ORIGINAL)
+  })
+
+  it('accepts a save with no Origin: browsers always send one on POST, so that is a local tool, not a page', async () => {
+    const { answer } = await post('/__editor/overrides', VALID, [], { host: DEV_HOST, 'content-type': 'application/json' })
+    expect(answer.status).toBe(200)
+  })
+
+  it('serialises overlapping saves: the file is whole and holds the save that arrived last', async () => {
+    const bodies = Array.from({ length: 12 }, (_, save) =>
+      JSON.stringify({
+        schemaVersion: 1,
+        // Sizes differ by save, so an in-place write over a longer one would leave a torn tail.
+        edits: Array.from({ length: (12 - save) * 150 }, (_edit, at) => ({ op: 'remove-decor', at: { x: at, z: save } })),
+      }),
+    )
+    const answers = await Promise.all(bodies.map((body) => post('/__editor/overrides', body)))
+    expect(answers.map(({ answer }) => answer.status)).toEqual(bodies.map(() => 200))
+    const last = prepareEditorSave('overrides', bodies.at(-1) ?? '')
+    if (!last.ok) throw new Error(last.reason)
+    expect(await readFile(join(layoutsDir, 'overrides.json'), 'utf8')).toBe(last.contents)
+    expect(await readdir(layoutsDir)).toEqual(['overrides.json'])
+  })
+
+  it('leaves no temporary file behind when the write fails part way', async () => {
+    // A directory where the file should be: the temp file is written, then the rename onto it fails.
+    await rm(join(layoutsDir, 'overrides.json'))
+    await mkdir(join(layoutsDir, 'overrides.json', 'blocked'), { recursive: true })
+    const { response: res } = response()
+    const save = handleEditorSave(request('POST', '/__editor/overrides', ORIGINAL), res, { layoutsDir, prepare: prepareEditorSave })
+    await expect(save).rejects.toThrow()
+    expect(await readdir(layoutsDir)).toEqual(['overrides.json'])
   })
 
   it('fails loudly when the directory cannot be written', async () => {

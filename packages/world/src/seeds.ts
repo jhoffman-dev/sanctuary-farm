@@ -1,8 +1,10 @@
 /**
  * Randomness enters the tile world through one port. `@sf/world` may not
  * import `@sf/domain` (dependency-cruiser `world-depends-on-nothing`), so the
- * port is declared here with the same shape as the domain's `Rng`, and the
- * composition root passes the domain's seeded `createRng` in as `RngFactory`.
+ * port is declared here with the same shape as the domain's `Rng`. The
+ * composition root passes the domain's own seeded `createRng` in as
+ * `RngFactory`, reaching it through `@sf/application` (apps may not import the
+ * domain directly), so the world and the game draw from one generator.
  */
 
 /** Returns a number in [0, 1). */

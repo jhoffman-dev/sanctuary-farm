@@ -1,10 +1,10 @@
 import type { PieceId, TileWorld } from '@sf/world'
-import { type ReactNode, useMemo } from 'react'
+import { type ReactNode, useMemo, useState } from 'react'
 import type { Object3D } from 'three'
 import { KENNEY_ANIMALS, KENNEY_CATALOGUE, KENNEY_KEEPERS, type PieceModel } from '../world-assets'
 import { IdlingModel } from './IdlingModel'
 import { InstancedPieces } from './InstancedPieces'
-import { groupPieces, hotspotMarkers, type PieceGroup, type Placement } from './piece-placement'
+import { groupPieces, hotspotMarkers, pieceGroupKeeper, type PieceGroup, type Placement } from './piece-placement'
 import { stageWorld } from './staging'
 import { useKenneyModels } from './use-kenney-models'
 
@@ -64,9 +64,11 @@ function idlingKeeper({ model, scene, at }: { model: PieceModel; scene: Object3D
 }
 
 export function WorldPieces({ world, extraPieces = NO_EXTRA_PIECES, renderKeeper = idlingKeeper }: WorldPiecesProps) {
-  const pieces = useMemo(() => groupPieces(world.chunks), [world])
-  const markers = useMemo(() => hotspotMarkers(world.hotspots), [world])
-  const staging = useMemo(() => stageWorld(world.hotspots), [world])
+  // An edit regroups the world, but each untouched type keeps its placements, and so its instanced mesh.
+  const [keepUnchanged] = useState(pieceGroupKeeper)
+  const pieces = useMemo(() => keepUnchanged(groupPieces(world.chunks)), [keepUnchanged, world.chunks])
+  const markers = useMemo(() => hotspotMarkers(world.hotspots), [world.hotspots])
+  const staging = useMemo(() => stageWorld(world.hotspots), [world.hotspots])
   const sources = useMemo(() => {
     const pieceIds = new Set<PieceId>([...[...pieces, ...markers].map((group) => group.pieceId), ...extraPieces])
     const animals = staging.animals.map((animal) => KENNEY_ANIMALS[animal.species])

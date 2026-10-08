@@ -1,21 +1,24 @@
-import { serializeWorldOverrides, serializeWorldSettings } from '@sf/world'
+import { type WorldDraft, serializeWorldOverrides, serializeWorldSettings } from '@sf/world'
 import { useCallback, useMemo, useReducer, useState } from 'react'
 import { HOME_VIEW, overviewOf } from '../scene/camera-views'
 import type { CameraCommand } from './EditorControls'
 import { EditorCanvas } from './EditorCanvas'
-import { type SaveStatus, EditorToolbar } from './EditorToolbar'
+import { EditorToolbar } from './EditorToolbar'
 import type { EditorCommand } from './editor-keys'
 import type { WorldEditorSession } from './editor-session'
 import { createEditorReducer, initialEditorState, pendingChanges } from './editor-state'
 import type { Tool } from './editor-tools'
 import { Inspector } from './Inspector'
 import { Palette } from './Palette'
-import { saveWorldDraft } from './save-client'
+import type { Post } from './save-client'
 import { ShortcutLegend } from './ShortcutLegend'
 import { useEditorKeys } from './use-editor-keys'
+import { useWorldSave } from './use-world-save'
 import { WorldPanel } from './WorldPanel'
 
 type CameraState = CameraCommand & { readonly topDown: boolean }
+
+const postToDevServer: Post = (url, init) => fetch(url, init)
 
 /** Half a chunk of the land beyond the farm stays in the top-down frame, so there is room to add more. */
 const TOP_DOWN_MARGIN_TILES = 8
@@ -29,7 +32,6 @@ export function WorldEditor({ session }: { session: WorldEditorSession }) {
   const reducer = useMemo(() => createEditorReducer(session), [session])
   const [state, dispatch] = useReducer(reducer, session, initialEditorState)
   const [camera, setCamera] = useState<CameraState>({ view: HOME_VIEW, id: 0, topDown: false })
-  const [status, setStatus] = useState<SaveStatus>({ kind: 'idle' })
   const [ready, setReady] = useState(false)
   const present = state.history.present
 
@@ -44,24 +46,15 @@ export function WorldEditor({ session }: { session: WorldEditorSession }) {
     [present.settings.chunks],
   )
 
-  const save = useCallback(async () => {
-    const draft = present
-    setStatus({ kind: 'saving' })
-    const outcome = await saveWorldDraft(draft, (url, init) => fetch(url, init))
-    if (!outcome.ok) {
-      setStatus({ kind: 'failed', reason: outcome.reason })
-      return
-    }
-    dispatch({ type: 'saved', draft })
-    setStatus({ kind: 'saved', message: 'Saved to packages/world/layouts — commit it, or ask an agent to open a PR.' })
-  }, [present])
+  const onSaved = useCallback((draft: WorldDraft) => dispatch({ type: 'saved', draft }), [])
+  const { status, setStatus, save } = useWorldSave({ draft: present, post: postToDevServer, onSaved })
 
   const copy = useCallback((label: string, text: string) => {
     navigator.clipboard.writeText(text).then(
       () => setStatus({ kind: 'saved', message: `Copied ${label} to the clipboard.` }),
       (error: unknown) => setStatus({ kind: 'failed', reason: `the clipboard refused (${String(error)})` }),
     )
-  }, [])
+  }, [setStatus])
 
   const chooseTool = useCallback((tool: Tool) => dispatch({ type: 'choose-tool', tool }), [])
 

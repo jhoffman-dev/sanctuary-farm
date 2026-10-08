@@ -8,7 +8,7 @@ import { editorSaveRoute } from '../dev-server/editor-save-routes'
 
 export type SaveOutcome = { readonly ok: true } | { readonly ok: false; readonly reason: string }
 
-type Post = (url: string, init: { method: 'POST'; headers: Record<string, string>; body: string }) => Promise<Response>
+export type Post = (url: string, init: { method: 'POST'; headers: Record<string, string>; body: string }) => Promise<Response>
 
 async function postFile(post: Post, url: string, body: string): Promise<SaveOutcome> {
   let response: Response

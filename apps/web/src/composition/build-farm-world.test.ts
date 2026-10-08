@@ -1,4 +1,6 @@
-import { CHUNK_SIZE, HOTSPOT_IDS, farmStartingChunks } from '@sf/world'
+import { createRng as applicationCreateRng } from '@sf/application'
+import { createRng } from '@sf/domain'
+import { CHUNK_SIZE, HOTSPOT_IDS, buildTileWorld, farmStartingChunks, farmWorldSpec } from '@sf/world'
 import { describe, expect, it } from 'vitest'
 import { buildFarmWorld } from './build-farm-world'
 import { loadFarmWorld } from './load-farm-world'
@@ -13,6 +15,11 @@ describe('buildFarmWorld', () => {
 
   it('is the same farm every time it is built', () => {
     expect(buildFarmWorld()).toEqual(buildFarmWorld())
+  })
+
+  it('draws from the domain\'s own seeded generator, so the farm is the one the domain\'s rng would build', () => {
+    expect(applicationCreateRng).toBe(createRng)
+    expect(buildFarmWorld()).toEqual(buildTileWorld(farmWorldSpec(createRng), farmStartingChunks()))
   })
 
   it('lays paths: the seeded generator ran, not an empty grid', () => {

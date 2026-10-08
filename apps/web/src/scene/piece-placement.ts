@@ -70,6 +70,35 @@ export function groupPieces(chunks: readonly Chunk[]): PieceGroup[] {
   return [...groups].map(([pieceId, placements]) => ({ pieceId, placements }))
 }
 
+function samePlacements(one: readonly Placement[], other: readonly Placement[]): boolean {
+  return (
+    one.length === other.length &&
+    one.every((placement, index) => {
+      const twin = other[index]
+      return twin !== undefined && placement.x === twin.x && placement.z === twin.z && placement.rotation === twin.rotation
+    })
+  )
+}
+
+/**
+ * `next`, with the `placements` array of `previous` kept for every piece type
+ * whose placements did not change, so its instanced mesh is not rebuilt when
+ * an edit elsewhere in the world gives a new grouping.
+ */
+export function keepUnchangedGroups(previous: readonly PieceGroup[], next: readonly PieceGroup[]): PieceGroup[] {
+  const before = new Map(previous.map((group) => [group.pieceId, group.placements]))
+  return next.map((group) => {
+    const kept = before.get(group.pieceId)
+    return kept !== undefined && samePlacements(kept, group.placements) ? { ...group, placements: kept } : group
+  })
+}
+
+/** Remembers the grouping it last returned, and keeps that grouping's unchanged placements in the next. */
+export function pieceGroupKeeper(): (next: readonly PieceGroup[]) => PieceGroup[] {
+  let last: readonly PieceGroup[] = []
+  return (next) => (last = keepUnchangedGroups(last, next))
+}
+
 /** The middle of a footprint, in world units: a 4-wide pen's centre falls on a tile edge, not a tile. */
 export function footprintCentre(rect: TileRect): { readonly x: number; readonly z: number } {
   return { x: rect.x + rect.width / 2, z: rect.z + rect.depth / 2 }

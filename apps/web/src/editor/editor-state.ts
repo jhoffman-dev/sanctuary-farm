@@ -22,6 +22,7 @@ import {
   eraseAt,
   hotspotMoveProblem,
   neighbouringChunks,
+  rebuildTileWorld,
   recordStep,
   redo,
   removeEditsAt,
@@ -73,6 +74,12 @@ export function buildDraftWorld(session: WorldEditorSession, draft: WorldDraft):
   return buildTileWorld(specOf(session, draft), draft.settings.chunks)
 }
 
+/** The world for `next`, keeping every chunk of `state.world` the change cannot reach. */
+function rebuildDraftWorld(session: WorldEditorSession, state: EditorState, next: WorldDraft): TileWorld {
+  const previous = { world: state.world, spec: specOf(session, state.history.present) }
+  return rebuildTileWorld(previous, specOf(session, next), next.settings.chunks)
+}
+
 export function initialEditorState(session: WorldEditorSession): EditorState {
   return {
     history: startHistory(session.saved),
@@ -95,7 +102,7 @@ export function createEditorReducer(session: WorldEditorSession): EditorReducer 
     ...state,
     history,
     strokeOpen,
-    world: history.present === state.history.present ? state.world : buildDraftWorld(session, history.present),
+    world: history.present === state.history.present ? state.world : rebuildDraftWorld(session, state, history.present),
   })
 
   const commit = (state: EditorState, next: WorldDraft, continuing: boolean): EditorState => {
