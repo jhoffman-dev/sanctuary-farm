@@ -1,10 +1,10 @@
 import type { PieceId, TileWorld } from '@sf/world'
-import { useMemo } from 'react'
+import { type ReactNode, useMemo } from 'react'
 import type { Object3D } from 'three'
 import { KENNEY_ANIMALS, KENNEY_CATALOGUE, KENNEY_KEEPERS, type PieceModel } from '../world-assets'
 import { IdlingModel } from './IdlingModel'
 import { InstancedPieces } from './InstancedPieces'
-import { groupPieces, hotspotMarkers, type PieceGroup } from './piece-placement'
+import { groupPieces, hotspotMarkers, type PieceGroup, type Placement } from './piece-placement'
 import { stageWorld } from './staging'
 import { useKenneyModels } from './use-kenney-models'
 
@@ -52,9 +52,18 @@ type WorldPiecesProps = {
    * passes every piece, so placing a new kind never suspends the scene.
    */
   extraPieces?: readonly PieceId[]
+  /**
+   * Draws the keeper from its loaded model, where it starts. The game passes
+   * its walking keeper; without one the keeper stands idling (the editor).
+   */
+  renderKeeper?: (keeper: { model: PieceModel; scene: Object3D; at: Placement }) => ReactNode
 }
 
-export function WorldPieces({ world, extraPieces = NO_EXTRA_PIECES }: WorldPiecesProps) {
+function idlingKeeper({ model, scene, at }: { model: PieceModel; scene: Object3D; at: Placement }): ReactNode {
+  return <IdlingModel model={model} scene={scene} at={at} />
+}
+
+export function WorldPieces({ world, extraPieces = NO_EXTRA_PIECES, renderKeeper = idlingKeeper }: WorldPiecesProps) {
   const pieces = useMemo(() => groupPieces(world.chunks), [world])
   const markers = useMemo(() => hotspotMarkers(world.hotspots), [world])
   const staging = useMemo(() => stageWorld(world.hotspots), [world])
@@ -81,7 +90,7 @@ export function WorldPieces({ world, extraPieces = NO_EXTRA_PIECES }: WorldPiece
           at={animal}
         />
       ))}
-      <IdlingModel model={KEEPER} scene={loadedScene(scenes, KEEPER)} at={staging.keeper} />
+      {renderKeeper({ model: KEEPER, scene: loadedScene(scenes, KEEPER), at: staging.keeper })}
     </>
   )
 }

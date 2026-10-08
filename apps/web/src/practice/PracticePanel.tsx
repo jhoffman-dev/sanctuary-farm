@@ -6,6 +6,12 @@ type PracticePanelProps = {
   game: FarmGame
   /** Fired whenever the farm may have changed, so the owner can re-read `game.summary()`. */
   onFarmChanged: () => void
+  /**
+   * Open on the round the game already has in flight — started elsewhere, by
+   * the keeper arriving at the paddock — exactly as if the start button had
+   * been pressed. The owner remounts the panel (a new `key`) for each such round.
+   */
+  openOnRoundInFlight?: boolean
 }
 
 type RoundTally = { coinsEarned: number; correct: number; answered: number }
@@ -53,8 +59,14 @@ const primaryButton =
   'hover:bg-amber-300 focus-visible:outline-4 focus-visible:outline-amber-600'
 
 /** Drives one practice round. Every rule (which fact, how many coins) comes from `game`. */
-export function PracticePanel({ game, onFarmChanged }: PracticePanelProps) {
-  const [phase, setPhase] = useState<Phase>({ kind: 'idle' })
+/** Where the panel starts: idle, or on the question the game already has in flight. */
+function openingPhase(game: FarmGame, onRoundInFlight: boolean): Phase {
+  const question = onRoundInFlight ? game.currentQuestion() : null
+  return question ? { kind: 'playing', question, progress: game.roundProgress(), feedback: null } : { kind: 'idle' }
+}
+
+export function PracticePanel({ game, onFarmChanged, openOnRoundInFlight = false }: PracticePanelProps) {
+  const [phase, setPhase] = useState<Phase>(() => openingPhase(game, openOnRoundInFlight))
   const [busy, setBusy] = useState(false)
   // Guards re-entry in the gap between a submit and the re-render that
   // disables the pad; the ref is current synchronously, the state is not.
