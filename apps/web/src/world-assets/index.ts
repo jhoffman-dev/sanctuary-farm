@@ -1,6 +1,6 @@
 export { KENNEY_ANIMALS, KENNEY_CATALOGUE, KENNEY_KEEPERS, KENNEY_KITS, kitDirectory } from './kenney-catalogue'
 export type { KenneyKit, PieceModel } from './kenney-catalogue'
 export { quarterTurnsToRadians } from './piece-fit'
-export type { Footprint, NativeBounds } from './piece-fit'
+export type { Footprint, NativeBounds, PieceFit } from './piece-fit'
 export { ANIMAL_SPECIES, KEEPER_VARIANTS } from './piece-kinds'
 export type { AnimalSpecies, KeeperVariant } from './piece-kinds'

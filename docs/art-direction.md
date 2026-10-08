@@ -16,12 +16,13 @@ screen bolted onto a quiz.
 ## 2. Camera and world
 
 Fixed three-quarter view from a little above, no free orbit. The numbers match
-`apps/web/src/scene/FarmScene.tsx` and are the starting point for the Phase 2
+`packages/world/layouts/farm.json` (`camera.home`) and
+`apps/web/src/scene/camera-views.ts`, and are the starting point for the Phase 2
 camera-rig ticket, not a contract.
 
 | Setting | Value | Why |
 | --- | --- | --- |
-| Position / look-at | `[9, 7, 12]` → `[0, 0.6, 0]` (≈ 23° elevation, ≈ 37° azimuth, 16.6 units out) | The "storybook" angle: roofs and faces both readable |
+| Position / look-at | `[13, 12.5, 18.5]` → `[0, 0.6, 1]` (≈ 29° elevation, ≈ 37° azimuth, 24.9 units out) | The "storybook" angle, pulled back (SF-75) so all seven hotspots are in frame at 1280 × 800; the alpha's `[9, 7, 12]` → `[0, 0.6, 0]` (23°, 16.6 out) framed only the middle of the 30 × 30 farm |
 | FOV | 35° vertical | Mild perspective; near and far animals stay the same shape |
 | Tunable range | elevation 20–35°, FOV 30–40° | Beyond this it reads as top-down or as first-person |
 | Motion | sway ≤ 0.35 m at ≤ 0.15 rad/s; game-initiated moves ≤ 1.5 s eased; **none** under reduced motion | `accessibility.md` §3 |
@@ -34,7 +35,10 @@ pond + petting zoo, farmhouse. Fog in the sky colour hides the edge.
 **Scale rule.** 1 unit = 1 m. Keeper 1.6 units, chunky (~3 heads tall). Chicken
 0.5, sheep / pig 0.9, cow 1.3; barn ≈ 3 × 2.5 × 3.3. At the alpha camera the
 keeper is ≈ 165 px tall at 1080p and ≈ 100 px on a 640-px phone, so animals land
-at 50–130 px — nothing the kid must recognise is under 0.5 units.
+at 50–130 px — nothing the kid must recognise is under 0.5 units. The SF-75 home
+camera is 1.5× further out, so until the camera rig follows the keeper and
+re-frames each hotspot (its `cameraAnchor`), the keeper is ≈ 110 px at 1080p and
+the chick ≈ 35 px — legibility is the rig ticket's job to win back.
 
 ## 3. Shape language
 
