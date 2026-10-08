@@ -32,6 +32,27 @@ async function readBody(request: IncomingMessage): Promise<string> {
   return Buffer.concat(chunks).toString('utf8')
 }
 
+/**
+ * Only the editor page itself may save. A page on another origin can still
+ * send a "simple" cross-site POST (text/plain, no preflight), so the body must
+ * be declared JSON and any `Origin` must be this dev server's own. Browsers
+ * always send `Origin` on a POST, so a request without one comes from a local
+ * tool (curl, a script), which could write the file directly anyway.
+ */
+function refusal(request: IncomingMessage): { status: number; reason: string } | null {
+  const mediaType = request.headers['content-type']?.split(';')[0]?.trim().toLowerCase()
+  if (mediaType !== 'application/json') return { status: 415, reason: 'send the save as application/json' }
+  const { origin, host } = request.headers
+  if (origin !== undefined && !isOwnOrigin(origin, host)) return { status: 403, reason: 'saves come from the editor page only' }
+  return null
+}
+
+function isOwnOrigin(origin: string, host: string | undefined): boolean {
+  // `Origin: null` (sandboxed frames, file:) and malformed values are never this server.
+  if (!URL.canParse(origin)) return false
+  return host !== undefined && new URL(origin).host === host
+}
+
 function reply(response: ServerResponse, status: number, body: Record<string, unknown>): void {
   response.statusCode = status
   response.setHeader('Content-Type', 'application/json')
@@ -48,6 +69,11 @@ export async function handleEditorSave(
   if (target === null) return false
   if (request.method !== 'POST') {
     reply(response, 405, { ok: false, reason: 'use POST' })
+    return true
+  }
+  const refused = refusal(request)
+  if (refused) {
+    reply(response, refused.status, { ok: false, reason: refused.reason })
     return true
   }
   let body: string
