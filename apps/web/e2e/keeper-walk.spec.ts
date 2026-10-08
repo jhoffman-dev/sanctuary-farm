@@ -1,5 +1,5 @@
-import { copyFile } from 'node:fs/promises'
-import { expect, type Page, test, type TestInfo } from '@playwright/test'
+import { expect, type Page, test } from '@playwright/test'
+import { saveDocImage } from './doc-image'
 
 // SF-77: the keeper walks the tile world, and arriving at the paddock opens
 // practice. `?perf=1` makes the scene publish the keeper's position, tile,
@@ -30,9 +30,6 @@ const WORLD_READY_MS = 30_000
 const WALK_MS = 15_000
 /** The farm is ~30 tiles across, crossed in ≤ 8 s (art-direction §2): no walk in these tests is longer. */
 const LONG_TEST_MS = 90_000
-
-/** Relative to `apps/web`, where Playwright runs — the same path the farm-world spec uses. */
-const DOC_IMAGES = '../../docs/img'
 
 const tileKey = ({ x, z }: Tile) => `${x},${z}`
 
@@ -87,17 +84,6 @@ async function waitUntilStoppedOn(page: Page, tile: string): Promise<void> {
   await expect(probe).toHaveAttribute('data-destination', '', { timeout: WALK_MS })
 }
 
-/**
- * Screenshots land in this run's own output folder; they are copied over the
- * committed ones in `docs/img/` only on purpose (`UPDATE_DOC_IMAGES=1`), so a
- * normal e2e run leaves the tree clean.
- */
-async function screenshot(page: Page, testInfo: TestInfo, name: string): Promise<void> {
-  const path = testInfo.outputPath(name)
-  await page.screenshot({ path })
-  if (process.env.UPDATE_DOC_IMAGES === '1') await copyFile(path, `${DOC_IMAGES}/${name}`)
-}
-
 test.describe('the keeper walks the farm, 1280 × 800', () => {
   test.use({ viewport: { width: 1280, height: 800 } })
 
@@ -136,14 +122,14 @@ test.describe('the keeper walks the farm, 1280 × 800', () => {
         return Math.hypot(x - start.x, z - start.z)
       }, { timeout: WALK_MS })
       .toBeGreaterThan(5)
-    await screenshot(page, testInfo, 'keeper-walking-1280x800.png')
+    await saveDocImage(page, testInfo, { name: 'keeper-walking-1280x800.png' })
 
     await waitUntilStoppedOn(page, tileKey(gate))
     const question = page.getByTestId('question')
     await expect(question).toBeVisible()
     const [a, b] = ((await question.textContent()) ?? '').match(/\d+/g)?.map(Number) ?? []
     for (const digit of String((a ?? 0) * (b ?? 0))) await page.getByTestId(`numberpad-${digit}`).click()
-    await screenshot(page, testInfo, 'keeper-at-paddock-1280x800.png')
+    await saveDocImage(page, testInfo, { name: 'keeper-at-paddock-1280x800.png' })
     await page.getByTestId('submit').click()
     await expect(page.getByTestId('feedback')).toBeVisible()
     await expect(page.getByTestId('feedback')).not.toHaveAttribute('data-outcome', 'WRONG')
