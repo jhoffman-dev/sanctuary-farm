@@ -1,7 +1,9 @@
 import { defineConfig, devices } from '@playwright/test'
+import { e2eServerPort } from '../../scripts/e2e/server-port.ts'
 
-const PORT = 4180
-const baseURL = `http://localhost:${PORT}`
+// Each run serves on a port of its own unless E2E_REUSE_SERVER=1 (SF-90).
+const server = e2eServerPort({ envKey: 'E2E_LANDING_PORT', fixedPort: 4180 })
+const baseURL = `http://localhost:${server.port}`
 
 export default defineConfig({
   testDir: './e2e',
@@ -14,9 +16,9 @@ export default defineConfig({
   webServer: {
     // The landing site has no build step: serve the folder itself, so the spec
     // checks the files Firebase Hosting uploads verbatim.
-    command: `node ./e2e/serve.mjs ${PORT}`,
+    command: `node ./e2e/serve.mjs ${server.port}`,
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: server.reuseExistingServer,
     timeout: 30_000,
   },
 })

@@ -1,9 +1,11 @@
 import { defineConfig, devices } from '@playwright/test'
+import { e2eServerPort } from '../../scripts/e2e/server-port.ts'
 
-const PROD_PORT = 4173
-const DEV_PORT = 5174
-const prodURL = `http://localhost:${PROD_PORT}`
-const devURL = `http://localhost:${DEV_PORT}`
+// Each run serves on ports of its own unless E2E_REUSE_SERVER=1 (SF-90).
+const prod = e2eServerPort({ envKey: 'E2E_WEB_PREVIEW_PORT', fixedPort: 4173 })
+const dev = e2eServerPort({ envKey: 'E2E_WEB_DEV_PORT', fixedPort: 5174 })
+const prodURL = `http://localhost:${prod.port}`
+const devURL = `http://localhost:${dev.port}`
 /** Specs for dev-only routes (`?assets=1`, `?view=`, `?edit=1`), which the production build does not contain. */
 const DEV_ONLY = /\.dev\.spec\.ts$/
 /**
@@ -43,15 +45,15 @@ export default defineConfig({
       // Build then serve the production bundle: e2e exercises what ships, not
       // the dev server. The build is a few seconds, so re-running it after CI's
       // own `pnpm build` is cheaper than a confusing "dist not found" locally.
-      command: `pnpm exec vite build && pnpm exec vite preview --port ${PROD_PORT} --strictPort`,
+      command: `pnpm exec vite build && pnpm exec vite preview --port ${prod.port} --strictPort`,
       url: prodURL,
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: prod.reuseExistingServer,
       timeout: 120_000,
     },
     {
-      command: `pnpm exec vite --port ${DEV_PORT} --strictPort`,
+      command: `pnpm exec vite --port ${dev.port} --strictPort`,
       url: devURL,
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: dev.reuseExistingServer,
       timeout: 120_000,
     },
   ],
