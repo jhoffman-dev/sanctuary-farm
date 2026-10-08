@@ -27,14 +27,14 @@ Target is what we build to; ceiling fails the gate or blocks a merge.
 
 ### Load (cold cache, throttled network, reference device)
 
-| Budget | Target | Ceiling | How measured |
-| --- | --- | --- | --- |
-| Shell JS transfer (practice-first: React, `@sf/*`, HUD, number pad) | 70 kB gz | 100 kB gz | `size-limit` in `pnpm build` |
-| World JS chunk (three, r3f, drei subset) | 250 kB gz | 350 kB gz | `size-limit` |
-| CSS transfer | 15 kB gz | 30 kB gz | `size-limit` |
-| 3D assets for the first hotspot (ground, keeper, barn exteriors) | 1.5 MB | 2.5 MB | `size-limit` on `public/models/**` |
-| Audio (synth only today) | 0 | see below | — |
-| Total transfer to first playable question | 100 kB | 150 kB | Lighthouse `total-byte-weight` on the shell |
+| Budget | Target | Ceiling | Measured (2026-09-08) | How measured |
+| --- | --- | --- | --- | --- |
+| Shell JS transfer (practice-first: React, `@sf/*`, HUD, number pad) | 70 kB gz | 100 kB gz | **68.7 kB gz** (was 303.2 kB) | `size-limit`, `pnpm size` in `pnpm gate` |
+| World JS chunk (three, r3f, drei subset) | 250 kB gz | 350 kB gz | **230.8 kB gz** (was: none, it was in the shell) | `size-limit` |
+| CSS transfer | 15 kB gz | 30 kB gz | 3.8 kB gz | `size-limit` |
+| 3D assets for the first hotspot (ground, keeper, barn exteriors) | 1.5 MB | 2.5 MB | 2.24 MB raw for the whole SF-82 catalogue (every piece, six animals, four keepers), more than one hotspot needs | `size-limit` on `public/models/**/*.{glb,png}`, uncompressed, at the ceiling |
+| Audio (synth only today) | 0 | see below | 0 | — |
+| Total transfer to first playable question | 100 kB | 150 kB | — | Lighthouse `total-byte-weight` on the shell |
 | Total transfer incl. first hotspot world | 2.5 MB | 4 MB | Lighthouse, world loaded |
 | Largest Contentful Paint | 2.5 s | 4 s | Lighthouse |
 | Time to Interactive (shell) | 3 s | 5 s | Lighthouse |
@@ -64,7 +64,7 @@ Target is what we build to; ceiling fails the gate or blocks a merge.
 | Unique materials | 12 | 20 | one asset pack, one atlas per category |
 | Lights | 1 directional + 1 hemisphere | 2 | no point/spot lights on low tier |
 | Shadow maps | 1 × 1024² (low) / 1 × 2048² (high) | 1 map | casters: keeper + animals only; ground receives |
-| Texture format | KTX2/Basis (UASTC atlas, ETC1S props), power-of-two, mipmapped | — | `gltf-transform` in the asset pipeline; PNG/JPG only for UI |
+| Texture format | Kenney's own 512² PNG atlas per kit, loaded once and shared (ADR-0003 addendum: GLB-native, no conversion, so no KTX2) | — | `e2e/kenney-assets.spec.ts`: one fetch and one 512² GPU upload per kit |
 | Texture size | ≤ 1024² props · ≤ 2048² ground atlas | as target | count ≤ 24 textures resident |
 | Skinned meshes on screen | 6 | 8 | ≤ 64 bones per rig |
 | Animation clips | ≤ 12 per character, ≤ 2 MB total clip data | — | quantised via `gltf-transform` |
@@ -97,22 +97,39 @@ Target is what we build to; ceiling fails the gate or blocks a merge.
 
 | Where | What | Fails on |
 | --- | --- | --- |
-| `pnpm build` (gate + CI) | `size-limit` with `@size-limit/file` | any chunk over its ceiling |
+| `pnpm size` — in `pnpm gate` right after `pnpm build` (gate + CI) | `size-limit` with `@size-limit/file` | any chunk over its ceiling |
 | CI, after build | Lighthouse CI (`@lhci/cli`) on the built shell | ceilings in the load table |
 | Any URL | `?perf=1` mounts `r3f-perf` `<Perf>` (lazy-loaded) | manual reading |
 | Monthly | Hand run on the reference device, row appended below | any ceiling |
 
-`size-limit` config, in `apps/web/package.json` (rename chunks via `React.lazy`
-file names or `build.rollupOptions.output.manualChunks`):
+`size-limit` config lives in `apps/web/package.json` and is run by the root
+`pnpm size`. The chunk names come from the `React.lazy` file name — the world
+chunk is `FarmScene-*.js` because `scene/LazyFarmScene.tsx` imports
+`./FarmScene`. Since SF-82 the `?assets=1` catalogue lazy-loads three as
+well, so the bundler moves three + r3f into a shared chunk named after r3f's
+entry file (`react-three-fiber.esm-*.js`); the world line sums that chunk and
+`FarmScene-*.js`. If the name ever changes, `size-limit` fails on the
+unmatched path rather than silently measuring less. The limits are this doc's **ceilings**, not its targets, so the
+gate fails on a regression and a merge is still the place to argue about a
+number between target and ceiling:
 
 ```json
 "size-limit": [
-  { "name": "shell", "path": "dist/assets/index-*.js", "limit": "100 kB", "gzip": true },
-  { "name": "world", "path": "dist/assets/FarmScene-*.js", "limit": "350 kB", "gzip": true },
-  { "name": "css",   "path": "dist/assets/*.css", "limit": "30 kB", "gzip": true },
-  { "name": "first-hotspot assets", "path": "public/models/**", "limit": "2.5 MB" }
+  { "name": "shell (everything the first question needs)", "path": "dist/assets/index-*.js", "limit": "100 kB", "gzip": true },
+  { "name": "world (three, r3f, the farm scene)", "path": ["dist/assets/FarmScene-*.js", "dist/assets/react-three-fiber.esm-*.js"], "limit": "350 kB", "gzip": true },
+  { "name": "models (every Kenney piece in the catalogue, uncompressed)", "path": "public/models/**/*.{glb,png}", "limit": "2.5 MB", "brotli": false },
+  { "name": "css", "path": "dist/assets/*.css", "limit": "30 kB", "gzip": true }
 ]
 ```
+
+The models line measures raw bytes (`"brotli": false`): GLB is binary and
+Firebase Hosting's compression of `model/gltf-binary` is not verified, so the
+honest number is the uncompressed one. It covers the whole catalogue, not one
+hotspot, so it sits at the hotspot ceiling until per-hotspot loading splits it.
+
+`size-limit`'s gzip numbers are a little under Vite's build report (68.71 kB vs
+69.64 kB for the shell) — different compression levels over the same bytes. The
+table above quotes `size-limit`, because that is what fails the gate.
 
 `rollup-plugin-visualizer` stays a diagnostic (`pnpm --filter @sf/web build
 --mode analyze`), not a gate — it explains a failure, it doesn't detect one.
@@ -128,24 +145,39 @@ than an N4000). Assertions, all `error`: `largest-contentful-paint ≤ 4000`,
 | Date | Build | Device | Transfer | TTI | First question | FPS avg / 1 % low | Heap | Tris | Draw calls | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 2026-09 | shell (Phase 1) | none yet — SF-34 | 302 kB gz | — | — | — | — | — | — | throttled desktop only |
+| 2026-09 | world split out (Phase 2) | none yet — SF-34 | 69 kB gz shell + 234 kB gz world | — | — | — | — | — | — | build output only, not a device run |
 
-## Current state vs budget (Phase 1 shell)
+## Current state vs budget (Phase 2, world code-split)
+
+Measured on the production build (`pnpm build`, Vite 8 / rolldown), one commit
+apart on `perf/code-split-three`:
+
+| | Before (one chunk) | After (split) |
+| --- | --- | --- |
+| Initial JS — everything the first question needs | `index-*.js` 1,097.63 kB raw / **303.17 kB gz** | `index-*.js` 217.82 kB raw / **69.64 kB gz** (`size-limit`: 68.71 kB) |
+| World JS — three, r3f, `FarmScene` | in the chunk above | `FarmScene-*.js` 882.07 kB raw / **234.35 kB gz** (`size-limit`: 230.76 kB) |
+| CSS | 13.91 kB / 3.58 kB gz | 14.95 kB / 3.80 kB gz (the loading pill's classes) |
+| Vite chunk-size warning | on every build | gone |
+
+The initial chunk shrank **77 %**, from 3× the shell ceiling to under the 70 kB
+*target*. Nothing was deleted: the same bytes now arrive after the child can
+already answer.
 
 | Line | Now | Budget | Status |
 | --- | --- | --- | --- |
-| JS | one chunk, 1,094 kB raw / ~300 kB gz, three.js inside | shell 100 kB gz, world 350 kB gz | **3× over** the shell ceiling; would pass as a world chunk |
-| CSS | 13.6 kB raw / 3.5 kB gz | 30 kB gz | ok |
-| Code-splitting | none; `<Canvas>` mounts before the save loads | practice first | not met |
+| JS | shell 68.7 kB gz + lazy world 230.8 kB gz | shell 100 kB gz, world 350 kB gz | **met**, both under target |
+| CSS | 14.95 kB raw / 3.8 kB gz | 30 kB gz | ok |
+| Code-splitting | `React.lazy` + Suspense; HUD and pad render and grade answers before the world lands (e2e holds the chunk on the wire to prove it) | practice first | met |
+| Stale chunk after a deploy | one reload, counted in `sessionStorage`; then the farm plays on without scenery | no white screen | met |
 | Frameloop / DPR | always unless reduced motion (then demand); no DPR cap | demand when idle; cap 1.5 | not met |
-| Reduced motion | camera sway off | also skips ceremonies | partial |
+| Reduced motion | camera sway off; the loading ring does not spin | also skips ceremonies | partial |
 | Scene | 3 meshes, 2 lights, 1 shadow map | scene table | trivially ok |
-| Gate | `pnpm gate` (typecheck · lint · boundaries · tests · build) + `pnpm e2e` | + size-limit + LHCI | not met |
+| Gate | `pnpm gate` (typecheck · lint · boundaries · tests · build · **size**) + `pnpm e2e` | + size-limit + LHCI | size-limit met; LHCI outstanding |
 
-### First three actions for Phase 2
+### Next two actions for Phase 2
 
-1. **Split the world out** — `React.lazy(() => import('./scene/FarmScene'))`
-   with the practice panel rendered before it resolves; add `size-limit` to
-   `pnpm build` with the config above. Brings the shell under 100 kB gz.
+1. ~~**Split the world out**~~ — done: `scene/LazyFarmScene.tsx`, with
+   `size-limit` in `pnpm gate`.
 2. **Tier switch + demand frameloop + `?perf=1`** — the 2 s probe, DPR cap 1.5,
    `frameloop="demand"` with invalidate on input/animation, lazy `<Perf>`.
 3. **Lighthouse CI in the gate + first device run** — LHCI with the assertions

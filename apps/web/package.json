@@ -9,8 +9,38 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "size": "size-limit"
   },
+  "size-limit": [
+    {
+      "name": "shell (everything the first question needs)",
+      "path": "dist/assets/index-*.js",
+      "limit": "100 kB",
+      "gzip": true
+    },
+    {
+      "name": "world (three, r3f, the farm scene)",
+      "path": [
+        "dist/assets/FarmScene-*.js",
+        "dist/assets/react-three-fiber.esm-*.js"
+      ],
+      "limit": "350 kB",
+      "gzip": true
+    },
+    {
+      "name": "models (every Kenney piece in the catalogue, uncompressed)",
+      "path": "public/models/**/*.{glb,png}",
+      "limit": "2.5 MB",
+      "brotli": false
+    },
+    {
+      "name": "css",
+      "path": "dist/assets/*.css",
+      "limit": "30 kB",
+      "gzip": true
+    }
+  ],
   "dependencies": {
     "@react-three/fiber": "^9.7.0",
     "@sf/application": "workspace:*",
@@ -24,6 +54,7 @@
   "devDependencies": {
     "@playwright/test": "^1.63.0",
     "@sf/config": "workspace:*",
+    "@size-limit/file": "^13.0.3",
     "@tailwindcss/vite": "^4.3.3",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^7.0.1",
@@ -34,6 +65,7 @@
     "@types/three": "^0.185.0",
     "@vitejs/plugin-react": "^6.1.0",
     "jsdom": "^30.0.1",
+    "size-limit": "^13.0.3",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
     "vite": "^8.2.2",

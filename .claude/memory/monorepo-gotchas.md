@@ -39,5 +39,19 @@
 - **The r3f frameloop is readable from the DOM.** `<Canvas>` spreads unknown
   props onto its container div, so `data-frameloop` / `data-testid="scene"` on
   it survive to the page and Playwright's `reducedMotion: 'reduce'` can assert
-  the rule without touching WebGL. Component tests mock `./scene/FarmScene`;
-  don't try to fake a WebGL context in jsdom.
+  the rule without touching WebGL. Component tests mock the scene; don't try to
+  fake a WebGL context in jsdom.
+- **The world is a lazy chunk; keep three out of the shell.** `App` renders
+  `scene/LazyFarmScene`, which is the only module allowed to reach
+  `./FarmScene`. Any import of `three` / `@react-three/fiber` from outside
+  `scene/` pulls ~230 kB gz back into the initial chunk and `pnpm size` fails
+  (limits in `apps/web/package.json`, budget in `docs/performance-budget.md`).
+  Vite names the chunk after the imported file, so the size-limit path
+  `dist/assets/FarmScene-*.js` breaks if `FarmScene.tsx` is renamed.
+- **`App.test.tsx` mocks `./scene/LazyFarmScene`, not `./scene/FarmScene`.**
+  Mocking the inner module leaves the Suspense fallback on screen, and its
+  `role="status"` collides with the app's own "Waking up the farm…" status —
+  `getByRole('status')` then finds two.
+- **A `React.lazy` promise is cached per module instance**, so only the first
+  render in a test file ever sees the fallback. Test the fallback
+  (`SceneLoading`) directly rather than trying to catch it twice.
