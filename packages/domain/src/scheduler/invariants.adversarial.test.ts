@@ -78,11 +78,6 @@ const POLICIES: ReadonlyArray<[string, AnswerPolicy]> = [
 ]
 const SEEDS = [1, 42, 98765]
 const RUN_LENGTH = 500
-/**
- * The long-run sweeps are deterministic but CPU-bound (seconds under coverage), so they get an
- * explicit budget: vitest's 5 s default made them fail on a loaded machine (SF-81).
- */
-const LONG_RUN_TIMEOUT_MS = 30_000
 
 type Run = { label: string; maxTable: number; steps: Step[] }
 
@@ -218,7 +213,7 @@ describe('purity — every exported function leaves a frozen mid-run state deep-
 
 // ─── Structural invariants over long runs ───
 
-describe('structural invariants hold at every step of long seeded runs (maxTable 12)', { timeout: LONG_RUN_TIMEOUT_MS }, () => {
+describe('structural invariants hold at every step of long seeded runs (maxTable 12)', () => {
   it('box is always an integer in 0..MASTERY_BOX', () => {
     const violation = firstFactViolation(RUNS_12, (status) =>
       Number.isInteger(status.box) && status.box >= 0 && status.box <= MASTERY_BOX
@@ -413,7 +408,7 @@ describe('structural invariants hold at every step of long seeded runs (maxTable
 
 // ─── Interleaving ───
 
-describe('interleaving — never the same family more than INTERLEAVE_MAX_CONSECUTIVE in a row', { timeout: LONG_RUN_TIMEOUT_MS }, () => {
+describe('interleaving — never the same family more than INTERLEAVE_MAX_CONSECUTIVE in a row', () => {
   function firstBreak(run: Run): string | null {
     const families = run.steps.map((step) => step.served.family)
     for (let i = INTERLEAVE_MAX_CONSECUTIVE; i < families.length; i++) {
@@ -456,7 +451,7 @@ describe('interleaving — never the same family more than INTERLEAVE_MAX_CONSEC
 
 // ─── Egg practice ───
 
-describe('egg practice — the family rotation over long runs', { timeout: LONG_RUN_TIMEOUT_MS }, () => {
+describe('egg practice — the family rotation over long runs', () => {
   const FAMILIES = [2, 3, 7, 12]
 
   it('never serves the same fact twice running for a family with more than one fact', () => {
