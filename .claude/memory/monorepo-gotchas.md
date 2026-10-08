@@ -63,3 +63,13 @@
 - **A `React.lazy` promise is cached per module instance**, so only the first
   render in a test file ever sees the fallback. Test the fallback
   (`SceneLoading`) directly rather than trying to catch it twice.
+- **Parallel worktrees share the e2e ports.** `playwright.config.ts` reuses an
+  existing server on :4173 / :5174 outside CI, so a run in one worktree can
+  silently test another worktree's build. With agents working side by side,
+  run `CI=1 pnpm e2e` (no reuse; `--strictPort` fails loudly if taken).
+- **Freezing the scene for a short-lived visual.** r3f frames run on
+  `requestAnimationFrame`, which Playwright's `page.clock` fakes:
+  `install({ time })`, `pauseAt(time + 1000)`, act, `runFor(ms)`, assert or
+  screenshot, `resume()`. The keeper spec uses it to catch the 400 ms
+  unreachable-tap cue (SF-89). In the shipped world the only unreachable taps
+  are > 8 tiles off the land, i.e. at the fogged horizon.
