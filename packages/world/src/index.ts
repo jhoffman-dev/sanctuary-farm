@@ -95,7 +95,7 @@ export { parseWorldOverrides } from './parse-world-overrides'
 
 export type { Chunk, PlacedHotspot, Tile, TileWorld } from './tile-world-types'
 export type { WorldSpec } from './tile-world'
-export { addChunk, buildTileWorld, tileOf } from './tile-world'
+export { addChunk, buildTileWorld, rebuildTileWorld, tileOf } from './tile-world'
 
 export { farmStartingChunks, farmWorldSpec, loadWorldOverrides, loadWorldSettings } from './farm-tile-world'
 

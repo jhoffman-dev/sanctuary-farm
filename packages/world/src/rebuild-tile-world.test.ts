@@ -53,10 +53,12 @@ describe('rebuildTileWorld', () => {
   })
 
   it('also rebuilds the chunk across the edge an edge tile autotiles against', () => {
-    const at = local(middle, CHUNK_SIZE - 1, 5)
-    const { before, rebuilt, full } = after([], [{ op: 'place-structure', at, kind: 'fence', rotation: 0 }])
-    expect(rebuilt).toEqual(full)
     const east = { cx: middle.cx + 1, cz: middle.cz }
+    // A fence just across the border: the new one beside it changes how it joins.
+    const across: WorldEdit = { op: 'place-structure', at: local(east, 0, 5), kind: 'fence', rotation: 0 }
+    const at = local(middle, CHUNK_SIZE - 1, 5)
+    const { before, rebuilt, full } = after([across], [across, { op: 'place-structure', at, kind: 'fence', rotation: 0 }])
+    expect(rebuilt).toEqual(full)
     const rebuiltCoords = rebuilt.chunks.filter((chunk) => chunk !== chunkAt(before, chunk.coord)).map((chunk) => chunk.coord)
     expect(rebuiltCoords).toEqual(expect.arrayContaining([middle, east]))
     expect(rebuiltCoords).toHaveLength(2)
@@ -86,6 +88,28 @@ describe('rebuildTileWorld', () => {
     const reseeded = after([], [], LAND, SEED + 1)
     expect(reseeded.rebuilt).toEqual(reseeded.full)
     expect(kept(reseeded.before, reseeded.rebuilt)).toEqual([])
+  })
+
+  it('matches a full build after every step of a long seeded run of edits along chunk borders', () => {
+    const rng = seededRngFactory(7)
+    const pick = <T,>(items: readonly T[]): T => items[Math.floor(rng() * items.length)] as T
+    // Biased to chunk edges and corners, where neighbouring chunks autotile against each other.
+    const offsets = [0, CHUNK_SIZE - 1]
+    const makers: ((at: TileCoord) => WorldEdit)[] = [
+      (at) => ({ op: 'set-ground', at, ground: pick(['path', 'dirt', 'water', 'grass'] as const) }),
+      (at) => ({ op: 'place-structure', at, kind: 'fence', rotation: 0 }),
+      (at) => ({ op: 'remove-structure', at }),
+      (at) => ({ op: 'place-decor', at, kind: 'rock', rotation: 0 }),
+    ]
+    let edits: WorldEdit[] = []
+    let world = buildTileWorld(specWith(edits), LAND)
+    for (let step = 0; step < 60; step += 1) {
+      const at = local(pick(LAND), pick(offsets), pick([4, 5]))
+      const next = rng() < 0.2 && edits.length > 0 ? edits.slice(0, -1) : [...edits, pick(makers)(at)]
+      world = rebuildTileWorld({ world, spec: specWith(edits) }, specWith(next), LAND)
+      edits = next
+      expect(world, `step ${step}`).toEqual(buildTileWorld(specWith(edits), LAND))
+    }
   })
 
   it('builds new land, drops land that is gone, and keeps the rest', () => {

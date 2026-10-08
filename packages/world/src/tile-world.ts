@@ -12,7 +12,7 @@ import { resolveTile } from './resolve-autotiles'
 import { scatterDecor } from './scatter-decor'
 import type { RngFactory } from './seeds'
 import type { ChunkCoord, TileCoord } from './tile-grid'
-import { chunkKey, chunkOf, indexInChunk, sameChunk, tilesOfChunk } from './tile-grid'
+import { DIRECTIONS, chunkKey, chunkOf, indexInChunk, neighbour, sameChunk, tileKey, tilesOfChunk } from './tile-grid'
 import type { Chunk, PlacedHotspot, Tile, TileWorld } from './tile-world-types'
 import type { WorldOverrides } from './world-overrides'
 import { applyHotspotMoves, applyTileEdits } from './world-overrides'
@@ -90,6 +90,65 @@ export function addChunk(world: TileWorld, spec: WorldSpec, coord: ChunkCoord): 
   if (world.chunks.some((chunk) => sameChunk(chunk.coord, coord))) return world
   const added = chunkBuilder(spec)(coord)
   return { ...world, chunks: [...world.chunks, added].sort(byRowThenColumn) }
+}
+
+/** Each edited tile's edits, in order: the only thing a tile edit changes is its own tile. */
+function tileEditsByTile(spec: WorldSpec): Map<string, { at: TileCoord; edits: string }> {
+  const byTile = new Map<string, { at: TileCoord; edits: string }>()
+  for (const edit of spec.overrides.edits) {
+    if (edit.op === 'move-hotspot') continue
+    const key = tileKey(edit.at)
+    byTile.set(key, { at: edit.at, edits: `${byTile.get(key)?.edits ?? ''}${JSON.stringify(edit)}\n` })
+  }
+  return byTile
+}
+
+/**
+ * The chunks a change of tile edits can reach: each changed tile's own chunk,
+ * and the chunks of its four side neighbours, which autotile against it.
+ */
+function chunksReachedByTileEdits(previous: WorldSpec, spec: WorldSpec): Set<string> {
+  const before = tileEditsByTile(previous)
+  const now = tileEditsByTile(spec)
+  const reached = new Set<string>()
+  for (const key of new Set([...before.keys(), ...now.keys()])) {
+    const at = (now.get(key) ?? before.get(key))?.at
+    if (at === undefined || before.get(key)?.edits === now.get(key)?.edits) continue
+    reached.add(chunkKey(chunkOf(at)))
+    for (const side of DIRECTIONS) reached.add(chunkKey(chunkOf(neighbour(at, side))))
+  }
+  return reached
+}
+
+/** Seed, generator and hotspot positions feed every chunk; when one changes, nothing can be kept. */
+function sameGeneration(previous: WorldSpec, spec: WorldSpec): boolean {
+  return (
+    previous.seed === spec.seed &&
+    previous.rngFor === spec.rngFor &&
+    JSON.stringify(applyHotspotMoves(previous.anchors, previous.overrides)) ===
+      JSON.stringify(applyHotspotMoves(spec.anchors, spec.overrides))
+  )
+}
+
+/**
+ * `buildTileWorld(spec, chunks)`, reusing the chunk objects of a world built
+ * from `previous.spec` wherever the change cannot reach them, so a renderer
+ * that keys on chunk identity redraws only the chunks an edit touched.
+ */
+export function rebuildTileWorld(
+  previous: { readonly world: TileWorld; readonly spec: WorldSpec },
+  spec: WorldSpec,
+  chunks: readonly ChunkCoord[],
+): TileWorld {
+  if (!sameGeneration(previous.spec, spec)) return buildTileWorld(spec, chunks)
+  const reached = chunksReachedByTileEdits(previous.spec, spec)
+  const kept = new Map(previous.world.chunks.map((chunk) => [chunkKey(chunk.coord), chunk]))
+  const build = chunkBuilder(spec)
+  const chunkFor = (coord: ChunkCoord): Chunk => {
+    const key = chunkKey(coord)
+    return (reached.has(key) ? undefined : kept.get(key)) ?? build(coord)
+  }
+  return { seed: spec.seed, hotspots: previous.world.hotspots, chunks: distinct(chunks).map(chunkFor).sort(byRowThenColumn) }
 }
 
 /** The tile at a coordinate, or `undefined` off the world's land. */
