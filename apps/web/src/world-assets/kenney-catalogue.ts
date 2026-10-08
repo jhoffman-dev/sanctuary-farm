@@ -31,6 +31,12 @@ export type PieceModel = PieceFit & {
   readonly nativeBounds: NativeBounds
   /** True where Kenney has no real piece for the kind and a stand-in fills the slot. */
   readonly placeholder: boolean
+  /**
+   * sRGB hex multiplied into the GLB's materials when it loads (three's
+   * `material.color`), so a species can be recoloured without editing Kenney's
+   * file or atlas (art-direction §3). Absent means drawn as authored.
+   */
+  readonly tint?: string
   readonly note?: string
 }
 
@@ -51,6 +57,7 @@ type PieceSpec = {
   readonly anchor?: Anchor
   readonly shift?: Shift
   readonly placeholder?: string
+  readonly tint?: string
 }
 
 function piece(spec: PieceSpec): PieceModel {
@@ -71,6 +78,7 @@ function piece(spec: PieceSpec): PieceModel {
     nativeBounds: spec.bounds,
     placeholder: spec.placeholder !== undefined,
     ...(spec.placeholder === undefined ? {} : { note: spec.placeholder }),
+    ...(spec.tint === undefined ? {} : { tint: spec.tint }),
   }
 }
 
@@ -114,8 +122,8 @@ const BUILDING_GAP = 'Fantasy Town wall/roof pieces stand in until GLB farm stru
 const HOTSPOT_GAP = 'A marker for the hotspot, not its structure; the structure waits for a GLB source (#115/#116 on hold).'
 
 /** Cube Pets face +Z (south); two turns make them face north like everything else (§8). */
-const animal = (file: string, bounds: NativeBounds, height: number): PieceModel =>
-  piece({ kit: 'cube-pets', file, bounds, size: { height }, quarterTurns: 2 })
+const animal = (file: string, bounds: NativeBounds, height: number, tint?: string): PieceModel =>
+  piece({ kit: 'cube-pets', file, bounds, size: { height }, quarterTurns: 2, ...(tint === undefined ? {} : { tint }) })
 
 /** Art-direction §2: keeper 1.6 units tall. Mini Characters face +Z, like Cube Pets. */
 const KEEPER_HEIGHT = 1.6

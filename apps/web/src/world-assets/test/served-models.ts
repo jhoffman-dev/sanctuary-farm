@@ -1,3 +1,4 @@
+import { PNG } from 'pngjs'
 import type { NativeBounds, Vec3 } from '../piece-fit'
 
 /**
@@ -7,6 +8,11 @@ import type { NativeBounds, Vec3 } from '../piece-fit'
  */
 const glbs = import.meta.glob<string>('../../../public/models/**/*.glb', { query: '?inline', import: 'default', eager: true })
 const pngs = import.meta.glob('../../../public/models/**/*.png', { query: '?url', import: 'default', eager: true })
+const atlasPngs = import.meta.glob<string>('../../../public/models/**/*.png', {
+  query: '?inline',
+  import: 'default',
+  eager: true,
+})
 
 const licenceFiles = import.meta.glob<string>('../../../public/models/**/License.txt', {
   query: '?raw',
@@ -33,12 +39,20 @@ type GltfNode = {
   scale?: Vec3
   matrix?: readonly number[]
 }
+type GltfPrimitive = { attributes: { POSITION: number; TEXCOORD_0?: number }; indices?: number }
 export type GltfJson = {
   scene?: number
   scenes: { nodes: number[] }[]
   nodes: GltfNode[]
-  meshes: { primitives: { attributes: { POSITION: number } }[] }[]
-  accessors: { min?: number[]; max?: number[]; bufferView?: number; byteOffset?: number; count: number }[]
+  meshes: { primitives: GltfPrimitive[] }[]
+  accessors: {
+    min?: number[]
+    max?: number[]
+    bufferView?: number
+    byteOffset?: number
+    count: number
+    componentType?: number
+  }[]
   bufferViews: { byteOffset?: number; byteStride?: number }[]
   images?: { uri?: string; bufferView?: number }[]
   animations?: { name?: string }[]
@@ -85,16 +99,14 @@ function localMatrix(node: GltfNode): Matrix {
   ]
 }
 
-type Visit = (accessor: number, world: Matrix) => void
+type Visit = (primitive: GltfPrimitive, world: Matrix) => void
 
-/** Calls `visit` with each POSITION accessor and its node's world matrix. */
-function eachPositionAccessor(gltf: GltfJson, visit: Visit): void {
+/** Calls `visit` with each mesh primitive and its node's world matrix. */
+function eachPrimitive(gltf: GltfJson, visit: Visit): void {
   const walk = (index: number, parent: Matrix) => {
     const node = gltf.nodes[index]!
     const world = multiply(parent, localMatrix(node))
-    for (const primitive of node.mesh === undefined ? [] : gltf.meshes[node.mesh]!.primitives) {
-      visit(primitive.attributes.POSITION, world)
-    }
+    for (const primitive of node.mesh === undefined ? [] : gltf.meshes[node.mesh]!.primitives) visit(primitive, world)
     for (const child of node.children ?? []) walk(child, world)
   }
   const identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
@@ -110,8 +122,8 @@ function apply(world: Matrix, [x, y, z]: Vec3): Vec3 {
 export function measureBounds(gltf: GltfJson): NativeBounds {
   const min = [Infinity, Infinity, Infinity]
   const max = [-Infinity, -Infinity, -Infinity]
-  eachPositionAccessor(gltf, (accessorIndex, world) => {
-    const { min: lo = [], max: hi = [] } = gltf.accessors[accessorIndex]!
+  eachPrimitive(gltf, ({ attributes }, world) => {
+    const { min: lo = [], max: hi = [] } = gltf.accessors[attributes.POSITION]!
     for (const cx of [lo[0]!, hi[0]!])
       for (const cy of [lo[1]!, hi[1]!])
         for (const cz of [lo[2]!, hi[2]!]) {
@@ -125,19 +137,71 @@ export function measureBounds(gltf: GltfJson): NativeBounds {
   return { min: min as unknown as Vec3, max: max as unknown as Vec3 }
 }
 
+/** Reads element `i` of a float accessor as `width` numbers (VEC2 → 2, VEC3 → 3). */
+function floatReader({ json, bin }: Glb, accessorIndex: number, width: number): (i: number) => number[] {
+  const accessor = json.accessors[accessorIndex]!
+  const bufferView = json.bufferViews[accessor.bufferView ?? 0]!
+  const stride = bufferView.byteStride ?? width * 4
+  const start = (bufferView.byteOffset ?? 0) + (accessor.byteOffset ?? 0)
+  return (i) => Array.from({ length: width }, (_, k) => bin.getFloat32(start + i * stride + k * 4, true))
+}
+
+const INDEX_BYTES: Readonly<Record<number, 1 | 2 | 4>> = { 5121: 1, 5123: 2, 5125: 4 }
+
+/** The primitive's triangle list: its index accessor, or 0, 1, 2, … when it has none. */
+function triangleIndices({ json, bin }: Glb, primitive: GltfPrimitive): number[] {
+  const count = json.accessors[primitive.attributes.POSITION]!.count
+  if (primitive.indices === undefined) return Array.from({ length: count }, (_, i) => i)
+  const accessor = json.accessors[primitive.indices]!
+  const bytes = INDEX_BYTES[accessor.componentType ?? 5125]
+  if (!bytes) throw new Error(`Unsupported index component type ${accessor.componentType}`)
+  const start = (json.bufferViews[accessor.bufferView ?? 0]!.byteOffset ?? 0) + (accessor.byteOffset ?? 0)
+  const read = { 1: (at: number) => bin.getUint8(at), 2: (at: number) => bin.getUint16(at, true), 4: (at: number) => bin.getUint32(at, true) }[bytes]
+  return Array.from({ length: accessor.count }, (_, i) => read(start + i * bytes))
+}
+
 /** Every vertex of a served GLB in its scene's space (bind pose; skins are not applied). */
 export function readVertices(url: string): Vec3[] {
-  const { json, bin } = readGlb(url)
+  const glb = readGlb(url)
   const vertices: Vec3[] = []
-  eachPositionAccessor(json, (accessorIndex, world) => {
-    const accessor = json.accessors[accessorIndex]!
-    const bufferView = json.bufferViews[accessor.bufferView ?? 0]!
-    const stride = bufferView.byteStride ?? 12
-    const start = (bufferView.byteOffset ?? 0) + (accessor.byteOffset ?? 0)
-    for (let i = 0; i < accessor.count; i++) {
-      const at = start + i * stride
-      vertices.push(apply(world, [bin.getFloat32(at, true), bin.getFloat32(at + 4, true), bin.getFloat32(at + 8, true)]))
-    }
+  eachPrimitive(glb.json, (primitive, world) => {
+    const position = floatReader(glb, primitive.attributes.POSITION, 3)
+    const count = glb.json.accessors[primitive.attributes.POSITION]!.count
+    for (let i = 0; i < count; i++) vertices.push(apply(world, position(i) as unknown as Vec3))
   })
   return vertices
+}
+
+export type TexturedTriangle = { readonly corners: readonly [Vec3, Vec3, Vec3]; readonly uvs: readonly [UV, UV, UV] }
+export type UV = readonly [number, number]
+
+/** Every triangle of a served GLB in its scene's space, with the atlas UVs of its corners. */
+export function readTexturedTriangles(url: string): TexturedTriangle[] {
+  const glb = readGlb(url)
+  const triangles: TexturedTriangle[] = []
+  eachPrimitive(glb.json, (primitive, world) => {
+    const uvAccessor = primitive.attributes.TEXCOORD_0
+    if (uvAccessor === undefined) throw new Error(`${url} has a primitive without TEXCOORD_0`)
+    const position = floatReader(glb, primitive.attributes.POSITION, 3)
+    const uv = floatReader(glb, uvAccessor, 2)
+    const indices = triangleIndices(glb, primitive)
+    for (let t = 0; t + 2 < indices.length; t += 3) {
+      const corner = [0, 1, 2].map((k) => indices[t + k]!)
+      triangles.push({
+        corners: corner.map((i) => apply(world, position(i) as unknown as Vec3)) as unknown as TexturedTriangle['corners'],
+        uvs: corner.map((i) => uv(i) as unknown as UV) as unknown as TexturedTriangle['uvs'],
+      })
+    }
+  })
+  return triangles
+}
+
+export type AtlasPixels = { readonly width: number; readonly height: number; readonly rgba: Uint8Array }
+
+/** A served atlas PNG, decoded to RGBA bytes, row 0 at the top as the file stores it. */
+export function readAtlasPixels(url: string): AtlasPixels {
+  const entry = Object.entries(atlasPngs).find(([key]) => servedUrl(key) === url)
+  if (!entry) throw new Error(`No served PNG at ${url}`)
+  const png = PNG.sync.read(Buffer.from(entry[1].split(',')[1] ?? '', 'base64'))
+  return { width: png.width, height: png.height, rgba: new Uint8Array(png.data) }
 }
