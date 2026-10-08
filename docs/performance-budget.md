@@ -64,7 +64,7 @@ Target is what we build to; ceiling fails the gate or blocks a merge.
 | Unique materials | 12 | 20 | one asset pack, one atlas per category |
 | Lights | 1 directional + 1 hemisphere | 2 | no point/spot lights on low tier |
 | Shadow maps | 1 × 1024² (low) / 1 × 2048² (high) | 1 map | casters: keeper + animals only; ground receives |
-| Texture format | Kenney's own 512² PNG atlas per kit, loaded once and shared (ADR-0003 addendum: GLB-native, no conversion, so no KTX2) | — | `e2e/kenney-assets.spec.ts`: one fetch and one 512² GPU upload per kit |
+| Texture format | Kenney's own 512² PNG atlas per kit, loaded once and shared (ADR-0003 addendum: GLB-native, no conversion, so no KTX2) | — | `e2e/kenney-assets.dev.spec.ts` (dev server): one fetch and one 512² GPU upload per kit |
 | Texture size | ≤ 1024² props · ≤ 2048² ground atlas | as target | count ≤ 24 textures resident |
 | Skinned meshes on screen | 6 | 8 | ≤ 64 bones per rig |
 | Animation clips | ≤ 12 per character, ≤ 2 MB total clip data | — | quantised via `gltf-transform` |
@@ -105,9 +105,8 @@ Target is what we build to; ceiling fails the gate or blocks a merge.
 `size-limit` config lives in `apps/web/package.json` and is run by the root
 `pnpm size`. The chunk names come from the `React.lazy` file name — the world
 chunk is `FarmScene-*.js` because `scene/LazyFarmScene.tsx` imports
-`./FarmScene`. Since SF-82 the `?assets=1` catalogue lazy-loads three as
-well, so the bundler moves three + r3f into a shared chunk named after r3f's
-entry file (`react-three-fiber.esm-*.js`); the world line sums that chunk and
+`./FarmScene`. The `?assets=1` catalogue (SF-82) also lazy-loads three, but it
+exists in dev builds only (SF-75), so in production three + r3f stay inside
 `FarmScene-*.js`. If the name ever changes, `size-limit` fails on the
 unmatched path rather than silently measuring less. The limits are this doc's **ceilings**, not its targets, so the
 gate fails on a regression and a merge is still the place to argue about a

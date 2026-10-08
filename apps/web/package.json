@@ -21,10 +21,7 @@
     },
     {
       "name": "world (three, r3f, the farm scene)",
-      "path": [
-        "dist/assets/FarmScene-*.js",
-        "dist/assets/react-three-fiber.esm-*.js"
-      ],
+      "path": "dist/assets/FarmScene-*.js",
       "limit": "350 kB",
       "gzip": true
     },

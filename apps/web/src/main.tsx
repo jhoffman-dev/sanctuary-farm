@@ -9,8 +9,10 @@ import './index.css'
 const root = document.getElementById('root')
 if (!root) throw new Error('index.html is missing the #root element')
 
+// `import.meta.env.DEV` is a build-time `false` in production, so the
+// catalogue viewer and its chunk are dropped from the child's build entirely.
+const showAssetCatalogue = import.meta.env.DEV && isAssetCatalogueRoute(window.location.search)
+
 createRoot(root).render(
-  <StrictMode>
-    {isAssetCatalogueRoute(window.location.search) ? <LazyAssetCatalogue /> : <App game={createGame()} />}
-  </StrictMode>,
+  <StrictMode>{showAssetCatalogue ? <LazyAssetCatalogue /> : <App game={createGame()} />}</StrictMode>,
 )
