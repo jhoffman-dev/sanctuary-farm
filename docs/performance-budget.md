@@ -32,7 +32,7 @@ Target is what we build to; ceiling fails the gate or blocks a merge.
 | Shell JS transfer (practice-first: React, `@sf/*`, HUD, number pad) | 70 kB gz | 100 kB gz | **68.7 kB gz** (was 303.2 kB) | `size-limit`, `pnpm size` in `pnpm gate` |
 | World JS chunk (three, r3f, drei subset) | 250 kB gz | 350 kB gz | **230.8 kB gz** (was: none, it was in the shell) | `size-limit` |
 | CSS transfer | 15 kB gz | 30 kB gz | 3.8 kB gz | `size-limit` |
-| 3D assets for the first hotspot (ground, keeper, barn exteriors) | 1.5 MB | 2.5 MB | — (no models ship yet) | `size-limit` on `public/models/**`, once there are models |
+| 3D assets for the first hotspot (ground, keeper, barn exteriors) | 1.5 MB | 2.5 MB | 2.24 MB raw for the whole SF-82 catalogue (every piece, six animals, four keepers), more than one hotspot needs | `size-limit` on `public/models/**/*.{glb,png}`, uncompressed, at the ceiling |
 | Audio (synth only today) | 0 | see below | 0 | — |
 | Total transfer to first playable question | 100 kB | 150 kB | — | Lighthouse `total-byte-weight` on the shell |
 | Total transfer incl. first hotspot world | 2.5 MB | 4 MB | Lighthouse, world loaded |
@@ -64,7 +64,7 @@ Target is what we build to; ceiling fails the gate or blocks a merge.
 | Unique materials | 12 | 20 | one asset pack, one atlas per category |
 | Lights | 1 directional + 1 hemisphere | 2 | no point/spot lights on low tier |
 | Shadow maps | 1 × 1024² (low) / 1 × 2048² (high) | 1 map | casters: keeper + animals only; ground receives |
-| Texture format | KTX2/Basis (UASTC atlas, ETC1S props), power-of-two, mipmapped | — | `gltf-transform` in the asset pipeline; PNG/JPG only for UI |
+| Texture format | Kenney's own 512² PNG atlas per kit, loaded once and shared (ADR-0003 addendum: GLB-native, no conversion, so no KTX2) | — | `e2e/kenney-assets.spec.ts`: one fetch and one 512² GPU upload per kit |
 | Texture size | ≤ 1024² props · ≤ 2048² ground atlas | as target | count ≤ 24 textures resident |
 | Skinned meshes on screen | 6 | 8 | ≤ 64 bones per rig |
 | Animation clips | ≤ 12 per character, ≤ 2 MB total clip data | — | quantised via `gltf-transform` |
@@ -105,21 +105,27 @@ Target is what we build to; ceiling fails the gate or blocks a merge.
 `size-limit` config lives in `apps/web/package.json` and is run by the root
 `pnpm size`. The chunk names come from the `React.lazy` file name — the world
 chunk is `FarmScene-*.js` because `scene/LazyFarmScene.tsx` imports
-`./FarmScene`. The limits are this doc's **ceilings**, not its targets, so the
+`./FarmScene`. Since SF-82 the `?assets=1` catalogue lazy-loads three as
+well, so the bundler moves three + r3f into a shared chunk named after r3f's
+entry file (`react-three-fiber.esm-*.js`); the world line sums that chunk and
+`FarmScene-*.js`. If the name ever changes, `size-limit` fails on the
+unmatched path rather than silently measuring less. The limits are this doc's **ceilings**, not its targets, so the
 gate fails on a regression and a merge is still the place to argue about a
 number between target and ceiling:
 
 ```json
 "size-limit": [
   { "name": "shell (everything the first question needs)", "path": "dist/assets/index-*.js", "limit": "100 kB", "gzip": true },
-  { "name": "world (three, r3f, the farm scene)", "path": "dist/assets/FarmScene-*.js", "limit": "350 kB", "gzip": true },
+  { "name": "world (three, r3f, the farm scene)", "path": ["dist/assets/FarmScene-*.js", "dist/assets/react-three-fiber.esm-*.js"], "limit": "350 kB", "gzip": true },
+  { "name": "models (every Kenney piece in the catalogue, uncompressed)", "path": "public/models/**/*.{glb,png}", "limit": "2.5 MB", "brotli": false },
   { "name": "css", "path": "dist/assets/*.css", "limit": "30 kB", "gzip": true }
 ]
 ```
 
-The `public/models/**` line from the original plan is **not** wired yet: there
-are no models in the repo, and `size-limit` errors on a path that matches
-nothing. It goes in with the first `.glb`.
+The models line measures raw bytes (`"brotli": false`): GLB is binary and
+Firebase Hosting's compression of `model/gltf-binary` is not verified, so the
+honest number is the uncompressed one. It covers the whole catalogue, not one
+hotspot, so it sits at the hotspot ceiling until per-hotspot loading splits it.
 
 `size-limit`'s gzip numbers are a little under Vite's build report (68.71 kB vs
 69.64 kB for the shell) — different compression levels over the same bytes. The

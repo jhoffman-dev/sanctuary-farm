@@ -21,9 +21,18 @@
     },
     {
       "name": "world (three, r3f, the farm scene)",
-      "path": "dist/assets/FarmScene-*.js",
+      "path": [
+        "dist/assets/FarmScene-*.js",
+        "dist/assets/react-three-fiber.esm-*.js"
+      ],
       "limit": "350 kB",
       "gzip": true
+    },
+    {
+      "name": "models (every Kenney piece in the catalogue, uncompressed)",
+      "path": "public/models/**/*.{glb,png}",
+      "limit": "2.5 MB",
+      "brotli": false
     },
     {
       "name": "css",
