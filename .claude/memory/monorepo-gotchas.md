@@ -63,3 +63,17 @@
 - **A `React.lazy` promise is cached per module instance**, so only the first
   render in a test file ever sees the fallback. Test the fallback
   (`SceneLoading`) directly rather than trying to catch it twice.
+- **Quality tiers decide the frameloop (SF-80).** Headless Chromium renders
+  in software (SwiftShader), so the tier probe puts every e2e run on the
+  **low** tier unless the URL says `?quality=high`: no shadows, idle clips
+  held, and `data-frameloop="demand"` once the farm is still. A spec that
+  needs the full look (screenshots, the high tier's draw calls) pins
+  `?quality=high`; Playwright contexts start with empty localStorage, so the
+  remembered tier never leaks between tests. On demand, `?perf=1` ticks a
+  frame every 0.5 s — wait on `data-publishes`, not on `data-fps` changing.
+- **Parallel worktrees share the e2e ports.** Playwright's web servers use
+  fixed ports (4173 preview, 5174 dev) with `reuseExistingServer` outside CI,
+  so a run in one worktree silently tests another worktree's server if that
+  one is up — failures that look like your change (missing attributes, empty
+  probes). Check `lsof -iTCP:4173 -sTCP:LISTEN` first, or run `CI=1 pnpm e2e`,
+  which starts its own servers and fails loudly on a busy port.
