@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { saveDocImage } from './doc-image'
 
 // SF-75: the farm scene draws the procedural tile world. `?perf=1` makes the
 // scene publish renderer.info, its frame rate and every hotspot's screen
@@ -8,7 +9,6 @@ import { expect, test, type Page } from '@playwright/test'
 /** docs/performance-budget.md: draw calls, target 100, ceiling 150. */
 const DRAW_CALL_CEILING = 150
 const HOTSPOT_COUNT = 7
-const SCREENSHOTS = '../../docs/img'
 
 type HotspotOnScreen = { id: string; left: number; top: number }
 type Probe = { drawCalls: number; triangles: number; fps: number; hotspots: HotspotOnScreen[] }
@@ -45,7 +45,7 @@ async function readSettledProbe(page: Page): Promise<Probe> {
 test.describe('the farm world at the §2 camera, 1280 × 800', () => {
   test.use({ viewport: { width: 1280, height: 800 } })
 
-  test('renders the tile world with no errors, every hotspot in frame, inside the draw-call budget', async ({ page }) => {
+  test('renders the tile world with no errors, every hotspot in frame, inside the draw-call budget', async ({ page }, testInfo) => {
     const errors = collectErrors(page)
     await page.goto('/?perf=1')
     await expect(page.locator('canvas')).toBeVisible()
@@ -66,14 +66,14 @@ test.describe('the farm world at the §2 camera, 1280 × 800', () => {
       type: 'renderer at 1280x800',
       description: `${probe.drawCalls} draw calls, ${probe.triangles} triangles, ${probe.fps} fps`,
     })
-    await page.screenshot({ path: `${SCREENSHOTS}/farm-world-1280x800.png` })
+    await saveDocImage(page, testInfo, { name: 'farm-world-1280x800.png' })
   })
 })
 
 test.describe('the farm world on a phone, 360 × 640', () => {
   test.use({ viewport: { width: 360, height: 640 } })
 
-  test('renders the tile world with no errors', async ({ page }) => {
+  test('renders the tile world with no errors', async ({ page }, testInfo) => {
     const errors = collectErrors(page)
     await page.goto('/?perf=1')
     const probe = await readSettledProbe(page)
@@ -84,6 +84,6 @@ test.describe('the farm world on a phone, 360 × 640', () => {
       type: 'renderer at 360x640',
       description: `${probe.drawCalls} draw calls, ${probe.triangles} triangles, ${probe.fps} fps`,
     })
-    await page.screenshot({ path: `${SCREENSHOTS}/farm-world-360x640.png` })
+    await saveDocImage(page, testInfo, { name: 'farm-world-360x640.png' })
   })
 })
