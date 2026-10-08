@@ -40,5 +40,10 @@ export function surfaceOf(ground: GroundPiece): Surface {
   return SURFACES[ground.kind]
 }
 
+/** A ground kind's colour as a CSS hex, for things drawn over the ground such as the editor's brush preview. */
+export function groundHex(kind: GroundPiece['kind']): string {
+  return GROUND_HEX[kind]
+}
+
 /** The grass beyond the farm's chunks, under the fog: one colour with the land so the edge never shows. */
 export const HORIZON_GRASS = GROUND_HEX.grass
