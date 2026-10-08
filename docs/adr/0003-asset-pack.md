@@ -288,6 +288,25 @@ under epic #32:
 - **SF-86 (#117)** Animal identification: distinct colour-blind-safe body
   colours and a 64-px colour check, replacing the shape-only silhouette test.
 
+## Addendum (2026-10-08)
+
+James Hoffman narrowed the decision further on 2026-10-07/08:
+
+- **No Synty, in any form.** That includes the Unity Asset Store "Simple Farm"
+  pack (US$9.99, marked Restricted): it sits under the standard Unity Asset
+  Store EULA, which forbids distributing assets in a form a user can extract,
+  and a browser game serves every model as a fetchable file.
+- **GLB-native only, no format conversion.** Every asset must ship as the GLB
+  its author published. No FBX/OBJ → glTF step, and no re-encoding pass in the
+  pipeline.
+- **Kenney GLBs are served unmodified.** Kenney's GLB folders reference each
+  kit's `Textures/colormap.png` by relative URI instead of embedding it, so
+  serving the files as-is gives one atlas per kit, fetched once and shared by
+  every model of that kit. This replaces the `gltf-transform optimize` step the
+  Consequences section assumed (SF-82, #113).
+- **Barn and world-gap modelling is on hold.** SF-84 (#115) and SF-85 (#116)
+  wait while James looks for more farm structures that already ship as GLB.
+
 ## Evidence
 
 Screenshots from the SF-63 spike, all at the art-direction §2 camera. Full
