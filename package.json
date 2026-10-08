@@ -18,6 +18,7 @@
     "test:rules": "firebase emulators:exec --only firestore --project demo-sanctuary-farm \"vitest run --config firestore/vitest.config.ts\"",
     "build": "pnpm -r build",
     "size": "pnpm --filter @sf/web size",
+    "lhci": "pnpm --filter @sf/web build && lhci autorun --config=lighthouserc.cjs",
     "e2e": "pnpm e2e:web && pnpm e2e:landing",
     "e2e:web": "pnpm --filter @sf/web e2e",
     "e2e:landing": "playwright test --config apps/landing/playwright.config.ts",
@@ -25,6 +26,7 @@
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.2",
+    "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.63.0",
     "@vitest/coverage-v8": "^5.0.0",
     "dependency-cruiser": "^18.2.0",
