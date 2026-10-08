@@ -2,7 +2,7 @@
   "name": "@sf/world",
   "version": "0.0.0",
   "private": true,
-  "description": "The farm layout: where the ground, paths, hotspots and camera anchors are. Plain data plus the rules that check it — no Three.js, no React, no DOM.",
+  "description": "The farm world: the hotspot layout, and the procedural tile world (chunks, seeded generator, autotiling, authored overrides) built around it. Plain data plus the rules that make and check it — no Three.js, no React, no DOM.",
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
