@@ -8,6 +8,16 @@
  * hotspots exactly once), then the art-direction rules in `layout-rules.ts`.
  */
 import { layoutRuleViolations } from './layout-rules'
+import {
+  fail,
+  parseOrReason,
+  requireArray,
+  requireFinite,
+  requireOneOf,
+  requireOnlyKeys,
+  requirePositive,
+  requireRecord,
+} from './parse-primitives'
 import type {
   Area,
   CameraAnchor,
@@ -26,45 +36,8 @@ import { GROUND_MATERIALS, HOTSPOT_IDS, LAYOUT_SCHEMA_VERSION } from './world-la
 
 export type ParsedFarmLayout = { ok: true; layout: WorldLayout } | { ok: false; reason: string }
 
-type UnknownRecord = Record<string, unknown>
-
 /** Model ids address `apps/web/public/models/<category>/<name>.glb` (art-direction §8). */
 const MODEL_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)+$/
-
-/** Thrown while walking the document, caught at the entry point and turned into a reason. */
-class LayoutProblem extends Error {}
-
-function fail(path: string, expected: string): never {
-  throw new LayoutProblem(`${path}: ${expected}`)
-}
-
-function requireRecord(value: unknown, path: string): UnknownRecord {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) fail(path, 'expected an object')
-  // `__proto__` arrives from JSON.parse as an ordinary own key; copying it would rewrite a prototype.
-  if (Object.hasOwn(value, '__proto__')) fail(path, 'forbidden key __proto__')
-  return value as UnknownRecord
-}
-
-function requireOnlyKeys(record: UnknownRecord, allowed: readonly string[], path: string): void {
-  const unknown = Object.keys(record).find((key) => !allowed.includes(key))
-  if (unknown !== undefined) fail(path, `unknown key ${JSON.stringify(unknown)}`)
-}
-
-function requireArray(value: unknown, path: string): unknown[] {
-  if (!Array.isArray(value)) fail(path, 'expected an array')
-  return value
-}
-
-function requireFinite(value: unknown, path: string): number {
-  if (typeof value !== 'number' || !Number.isFinite(value)) fail(path, 'expected a finite number')
-  return value
-}
-
-function requirePositive(value: unknown, path: string): number {
-  const size = requireFinite(value, path)
-  if (size <= 0) fail(path, 'expected a number greater than 0')
-  return size
-}
 
 function requireModelId(value: unknown, path: string): string {
   if (typeof value !== 'string' || !MODEL_ID.test(value)) fail(path, 'expected a model id like "buildings/barn"')
@@ -123,8 +96,7 @@ function parseArea(value: unknown, path: string): Area {
 function parseGround(value: unknown): Ground {
   const ground = requireRecord(value, 'ground')
   requireOnlyKeys(ground, ['size', 'material'], 'ground')
-  const material = GROUND_MATERIALS.find((known) => known === ground.material)
-  if (material === undefined) fail('ground.material', `expected one of ${GROUND_MATERIALS.join(', ')}`)
+  const material = requireOneOf(ground.material, GROUND_MATERIALS, 'ground.material')
   return { size: requireSize2(ground.size, 'ground.size'), material }
 }
 
@@ -163,10 +135,8 @@ function parseHotspot(value: unknown, index: number): Hotspot {
   const path = `hotspots[${index}]`
   const hotspot = requireRecord(value, path)
   requireOnlyKeys(hotspot, HOTSPOT_KEYS, path)
-  const id = HOTSPOT_IDS.find((known) => known === hotspot.id)
-  if (id === undefined) fail(`${path}.id`, `expected one of ${HOTSPOT_IDS.join(', ')}`)
   return {
-    id,
+    id: requireOneOf(hotspot.id, HOTSPOT_IDS, `${path}.id`),
     model: requireModelId(hotspot.model, `${path}.model`),
     position: requirePoint3(hotspot.position, `${path}.position`),
     rotationY: requireDegrees(hotspot.rotationY, `${path}.rotationY`),
@@ -230,14 +200,8 @@ function buildLayout(raw: unknown): WorldLayout {
  * caller decides whether that is a broken build or a bad hand edit.
  */
 export function parseFarmLayout(raw: unknown): ParsedFarmLayout {
-  let layout: WorldLayout
-  try {
-    layout = buildLayout(raw)
-  } catch (problem) {
-    // Only our own structural complaints are answers; anything else is a bug here.
-    if (problem instanceof LayoutProblem) return { ok: false, reason: problem.message }
-    throw problem
-  }
-  const [violation] = layoutRuleViolations(layout)
-  return violation === undefined ? { ok: true, layout } : { ok: false, reason: violation }
+  const built = parseOrReason(() => buildLayout(raw))
+  if (!built.ok) return built
+  const [violation] = layoutRuleViolations(built.value)
+  return violation === undefined ? { ok: true, layout: built.value } : { ok: false, reason: violation }
 }
