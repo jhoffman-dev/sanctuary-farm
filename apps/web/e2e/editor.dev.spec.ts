@@ -1,6 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises'
 import { type Page, expect, test } from '@playwright/test'
 import type { TileCoord, TileWorld } from '@sf/world'
+import { saveDocImage } from './doc-image'
 
 /**
  * The world editor (#105), end to end against the dev server: paint, place,
@@ -12,7 +13,6 @@ import type { TileCoord, TileWorld } from '@sf/world'
 const LAYOUTS = '../../packages/world/layouts'
 const OVERRIDES_FILE = `${LAYOUTS}/overrides.json`
 const WORLD_FILE = `${LAYOUTS}/world.json`
-const SCREENSHOTS = '../../docs/img'
 /** Below the editor's toolbar, which floats over the top of the view. */
 const CLEAR_OF_TOOLBAR_PX = 110
 
@@ -20,6 +20,8 @@ test.describe.configure({ mode: 'serial' })
 test.use({ viewport: { width: 1280, height: 800 } })
 
 const originals = { overrides: '', world: '' }
+/** What the editing test saved, for the reload test to find again. */
+let saved: { readonly painted: TileCoord; readonly chunks: number } | undefined
 
 test.beforeAll(async () => {
   originals.overrides = await readFile(OVERRIDES_FILE, 'utf8')
@@ -107,7 +109,10 @@ function unsaved(page: Page) {
   return page.getByTestId('unsaved-count')
 }
 
-test('edit the farm in the browser and save exactly those edits to the repo', async ({ page }) => {
+test('edit the farm in the browser and save exactly those edits to the repo', async ({ page }, testInfo) => {
+  // A cold dev-server load plus a dozen edits that each redraw a WebGL scene:
+  // ~14 s alone, but twice that when the whole suite shares the machine.
+  test.setTimeout(60_000)
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
 
@@ -166,7 +171,7 @@ test('edit the farm in the browser and save exactly those edits to the repo', as
   await clickTile(page, { x: 20, z: 8 })
   await expect.poll(async () => (await world(page)).chunks.length).toBe(5)
   await expect(unsaved(page)).toHaveAttribute('data-count', '4')
-  await page.screenshot({ path: `${SCREENSHOTS}/world-editor-topdown.png` })
+  await saveDocImage(page, testInfo, { name: 'world-editor-topdown.png' })
 
   // The deliverable screenshot: game camera, a tile selected, a tree ghost under the cursor.
   await page.keyboard.press('g')
@@ -175,7 +180,7 @@ test('edit the farm in the browser and save exactly those edits to the repo', as
   const hover = await screenOf(page, { x: painted.x + 1, z: painted.z })
   await page.mouse.move(hover.x, hover.y)
   await nextFrames(page)
-  await page.screenshot({ path: `${SCREENSHOTS}/world-editor-1280x800.png` })
+  await saveDocImage(page, testInfo, { name: 'world-editor-1280x800.png' })
 
   // Save, and the files on disk hold exactly what was done.
   await page.getByTestId('save').click()
@@ -194,12 +199,26 @@ test('edit the farm in the browser and save exactly those edits to the repo', as
   const savedWorld = JSON.parse(await readFile(WORLD_FILE, 'utf8')) as { chunks: unknown[] }
   expect(savedWorld.chunks).toContainEqual({ cx: 1, cz: 0 })
   expect(savedWorld.chunks).toHaveLength((JSON.parse(originals.world) as { chunks: unknown[] }).chunks.length + 1)
+  saved = { painted, chunks: savedWorld.chunks.length }
 
-  // A fresh load reads the saved files back: nothing unsaved, the edits still there.
-  await page.reload()
+  expect(errors).toEqual([])
+})
+
+// Its own test, so a second cold load of the editor gets its own time budget
+// rather than finishing an already long editing run past the timeout.
+test('a fresh load reads the saved files back: nothing unsaved, the edits still there', async ({ page }) => {
+  expect(saved, 'the editing test saved first').toBeDefined()
+  const { painted, chunks } = saved!
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(error.message))
+
+  await page.goto('/?edit=1')
   await expect(page.getByTestId('world-editor')).toHaveAttribute('data-ready', 'true', { timeout: 30_000 })
   await expect(unsaved(page)).toHaveAttribute('data-count', '0')
-  expect((await world(page)).chunks).toHaveLength(5)
+  expect((await world(page)).chunks).toHaveLength(chunks)
+  // Picked in the game camera's view, which a fresh load opens on.
+  await inspect(page, painted)
+  await expect(page.getByTestId('inspector-ground')).toContainText('dirt')
 
   expect(errors).toEqual([])
 })
