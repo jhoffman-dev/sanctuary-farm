@@ -3,7 +3,7 @@
   "ground": { "size": [30, 30], "material": "grass" },
   "camera": {
     "fov": 35,
-    "home": { "position": [9, 7, 12], "lookAt": [0, 0.6, 0] }
+    "home": { "position": [13, 12.5, 18.5], "lookAt": [0, 0.6, 1] }
   },
   "paths": [
     { "id": "farmhouse-to-yard", "width": 1.4, "points": [[-7, 6], [-4, 2], [-1, -2]] },

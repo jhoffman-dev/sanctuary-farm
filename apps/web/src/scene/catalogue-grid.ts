@@ -1,3 +1,4 @@
+import { PIECE_IDS, type PieceId } from '@sf/world'
 import {
   ANIMAL_SPECIES,
   type AnimalSpecies,
@@ -6,8 +7,6 @@ import {
   KENNEY_ANIMALS,
   KENNEY_CATALOGUE,
   KENNEY_KEEPERS,
-  PIECE_IDS,
-  type PieceId,
   type PieceModel,
 } from '../world-assets'
 

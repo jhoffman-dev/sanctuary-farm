@@ -16,9 +16,10 @@ export type ModelSource = { readonly url: string; readonly atlasUrl: string }
 
 /**
  * Loads each GLB once (suspending until all arrive) and shares each kit's atlas
- * between them. One GLB per atlas loads first: three r185's ImageBitmapLoader
- * hands `undefined` to a second caller that asks for an image still in flight,
- * so the atlas must be decoded and cached before any other GLB asks for it.
+ * between them; each scene carries its GLB's clips in `scene.animations`. One
+ * GLB per atlas loads first: three r185's ImageBitmapLoader hands `undefined`
+ * to a second caller that asks for an image still in flight, so the atlas must
+ * be decoded and cached before any other GLB asks for it.
  */
 export function useKenneyModels(sources: readonly ModelSource[]): ReadonlyMap<string, Object3D> {
   const { first, rest } = useMemo(() => splitByAtlas(sources), [sources])
@@ -32,6 +33,8 @@ export function useKenneyModels(sources: readonly ModelSource[]): ReadonlyMap<st
         const gltf = gltfs[index]
         if (!gltf) throw new Error(`GLTFLoader returned nothing for ${url}`)
         atlases.share(gltf.scene)
+        // Object3D's own `animations` slot: clips travel with the scene and with every clone of it.
+        gltf.scene.animations = gltf.animations
         scenes.set(url, gltf.scene)
       })
     record(first, firstLoaded)

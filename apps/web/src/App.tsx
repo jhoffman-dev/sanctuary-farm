@@ -2,13 +2,15 @@ import type { FarmGame, FarmSummary } from '@sf/application'
 import { useCallback, useEffect, useState } from 'react'
 import { Hud } from './hud/Hud'
 import { PracticePanel } from './practice/PracticePanel'
-import { LazyFarmScene } from './scene/LazyFarmScene'
+import { LazyFarmScene, type WorldLoader } from './scene/LazyFarmScene'
 
 type AppProps = {
   game: FarmGame
+  /** Builds the tile world the scene draws; fetched after the number pad is up. */
+  loadWorld: WorldLoader
 }
 
-export function App({ game }: AppProps) {
+export function App({ game, loadWorld }: AppProps) {
   const [summary, setSummary] = useState<FarmSummary | null>(null)
   const [loadFailed, setLoadFailed] = useState(false)
   const refreshSummary = useCallback(() => setSummary(game.summary()), [game])
@@ -43,7 +45,7 @@ export function App({ game }: AppProps) {
 
   return (
     <main className="relative h-full w-full">
-      <LazyFarmScene />
+      <LazyFarmScene loadWorld={loadWorld} />
       <div className="pointer-events-none absolute inset-0 flex flex-col">
         {summary ? (
           <>

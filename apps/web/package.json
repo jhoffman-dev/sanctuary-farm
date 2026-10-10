@@ -20,10 +20,11 @@
       "gzip": true
     },
     {
-      "name": "world (three, r3f, the farm scene)",
+      "name": "world (three, r3f, the farm scene, the tile-world generator)",
       "path": [
         "dist/assets/FarmScene-*.js",
-        "dist/assets/react-three-fiber.esm-*.js"
+        "dist/assets/tile-world-*.js",
+        "dist/assets/build-farm-world-*.js"
       ],
       "limit": "350 kB",
       "gzip": true
@@ -47,6 +48,7 @@
     "@sf/audio": "workspace:*",
     "@sf/domain": "workspace:*",
     "@sf/persistence": "workspace:*",
+    "@sf/world": "workspace:*",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "three": "^0.185.1"

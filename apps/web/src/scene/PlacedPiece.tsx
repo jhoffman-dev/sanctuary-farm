@@ -1,5 +1,6 @@
 import type { Object3D } from 'three'
-import { type PieceModel, type QuarterTurns, quarterTurnsToRadians } from '../world-assets'
+import type { QuarterTurns } from '@sf/world'
+import { type PieceModel, quarterTurnsToRadians } from '../world-assets'
 
 type PlacedPieceProps = {
   model: PieceModel

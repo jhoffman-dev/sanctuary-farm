@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { KENNEY_ANIMALS, KENNEY_CATALOGUE, KENNEY_KEEPERS, KENNEY_KITS, kitDirectory, type PieceModel } from './kenney-catalogue'
-import { ANIMAL_SPECIES, KEEPER_VARIANTS, PIECE_IDS, type PieceId } from './piece-kinds'
+import { PIECE_IDS, type PieceId } from '@sf/world'
+import { ANIMAL_SPECIES, KEEPER_VARIANTS } from './piece-kinds'
 import { LICENCES, measureBounds, readGltfJson, SERVED_URLS } from './test/served-models'
 
 /** Tile pieces, animals and keepers alike: every model the catalogue serves. */
@@ -8,17 +9,6 @@ const entries: [string, PieceModel][] = [
   ...Object.entries(KENNEY_CATALOGUE),
   ...Object.entries(KENNEY_ANIMALS).map(([species, model]): [string, PieceModel] => [`animal:${species}`, model]),
   ...Object.entries(KENNEY_KEEPERS).map(([variant, model]): [string, PieceModel] => [`keeper:${variant}`, model]),
-]
-
-/** The `PieceId` list of `@sf/world` on feat/SF-87-tile-world (PR #119), restated so drift fails here. */
-const WORLD_PIECE_IDS = [
-  'grass', 'dirt', 'water',
-  'fence:end', 'fence:straight', 'fence:corner', 'fence:tee', 'fence:cross',
-  'path:end', 'path:straight', 'path:corner', 'path:tee', 'path:cross',
-  'fence-gate', 'building-wall', 'building-wall-door', 'building-wall-window', 'building-roof',
-  'tree', 'tree-tall', 'bush', 'rock', 'crate', 'barrel', 'hay-bale', 'crop',
-  'hotspot:barn', 'hotspot:feed-shed', 'hotspot:nest', 'hotspot:paddock',
-  'hotspot:training-ring', 'hotspot:petting-zoo', 'hotspot:farmhouse',
 ]
 
 /**
@@ -39,9 +29,8 @@ const GROUND_TILES = new Set<string>(['grass', 'dirt', 'water', 'path:end', 'pat
 const SPECIES_HEIGHT = { cow: 1.3, pig: 0.9, hog: 0.9, chick: 0.5, bunny: 0.6, dog: 0.7 } as const
 
 describe('the Kenney piece catalogue', () => {
-  it('speaks exactly the tile world\'s PieceId vocabulary', () => {
-    expect([...PIECE_IDS]).toEqual(WORLD_PIECE_IDS)
-    expect(Object.keys(KENNEY_CATALOGUE).toSorted()).toEqual(WORLD_PIECE_IDS.toSorted())
+  it('maps exactly the tile world\'s PieceId vocabulary, no more', () => {
+    expect(Object.keys(KENNEY_CATALOGUE).toSorted()).toEqual([...PIECE_IDS].toSorted())
   })
 
   it('points every entry at a GLB and an atlas that are actually served', () => {

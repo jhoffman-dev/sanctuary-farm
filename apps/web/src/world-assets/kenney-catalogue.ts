@@ -1,5 +1,6 @@
-import { type Anchor, fitPiece, type NativeBounds, type PieceFit, type QuarterTurns, type Rest, scaleToHeight } from './piece-fit'
-import type { AnimalSpecies, KeeperVariant, PieceId } from './piece-kinds'
+import type { PieceId, QuarterTurns } from '@sf/world'
+import { type Anchor, fitPiece, type NativeBounds, type PieceFit, type Rest, type Shift, scaleToHeight } from './piece-fit'
+import type { AnimalSpecies, KeeperVariant } from './piece-kinds'
 
 /**
  * Which Kenney GLB draws each piece kind, and how to sit it on the tile grid.
@@ -48,6 +49,7 @@ type PieceSpec = {
   readonly quarterTurns?: QuarterTurns
   readonly rest?: Rest
   readonly anchor?: Anchor
+  readonly shift?: Shift
   readonly placeholder?: string
 }
 
@@ -59,6 +61,7 @@ function piece(spec: PieceSpec): PieceModel {
     quarterTurns: spec.quarterTurns ?? 0,
     rest: spec.rest ?? 'base',
     anchor: spec.anchor ?? 'origin',
+    ...(spec.shift === undefined ? {} : { shift: spec.shift }),
   })
   return {
     ...fit,
@@ -146,6 +149,13 @@ const GROUND: Readonly<Record<'grass' | 'dirt' | 'water', PieceModel>> = {
   }),
 }
 
+/**
+ * Turned to join north and east, the arc's ends sit 0.4625 (to the middle of
+ * its 0.075 rail) west of and south of the centre lines; moving it by that much
+ * puts both ends on the lines the centred straights run along.
+ */
+const CORNER_ONTO_CENTRE_LINES: Shift = { x: 0.4625, z: -0.4625 }
+
 const AUTOTILES = {
   'fence:end': fenceRun('No fence end post in Fantasy Town; a north–south run stands in (it also reaches south).'),
   'fence:straight': fenceRun(),
@@ -155,8 +165,9 @@ const AUTOTILES = {
     bounds: { min: [-0.5, 0, -0.5], max: [0.5, 0.38, 0.5] },
     size: TOWN_SCALE,
     quarterTurns: 2,
+    shift: CORNER_ONTO_CENTRE_LINES,
     placeholder:
-      'Fantasy Town has no centre-line corner. Its arc, turned to join north and east, meets those edges 0.46 off the centre line, so it leaves a gap beside centred straights.',
+      'Fantasy Town has no centre-line corner. Its edge arc is shifted onto the centre lines, so its ends overlap the neighbouring straights by about half a tile.',
   }),
   'fence:tee': fenceRun('No fence tee in Fantasy Town; a north–south run stands in (the east branch is missing).'),
   'fence:cross': fenceRun('No fence cross in Fantasy Town; a north–south run stands in (east and west are missing).'),
@@ -281,7 +292,7 @@ const HOTSPOTS = {
   'hotspot:farmhouse': STRUCTURES['building-wall-door'],
 }
 
-/** Keyed by the tile world's `PieceId` strings; retype as `Record<PieceId, …>` from `@sf/world` once SF-87 merges. */
+/** Keyed by the tile world's `PieceId`: a kind `@sf/world` adds fails the build until it is mapped here. */
 export const KENNEY_CATALOGUE: Readonly<Record<PieceId, PieceModel>> = {
   ...GROUND,
   ...AUTOTILES,
