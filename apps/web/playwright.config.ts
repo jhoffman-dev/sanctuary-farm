@@ -8,6 +8,10 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
+  // CI renders WebGL in software (SwiftShader), which takes every core it can get: two
+  // workers' farms starve each other's frames and main threads, so a test's speed would
+  // depend on what the other worker happens to be drawing. One farm at a time, as a player has.
+  workers: process.env.CI ? 1 : '50%', // '50%' is Playwright's own default
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {
     baseURL,
