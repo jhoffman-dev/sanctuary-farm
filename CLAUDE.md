@@ -23,6 +23,13 @@ the exception — it stays repo-only.
 - **pnpm** workspaces. Node pinned in `.nvmrc` + `engines`.
 - Firebase: Hosting (game + landing), custom Auth, Firestore, Cloud Functions.
 - Deploy: Firebase Hosting. PR previews + prod on merge.
+- **We share the Firebase project `student-games-be188` with two other games.**
+  Own Hosting sites (`sanctuary-farm`, `sanctuary-farm-landing`), own functions
+  codebase (`sanctuary-farm`), own named Firestore database (`sanctuary-farm`).
+  Deploy only with the scoped `pnpm deploy:*` scripts — a bare `firebase deploy`,
+  the `default` codebase, or rules on `(default)` would break another game.
+  Emulators run on `demo-sanctuary-farm`. Read `docs/deploy.md` before touching
+  `firebase.json` or `.firebaserc`.
 
 ## Architecture — the rule that matters
 
@@ -77,6 +84,8 @@ No snapshot test as a stand-in for a behaviour test.
 | `UPDATE_DOC_IMAGES=1 pnpm e2e` | same, and refresh the tracked screenshots in `docs/img/` (a normal run writes them only under `apps/web/test-results/`) |
 | `E2E_REUSE_SERVER=1 pnpm e2e` | run against servers you already started on the fixed ports — `vite preview` :4173, `pnpm dev --port 5174`, landing :4180 (Playwright starts any that are not up). Pin a single port with `E2E_WEB_PREVIEW_PORT` / `E2E_WEB_DEV_PORT` / `E2E_LANDING_PORT` |
 | `pnpm vitest run --project domain` | one package's tests (`domain` · `application` · `persistence` · `audio` · `web`) |
+| `pnpm emulators` / `pnpm test:rules` | Firebase emulators / Firestore rules tests, both pinned to `demo-sanctuary-farm` (needs a JDK) |
+| `pnpm deploy:game` · `:landing` · `:functions` · `:rules` | the only sanctioned deploys — see `docs/deploy.md` |
 
 Node is Homebrew-installed — prefix bash calls with `export PATH="/opt/homebrew/bin:$PATH"`.
 
@@ -106,6 +115,10 @@ this file → human merges. Move the ticket across the board as you go (skill:
 
 Branch names: `feat/SF-123-short-slug`, `fix/…`, `chore/…`. One ticket per PR.
 PR description links the ticket and states what changed + how it was verified.
+
+`CONTRIBUTING.md` states this same workflow for humans outside the agent fleet;
+`CODE_OF_CONDUCT.md` covers conduct and the kid-safety reporting address. Keep
+all three in step when the workflow changes.
 
 ## Agents & skills
 
