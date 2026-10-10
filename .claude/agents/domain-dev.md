@@ -33,6 +33,6 @@ only `packages/domain` / `packages/application` touched; PR links the ticket and
 lists the behaviours added/changed with the tests that cover them.
 
 ## Hand-off
-Move the ticket to review (skill: `notion-board`). If you discovered something
+Move the ticket to review (skill: `github-board`). If you discovered something
 the next agent needs (a subtle invariant, a gotcha), append it to
 `.claude/memory/`.

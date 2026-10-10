@@ -162,6 +162,18 @@ function hotspotNamed(state: KeeperState, id: string): HotspotTiles {
   return found
 }
 
+/**
+ * Waits for a walk that has happened, not one in progress. `data-clip="walk"` and
+ * `data-destination` last only while the keeper walks — at CI's software-rendered
+ * ~1 fps that can be two frames, between two polls. `data-clips-seen` keeps them.
+ */
+async function waitUntilWalkedAndStopped(page: Page): Promise<KeeperState> {
+  const probe = page.getByTestId('keeper-probe')
+  await expect(probe).toHaveAttribute('data-clips-seen', 'idle,walk,idle', { timeout: WALK_MS })
+  await expect(probe).toHaveAttribute('data-destination', '', { timeout: WALK_MS })
+  return readKeeper(page)
+}
+
 async function waitUntilStoppedOn(page: Page, tile: string): Promise<void> {
   const probe = page.getByTestId('keeper-probe')
   await expect(probe).toHaveAttribute('data-tile', tile, { timeout: WALK_MS })
@@ -177,19 +189,18 @@ test.describe('the keeper walks the farm, 1280 × 800', () => {
     const start = await openFarm(page)
     const target = hotspotNamed(start, 'nest').arrival
 
-    await tapTile(page, target)
-    await expect(page.getByTestId('keeper-probe')).toHaveAttribute('data-destination', tileKey(target))
-    await expect(page.getByTestId('keeper-probe')).toHaveAttribute('data-clip', 'walk', { timeout: WALK_MS })
-    const midWalk = await readKeeper(page)
-    expect(Math.hypot(midWalk.x - start.x, midWalk.z - start.z)).toBeGreaterThan(0)
+    expect(start.tile).not.toBe(tileKey(target))
 
+    await tapTile(page, target)
+    // The nest has no activity yet: the game says so on arrival instead of doing nothing.
+    // Checked first: the message stays up for 4 s of wall-clock, and on a slow machine the
+    // probe reads below can take longer than that.
+    await expect(page.getByTestId('coming-soon')).toHaveText('The nest is coming soon!', { timeout: WALK_MS })
     await waitUntilStoppedOn(page, tileKey(target))
     const end = await readKeeper(page)
     expect(end.x).toBeCloseTo(target.x + 0.5, 2)
     expect(end.z).toBeCloseTo(target.z + 0.5, 2)
     expect(end.clipsSeen).toBe('idle,walk,idle')
-    // The nest has no activity yet: the game says so instead of doing nothing.
-    await expect(page.getByTestId('coming-soon')).toHaveText('The nest is coming soon!')
   })
 
   test('tapping the paddock gate walks there and opens practice; the number pad takes an answer', async ({ page }, testInfo) => {
@@ -199,7 +210,7 @@ test.describe('the keeper walks the farm, 1280 × 800', () => {
     await expect(page.getByTestId('question')).toHaveCount(0)
 
     await tapTile(page, gate)
-    await expect(page.getByTestId('keeper-probe')).toHaveAttribute('data-clip', 'walk', { timeout: WALK_MS })
+    await expect(page.getByTestId('keeper-probe')).toHaveAttribute('data-clips-seen', /walk/, { timeout: WALK_MS })
     // Mid-walk: far enough along to read as a walk, with the marker on the gate ahead.
     await expect
       .poll(async () => {
@@ -232,17 +243,16 @@ test.describe('the keeper walks the farm, 1280 × 800', () => {
     const inside = { x: footprint.x + Math.floor(footprint.width / 2), z: footprint.z + Math.floor(footprint.depth / 2) }
 
     await tapTile(page, inside)
-    // Captured by the same read that sees it: on a loaded machine a short walk can end between two reads.
-    let destination = ''
-    await expect
-      .poll(async () => (destination = (await readKeeper(page)).destination), { timeout: WALK_MS })
-      .not.toBe('')
-    const [x, z] = destination.split(',').map(Number) as [number, number]
+    // Where it stopped, read once the walk is over: the destination is only on the probe mid-walk.
+    const end = await waitUntilWalkedAndStopped(page)
+    const [x, z] = end.tile.split(',').map(Number) as [number, number]
     const inBarn = x >= footprint.x && x < footprint.x + footprint.width && z >= footprint.z && z < footprint.z + footprint.depth
-    expect(inBarn, `walking to ${destination}`).toBe(false)
+    expect(inBarn, `stopped on ${end.tile}`).toBe(false)
     expect(Math.max(Math.abs(x - inside.x), Math.abs(z - inside.z))).toBeLessThanOrEqual(3)
-
-    await waitUntilStoppedOn(page, destination)
+    expect(end.clip).toBe('idle')
+    // On a tile centre: it walked all the way to the tile, not just towards the barn.
+    expect(end.x).toBeCloseTo(x + 0.5, 2)
+    expect(end.z).toBeCloseTo(z + 0.5, 2)
   })
 
   test('the arrow keys walk the keeper tile by tile, and it stops when they are let go', async ({ page }) => {
