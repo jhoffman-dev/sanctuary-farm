@@ -24,3 +24,17 @@ export function documentWithHotspots(overrides: Partial<Record<HotspotId, JsonRe
 export function documentWithHotspot(id: HotspotId, overrides: JsonRecord): JsonRecord {
   return documentWithHotspots({ [id]: overrides })
 }
+
+/**
+ * A seeded `RngFactory` fake (mulberry32, the algorithm the composition root
+ * passes in from `@sf/domain`, which this package may not import).
+ */
+export function seededRngFactory(seed: number): () => number {
+  let state = seed >>> 0
+  return () => {
+    state = (state + 0x6d2b79f5) | 0
+    let mixed = Math.imul(state ^ (state >>> 15), 1 | state)
+    mixed = (mixed + Math.imul(mixed ^ (mixed >>> 7), 61 | mixed)) ^ mixed
+    return ((mixed ^ (mixed >>> 14)) >>> 0) / 4294967296
+  }
+}
