@@ -31,6 +31,12 @@ export type PieceModel = PieceFit & {
   readonly nativeBounds: NativeBounds
   /** True where Kenney has no real piece for the kind and a stand-in fills the slot. */
   readonly placeholder: boolean
+  /**
+   * sRGB hex multiplied into the GLB's materials when it loads (three's
+   * `material.color`), so a species can be recoloured without editing Kenney's
+   * file or atlas (art-direction §3). Absent means drawn as authored.
+   */
+  readonly tint?: string
   readonly note?: string
 }
 
@@ -51,6 +57,7 @@ type PieceSpec = {
   readonly anchor?: Anchor
   readonly shift?: Shift
   readonly placeholder?: string
+  readonly tint?: string
 }
 
 function piece(spec: PieceSpec): PieceModel {
@@ -71,6 +78,7 @@ function piece(spec: PieceSpec): PieceModel {
     nativeBounds: spec.bounds,
     placeholder: spec.placeholder !== undefined,
     ...(spec.placeholder === undefined ? {} : { note: spec.placeholder }),
+    ...(spec.tint === undefined ? {} : { tint: spec.tint }),
   }
 }
 
@@ -114,8 +122,8 @@ const BUILDING_GAP = 'Fantasy Town wall/roof pieces stand in until GLB farm stru
 const HOTSPOT_GAP = 'A marker for the hotspot, not its structure; the structure waits for a GLB source (#115/#116 on hold).'
 
 /** Cube Pets face +Z (south); two turns make them face north like everything else (§8). */
-const animal = (file: string, bounds: NativeBounds, height: number): PieceModel =>
-  piece({ kit: 'cube-pets', file, bounds, size: { height }, quarterTurns: 2 })
+const animal = (file: string, bounds: NativeBounds, height: number, tint?: string): PieceModel =>
+  piece({ kit: 'cube-pets', file, bounds, size: { height }, quarterTurns: 2, ...(tint === undefined ? {} : { tint }) })
 
 /** Art-direction §2: keeper 1.6 units tall. Mini Characters face +Z, like Cube Pets. */
 const KEEPER_HEIGHT = 1.6
@@ -301,13 +309,24 @@ export const KENNEY_CATALOGUE: Readonly<Record<PieceId, PieceModel>> = {
   ...HOTSPOTS,
 }
 
+/*
+ * Art-direction §3: every pair of animals differs in body colour by ΔE00 ≥ 20
+ * for normal vision and all three dichromacies, or in height by ≥ 30 %
+ * (`animal-identification.test.ts`). Kenney draws the hog, bunny and dog in one
+ * brown, and pink against brown, or brown against yellow, merges under
+ * tritanopia. So the hog is tinted to a darker boar brown (#8e5f54) to part from
+ * the pig at the same height; the bunny to a rust brown (#b2633b) to part from
+ * the chick; the dog to slate (#525557) to part from the bunny; and the dog
+ * stands 0.67, not 0.7, so size alone parts it from the pig, hog and chick.
+ * A tint multiplies Kenney's texel, so it can only darken it.
+ */
 export const KENNEY_ANIMALS: Readonly<Record<AnimalSpecies, PieceModel>> = {
   cow: animal('animal-cow', { min: [-0.77, 0, -0.625], max: [0.77, 1.612, 0.835] }, 1.3),
   pig: animal('animal-pig', { min: [-0.625, 0, -0.625], max: [0.625, 1.584, 0.835] }, 0.9),
-  hog: animal('animal-hog', { min: [-0.675, 0, -0.625], max: [0.675, 1.516, 0.876] }, 0.9),
+  hog: animal('animal-hog', { min: [-0.675, 0, -0.625], max: [0.675, 1.516, 0.876] }, 0.9, '#b3ccff'),
   chick: animal('animal-chick', { min: [-1.098, 0, -0.625], max: [1.098, 1.594, 0.725] }, 0.5),
-  bunny: animal('animal-bunny', { min: [-0.625, 0, -0.625], max: [0.625, 2.01, 0.705] }, 0.6),
-  dog: animal('animal-dog', { min: [-0.625, 0, -0.625], max: [0.635, 1.584, 0.876] }, 0.7),
+  bunny: animal('animal-bunny', { min: [-0.625, 0, -0.625], max: [0.625, 2.01, 0.705] }, 0.6, '#d9ccb3'),
+  dog: animal('animal-dog', { min: [-0.625, 0, -0.625], max: [0.635, 1.584, 0.876] }, 0.67, '#66b3ff'),
 }
 
 export const KENNEY_KEEPERS: Readonly<Record<KeeperVariant, PieceModel>> = {
