@@ -48,10 +48,56 @@ export function getFact(id: FactId): Fact | undefined {
   return BY_ID.get(id)
 }
 
-export function factsInFamily(family: number, maxTable: number = MAX_TABLE_DEFAULT): Fact[] {
-  return buildFacts(maxTable).filter((fact) => fact.family === family)
+/** One table size's facts grouped by family and by tier; every array and fact is frozen. */
+type Membership = {
+  readonly byFamily: ReadonlyMap<number, readonly Fact[]>
+  readonly byTier: ReadonlyMap<Tier, readonly Fact[]>
 }
 
-export function factsInTier(tier: Tier, maxTable: number = MAX_TABLE_DEFAULT): Fact[] {
-  return buildFacts(maxTable).filter((fact) => fact.tier === tier)
+const NO_FACTS: readonly Fact[] = Object.freeze([])
+
+function groupFacts<K>(facts: readonly Fact[], keyOf: (fact: Fact) => K): ReadonlyMap<K, readonly Fact[]> {
+  const groups = new Map<K, Fact[]>()
+  for (const fact of facts) {
+    const group = groups.get(keyOf(fact))
+    if (group) group.push(fact)
+    else groups.set(keyOf(fact), [fact])
+  }
+  return new Map([...groups].map(([key, group]) => [key, Object.freeze(group)]))
+}
+
+function indexTable(maxTable: number): Membership {
+  const facts = buildFacts(maxTable).map((fact) => Object.freeze(fact))
+  return {
+    byFamily: groupFacts(facts, (fact) => fact.family),
+    byTier: groupFacts(facts, (fact) => fact.tier),
+  }
+}
+
+/**
+ * Family and tier membership for every valid table size, built once at load (12 sizes, 650 facts)
+ * instead of rebuilding the table on every scheduler step (SF-88). Safe as module state in the
+ * domain: it is a pure function of the table size, never written after load, and everything it
+ * hands out is frozen, so no caller can observe or change it.
+ */
+const MEMBERSHIP: ReadonlyMap<number, Membership> = new Map(
+  Array.from({ length: MAX_TABLE_DEFAULT - MIN_TABLE + 1 }, (_, i) => MIN_TABLE + i).map((size) => [
+    size,
+    indexTable(size),
+  ]),
+)
+
+function membershipOf(maxTable: number): Membership {
+  // Every valid size is indexed at load, so a miss is an invalid size and buildFacts throws its RangeError.
+  return MEMBERSHIP.get(maxTable) ?? indexTable(maxTable)
+}
+
+/** The facts whose larger operand is `family`, in (a, b) order. Frozen and shared between calls. */
+export function factsInFamily(family: number, maxTable: number = MAX_TABLE_DEFAULT): readonly Fact[] {
+  return membershipOf(maxTable).byFamily.get(family) ?? NO_FACTS
+}
+
+/** The facts of `tier`, in (a, b) order. Frozen and shared between calls. */
+export function factsInTier(tier: Tier, maxTable: number = MAX_TABLE_DEFAULT): readonly Fact[] {
+  return membershipOf(maxTable).byTier.get(tier) ?? NO_FACTS
 }

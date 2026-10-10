@@ -10,8 +10,11 @@ import { withUnlockedTiers } from './tiers'
 import type { SchedulerState } from './types'
 
 const SEED = 7
-/** Fluent cycles per fact — comfortably more than introduction needs. */
-const CYCLES_PER_FACT = 40
+/**
+ * Fluent cycles per fact. Seed 7 serves the whole table by 7.3 cycles per fact at 12×12 (the
+ * worst size; 4.4 or fewer below it), so 16 keeps over 2× headroom without the cost of 40 (SF-81).
+ */
+const CYCLES_PER_FACT = 16
 
 function everyFactAtBox(state: SchedulerState, box: Box): SchedulerState {
   return withFacts(state, Object.keys(state.facts), { box })
