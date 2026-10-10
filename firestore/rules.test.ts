@@ -8,8 +8,22 @@ import {
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-/** Matches `.firebaserc`; the `demo-` prefix keeps the SDK off real Google APIs. */
+/**
+ * The `emulator` alias in `.firebaserc`; the `demo-` prefix keeps the SDK off
+ * real Google APIs.
+ */
 const PROJECT_ID = 'demo-sanctuary-farm'
+
+// In production these rules govern the *named* database `sanctuary-farm`, not
+// `(default)` — the shared `student-games-be188` project holds other games, and
+// deny-all rules on `(default)` would be theirs too (see `docs/deploy.md`).
+// The test still runs against the emulator's default database:
+// `@firebase/rules-unit-testing` 5.0.2 has no database-id option —
+// `TestEnvironmentConfig.firestore` takes only `rules`/`host`/`port`, and
+// `RulesTestContext.firestore()` takes compat `Settings`, which carries no
+// database id. The rules source under test is byte-identical either way, so the
+// contract asserted here is the one deployed; only the database it is attached
+// to differs.
 
 /** Stands in for any document a client might reach for. */
 const SAMPLE_DOCUMENT = 'saves/a-save-code'

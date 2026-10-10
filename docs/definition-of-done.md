@@ -43,7 +43,8 @@ merges only green PRs. If an item doesn't apply, the PR says why.
 
 - [ ] `pnpm gate` green — typecheck · lint · boundaries · tests + coverage · build.
 - [ ] `pnpm e2e` green for anything player-facing.
-- [ ] CI green on the PR once SF-39 lands.
+- [ ] CI green on the PR — the `gate`, `e2e` and `rules` jobs in
+      `.github/workflows/ci.yml`.
 - [ ] The PR says **what was run and what it said**. Never "should work" — if a
       test fails, the output is in the PR and the ticket is not done.
 
