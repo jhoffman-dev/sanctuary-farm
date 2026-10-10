@@ -10,7 +10,7 @@ Reachable by any kid on any device from a link.
 
 > **Status:** rebuilding from a clean base (2026-09-07). The learning engine,
 > saves and sound live in tested packages; the game world comes next. Work is
-> tracked on the Notion board — see `docs/board.md`.
+> tracked as GitHub issues on the "Sanctuary Farm Project" — see `docs/board.md`.
 
 ## Start here
 
@@ -21,7 +21,7 @@ Reachable by any kid on any device from a link.
 | [`docs/architecture.md`](docs/architecture.md) | Clean Architecture layers + the dependency rule |
 | [`docs/implementation-plan.md`](docs/implementation-plan.md) | phases 0–6 |
 | [`docs/adr/`](docs/adr/) | decisions that are expensive to reverse (stack, identity) |
-| [`docs/board.md`](docs/board.md) | the Notion board + docs — schema, views, flow |
+| [`docs/board.md`](docs/board.md) | the board (GitHub Issues + Project) — mapping, flow, `gh` commands |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | setup, the gate, branches and PRs, secrets, reporting a kid-safety concern |
 | [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) | how we behave here — Contributor Covenant 2.1, plus what a kid audience demands |
 
@@ -66,7 +66,7 @@ Playwright · oxlint · dependency-cruiser.
 ## Agents & skills
 
 `.claude/agents/` — `architect`, `domain-dev`, `app-dev`, `qa`, `reviewer`,
-`devops`. `.claude/skills/` — `write-ticket`, `notion-board`, `notion-docs`,
+`devops`. `.claude/skills/` — `write-ticket`, `github-board`, `notion-docs`,
 `adr`, `feature-workflow`. Cross-agent notes: `.claude/memory/`.
 
 ## Non-negotiables (full list in `CLAUDE.md`)

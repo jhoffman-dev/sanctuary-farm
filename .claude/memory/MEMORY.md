@@ -11,8 +11,10 @@ Bigger stuff belongs elsewhere: product intent → `docs/PRD.md`, architecture �
 ## Notes
 
 - [environment.md](environment.md) — local toolchain quirks (Node via Homebrew, CLIs, auth state).
+- [board-moved-to-github.md](board-moved-to-github.md) — tickets are GitHub issues on the "Sanctuary Farm Project" since 2026-10-04; SF-n = issue #(n + 29).
 - [monorepo-gotchas.md](monorepo-gotchas.md) — traps in the rebuilt monorepo (scheduler state fields, vitest coverage, oxlint, worktree Bash guard, saves).
 - [prototype-gotchas.md](prototype-gotchas.md) — lessons from the retired `src/` prototype (file refs are historical).
 - [world-layout.md](world-layout.md) — `@sf/world`: where `farm.json` lives, the parser contract, the art-direction rules it enforces, and the keeper-speed constant.
 - [tile-world.md](tile-world.md) — `@sf/world` tile world: generate(seed) + overrides, chunk independence, connectors, PieceId contract with the GLB adapter.
 - [farm-game-facade.md](farm-game-facade.md) — `createFarmGame` contract gotchas: rounds stay active until `endRound`, latency is measured here, progress semantics.
+- [3d-assets-and-r3f.md](3d-assets-and-r3f.md) — from the SF-63/64 spikes: Quaternius' licence change and download route, the glTF pipeline (`gltf-transform`, meshopt, `metallicFactor`), why draw calls bite before triangles, testing r3f without WebGL.
