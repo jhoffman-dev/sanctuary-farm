@@ -3,6 +3,8 @@ import { defineProject } from 'vitest/config'
 
 export default defineProject({
   plugins: [react()],
+  // The catalogue tests read the served GLBs as inline data to check them against the catalogue.
+  assetsInclude: ['**/*.glb'],
   test: {
     name: 'web',
     environment: 'jsdom',
