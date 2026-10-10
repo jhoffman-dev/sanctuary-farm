@@ -2,7 +2,12 @@ import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   test: {
-    projects: ['packages/*', 'apps/web'],
+    projects: [
+      'packages/*',
+      'apps/web',
+      // The e2e tooling the Playwright configs share (SF-90).
+      { test: { name: 'e2e-tooling', environment: 'node', include: ['scripts/e2e/**/*.test.ts'] } },
+    ],
     coverage: {
       provider: 'v8',
       include: ['packages/*/src/**/*.ts', 'apps/web/src/**/*.{ts,tsx}'],

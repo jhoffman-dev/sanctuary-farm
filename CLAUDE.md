@@ -80,8 +80,9 @@ No snapshot test as a stand-in for a behaviour test.
 | `pnpm typecheck` / `pnpm lint` / `pnpm boundaries` / `pnpm test` / `pnpm build` / `pnpm size` | the gate's parts |
 | `pnpm size` | the JS/CSS budgets in `docs/performance-budget.md`, over `apps/web/dist` (needs a build first) |
 | `pnpm test:coverage` | tests with the domain ≥ 90% line threshold enforced |
-| `pnpm e2e` | Playwright smoke against `apps/web` (first: `pnpm --filter @sf/web exec playwright install chromium`) |
+| `pnpm e2e` | Playwright smoke against `apps/web` (first: `pnpm --filter @sf/web exec playwright install chromium`). Each run builds and serves on free ports of its own and never reuses a server, so worktrees can run it side by side |
 | `UPDATE_DOC_IMAGES=1 pnpm e2e` | same, and refresh the tracked screenshots in `docs/img/` (a normal run writes them only under `apps/web/test-results/`) |
+| `E2E_REUSE_SERVER=1 pnpm e2e` | run against servers you already started on the fixed ports — `vite preview` :4173, `pnpm dev --port 5174`, landing :4180 (Playwright starts any that are not up). Pin a single port with `E2E_WEB_PREVIEW_PORT` / `E2E_WEB_DEV_PORT` / `E2E_LANDING_PORT` |
 | `pnpm vitest run --project domain` | one package's tests (`domain` · `application` · `persistence` · `audio` · `web`) |
 | `pnpm emulators` / `pnpm test:rules` | Firebase emulators / Firestore rules tests, both pinned to `demo-sanctuary-farm` (needs a JDK) |
 | `pnpm deploy:game` · `:landing` · `:functions` · `:rules` | the only sanctioned deploys — see `docs/deploy.md` |

@@ -55,7 +55,11 @@
   `await act(async () => render(…))`, or `use()` never retries.
 - **Dev-only routes.** `?assets=1` (catalogue) and `?view=` (scene cameras)
   exist only under `import.meta.env.DEV`; their e2e specs are `*.dev.spec.ts`
-  and run in the `chromium-dev` Playwright project against `vite` on :5174.
+  and run in the `chromium-dev` Playwright project against the run's own `vite`.
+- **Every e2e run serves on free ports of its own** (SF-90,
+  `scripts/e2e/server-port.ts`) and never reuses a server, so worktrees can run
+  `pnpm e2e` side by side; no `CI=1` workaround is needed. `E2E_REUSE_SERVER=1`
+  opts back in to the fixed ports (4173 / 5174 / 4180) and reuse.
 - **`App.test.tsx` mocks `./scene/LazyFarmScene`, not `./scene/FarmScene`.**
   Mocking the inner module leaves the Suspense fallback on screen, and its
   `role="status"` collides with the app's own "Waking up the farm…" status —
