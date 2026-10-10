@@ -1,6 +1,6 @@
 ## Ticket
 
-SF-___ — <link to the Notion ticket>
+Closes #___ <!-- the ticket's issue number; SF-n ≤ 80 is issue n + 29 (docs/notion-migration.md) -->
 
 ## What changed
 
@@ -16,4 +16,4 @@ SF-___ — <link to the Notion ticket>
 
 - [ ] Dependencies point inward (domain → nothing; presentation → application only)
 - [ ] Tests cover the behaviour, not the implementation
-- [ ] Notion ticket moved to **In review** with this PR linked
+- [ ] Ticket's project Status moved to **In review** (skill: `github-board`)

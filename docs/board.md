@@ -1,67 +1,84 @@
-# The board and docs in Notion — "Sanctuary Farm DB"
+# The board — GitHub Issues + "Sanctuary Farm Project"
 
-Notion holds two things: the **board** (tickets — the single source of truth for
-work) and the **docs** (PRD, plan, architecture, ADRs — mirrored from the repo,
-read here). Humans watch both; agents work from the board and keep it current.
-We do **not** use GitHub Issues or Projects — the Notion board only.
+Tickets are **GitHub issues** on `jhoffman-dev/sanctuary-farm`, tracked on the
+GitHub Project **"Sanctuary Farm Project"** (owner `jhoffman-dev`). That is the
+single source of truth for work. Agents work from it and keep it current with
+the `gh` CLI (skill: `github-board`).
 
-Everything sits under one Notion page:
+The prose docs (PRD, plan, architecture, ADRs…) are still **mirrored to Notion**
+— see `docs/README.md` and the `notion-docs` skill. Only the board moved.
 
-- **Project page:** [Sanctuary Farm — Student Game Project](https://app.notion.com/p/3cd672aa2c4a814e8714e77635cc762a)
-  - **Board:** [Sanctuary Farm DB](https://app.notion.com/p/3cd672aa2c4a809ca13bddf87a2c9d64)
-    (data source `collection://3cd672aa-2c4a-80ec-a1ab-000b40f7e4d1`)
-  - **Docs:** [Docs](https://app.notion.com/p/3d5672aa2c4a80ecaed8f07d0875b5aa) — one
-    page per doc; ADRs under its [ADR's](https://app.notion.com/p/3d5672aa2c4a809791c7dd75c84db1e9) subpage
+## How tickets map
 
-## Access
+| Ticket field | On GitHub |
+| --- | --- |
+| ID | issue title prefix `[SF-n]` — numbering continues (`SF-81`, …) |
+| Name | issue title after the prefix: `[SF-81] Add the barn` |
+| Phase | **milestone**, titled by the epic: `Phase 2 — 3D rendering foundation` |
+| Type | label `type: epic` · `type: story` · `type: task` · `type: bug` |
+| Priority | label `priority: P0` … `priority: P3` |
+| Size | label `size: XS` · `size: S` · `size: M` |
+| Epic / parent | GitHub **sub-issue** of its parent; the phase epics are #30–#36 (Phase 0–6+) |
+| Assignee | `jhoffman-dev` = needs James (human-only) · unassigned = any agent |
+| Status | `Done` → issue **closed** (completed) · `Blocked` → label `blocked` · `Later` → label `later` (James deferred it — leave alone) · `Backlog` / `Ready` / `In progress` / `In review` → the project's **Status** field |
+| PR | the PR body says `Closes #<issue>`; GitHub links and closes it on merge |
 
-Agents read and write the board and docs through the **Notion MCP connector**
-(skills: `notion-board`, `notion-docs`). There is no local token or CLI. If the
-connector isn't available in a session, say so and proceed with code work,
-noting what you would have changed on the board.
-
-The board was built and the starter backlog imported on 2026-08-31. Schema,
-views, and all seed tickets are live — the setup below is a record, not a
-to-do.
-
-## Schema
-
-| Property | Type | Values |
-| --- | --- | --- |
-| **Name** | Title | the ticket title |
-| **ID** | Unique ID | prefix `SF` — Notion auto-numbers (`SF-1`, `SF-2`, …) |
-| **Type** | Select | `Epic` · `Story` · `Task` · `Bug` |
-| **Status** | Select | `Backlog` · `Ready` · `In progress` · `In review` · `Blocked` · `Done` · `Later` |
-| **Assignee** | Select | `James` (human-only) · *empty* = any agent |
-| **Size** | Select | `XS` · `S` · `M` |
-| **Priority** | Select | `P0` · `P1` · `P2` · `P3` |
-| **Phase** | Select | `Phase 0` … `Phase 6` |
-| **Epic** | Relation → same DB | the parent Epic (and Story for Tasks); back-relation `Children` |
-| **PR** | URL | the pull request, once opened |
-
-## Views
-
-- **Board** — group by `Status`, ordered `Backlog → Ready → In progress → In
-  review → Blocked → Done`. The working view.
-- **By phase** — board grouped by `Phase`, filtered `Status ≠ Done`. Roadmap at a
-  glance.
-- **James' queue** — table, filter `Assignee = James` and `Status ≠ Done`.
-  The human to-do list.
-- **Backlog** — table, filter `Status = Backlog`, sort `Priority` then `Phase`.
+The Status field's exact option names live on the project — read them, don't
+guess: `gh project field-list <N> --owner jhoffman-dev`.
 
 ## How work flows
 
 `Backlog` (not started) → `Ready` (unblocked, next up) → `In progress` (an agent
-claimed it) → `In review` (PR open, qa + reviewer) → `Done` (human merged).
-`Blocked` any time, with a note saying why. `Later` parks a decision James has
-deliberately deferred — leave those alone.
+claimed it) → `In review` (PR open, qa + reviewer) → closed (human merged the PR
+with `Closes #n`). Add `blocked` any time, with a comment saying why.
+Branch names keep the ticket key: `feat/SF-123-short-slug`. See `CLAUDE.md`
+§Workflow and the `feature-workflow` skill.
 
-Agents move their own tickets (skill: `notion-board`). See `CLAUDE.md` §Workflow.
+## Common moves
 
-## Docs
+`gh` needs the `project` scope for `gh project …` (`gh auth refresh -s project`);
+issue commands need only `repo`. `R=jhoffman-dev/sanctuary-farm`; `<N>` is the
+project number from `gh project list --owner jhoffman-dev`.
 
-The prose docs live as markdown in `docs/` (authored via PR) and are mirrored to
-Notion pages under the Docs page. Notion is where to **read** them; edit the
-markdown and push the change with the `notion-docs` skill. `docs/README.md` is
-the link index. `CLAUDE.md` is deliberately not mirrored — it's the agent entry
-point and stays in the repo.
+```sh
+# My queue (James) / the agents' queue
+gh issue list -R $R --assignee @me --state open
+gh issue list -R $R --search "no:assignee -label:later -label:blocked" --state open
+
+# Read one ticket
+gh issue view 123 -R $R --comments
+
+# Create a ticket: next number, then the issue
+gh issue list -R $R --search "SF- in:title" --state all --limit 500 --json title \
+  --jq '[.[].title | capture("^\\[SF-(?<n>[0-9]+)\\]").n | tonumber] | max + 1'
+gh issue create -R $R --title "[SF-81] Add the barn" --body-file ticket.md \
+  --milestone "Phase 3 — Alpha parity in 3D" \
+  --label "type: story" --label "priority: P1" --label "size: S"
+
+# Make it a sub-issue of its epic (needs the child's numeric id, not its number)
+gh api repos/$R/issues/33/sub_issues -F sub_issue_id=$(gh api repos/$R/issues/110 --jq .id)
+
+# Add it to the project (prints the project item id)
+gh project item-add <N> --owner jhoffman-dev --url https://github.com/$R/issues/110 --format json --jq .id
+
+# Move status: look up the ids once, then edit the item
+gh project view <N> --owner jhoffman-dev --format json --jq .id            # project id
+gh project field-list <N> --owner jhoffman-dev --format json               # Status field id + option ids
+gh project item-list <N> --owner jhoffman-dev --limit 500 --format json \
+  --jq '.items[] | select(.content.number==110) | .id'                     # item id
+gh project item-edit --project-id <project-id> --id <item-id> \
+  --field-id <status-field-id> --single-select-option-id <option-id>
+
+# Blocked / unblocked, with the reason
+gh issue edit 110 -R $R --add-label blocked && gh issue comment 110 -R $R --body "Blocked: …"
+gh issue edit 110 -R $R --remove-label blocked
+```
+
+## History
+
+The board lived in Notion ("Sanctuary Farm DB") from 2026-08-31 to 2026-10-04.
+On 2026-10-04 all 80 tickets (SF-1 … SF-80) became issues #30 … #109 — **issue
+number = SF number + 29**; `docs/notion-migration.md` has the full map, and each
+issue body starts with a blockquote linking its original Notion page. The Notion
+board is left in place, read-only:
+[Sanctuary Farm DB](https://app.notion.com/p/3cd672aa2c4a809ca13bddf87a2c9d64).
