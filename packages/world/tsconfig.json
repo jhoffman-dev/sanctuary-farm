@@ -1,0 +1,7 @@
+{
+  "extends": "@sf/config/tsconfig.base.json",
+  "compilerOptions": {
+    "resolveJsonModule": true
+  },
+  "include": ["src", "layouts"]
+}

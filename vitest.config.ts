@@ -26,6 +26,7 @@ export default defineConfig({
         lines: 70,
         statements: 70,
         'packages/domain/src/**': { lines: 90, statements: 90 },
+        'packages/world/src/**': { lines: 90, statements: 90 },
       },
     },
   },

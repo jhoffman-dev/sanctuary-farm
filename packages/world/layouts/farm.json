@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "ground": { "size": [30, 30], "material": "grass" },
+  "camera": {
+    "fov": 35,
+    "home": { "position": [9, 7, 12], "lookAt": [0, 0.6, 0] }
+  },
+  "paths": [
+    { "id": "farmhouse-to-yard", "width": 1.4, "points": [[-7, 6], [-4, 2], [-1, -2]] },
+    { "id": "yard-to-barn", "width": 1.4, "points": [[-1, -2], [0, -5]] },
+    { "id": "barn-to-feed-shed", "width": 1.2, "points": [[0, -5], [2, -4.5], [4.5, -4]] },
+    { "id": "barn-to-nest", "width": 1.2, "points": [[0, -5], [-2, -4.5], [-4.5, -4]] },
+    { "id": "yard-to-paddock", "width": 1.2, "points": [[-1, -2], [3, 0], [7, 1.5]] },
+    { "id": "yard-to-training-ring", "width": 1.2, "points": [[-1, -2], [0, 2], [1.5, 5]] },
+    { "id": "farmhouse-to-petting-zoo", "width": 1.2, "points": [[-7, 6], [-7.5, 3], [-7, 0]] }
+  ],
+  "hotspots": [
+    {
+      "id": "barn",
+      "model": "buildings/barn",
+      "position": [0, 0, -8],
+      "rotationY": 180,
+      "footprint": { "shape": "box", "centre": [0, -8], "size": [4, 3.5] },
+      "arrival": [0, -5],
+      "trigger": { "shape": "circle", "centre": [0, -5], "radius": 2 },
+      "cameraAnchor": { "position": [9, 7, 4], "lookAt": [0, 0.6, -8] }
+    },
+    {
+      "id": "feed-shed",
+      "model": "buildings/feed-shed",
+      "position": [7, 0, -6],
+      "rotationY": 130,
+      "footprint": { "shape": "box", "centre": [7, -6], "size": [3, 2.5] },
+      "arrival": [4.5, -4],
+      "trigger": { "shape": "circle", "centre": [4.5, -4], "radius": 2 },
+      "cameraAnchor": { "position": [-2, 7, 6], "lookAt": [7, 0.6, -6] }
+    },
+    {
+      "id": "nest",
+      "model": "buildings/nest-hollow",
+      "position": [-7, 0, -6],
+      "rotationY": 230,
+      "footprint": { "shape": "circle", "centre": [-7, -6], "radius": 2 },
+      "arrival": [-4.5, -4],
+      "trigger": { "shape": "circle", "centre": [-4.5, -4], "radius": 2 },
+      "cameraAnchor": { "position": [2, 7, 6], "lookAt": [-7, 0.6, -6] }
+    },
+    {
+      "id": "paddock",
+      "model": "buildings/paddock",
+      "position": [10, 0, 2],
+      "rotationY": 80,
+      "footprint": { "shape": "box", "centre": [10, 2], "size": [8, 10] },
+      "arrival": [7, 1.5],
+      "trigger": { "shape": "circle", "centre": [7, 1.5], "radius": 2 },
+      "cameraAnchor": { "position": [1, 7, 14], "lookAt": [10, 0.6, 2] }
+    },
+    {
+      "id": "training-ring",
+      "model": "buildings/training-ring",
+      "position": [2, 0, 8],
+      "rotationY": 15,
+      "footprint": { "shape": "circle", "centre": [2, 8], "radius": 3.5 },
+      "arrival": [1.5, 5],
+      "trigger": { "shape": "circle", "centre": [1.5, 5], "radius": 2 },
+      "cameraAnchor": { "position": [11, 7, 20], "lookAt": [2, 0.6, 8] }
+    },
+    {
+      "id": "petting-zoo",
+      "model": "buildings/petting-zoo",
+      "position": [-10, 0, 0],
+      "rotationY": 270,
+      "footprint": { "shape": "circle", "centre": [-10, 0], "radius": 3.5 },
+      "arrival": [-7, 0],
+      "trigger": { "shape": "circle", "centre": [-7, 0], "radius": 2 },
+      "cameraAnchor": { "position": [-1, 7, 12], "lookAt": [-10, 0.6, 0] }
+    },
+    {
+      "id": "farmhouse",
+      "model": "buildings/farmhouse",
+      "position": [-9, 0, 8],
+      "rotationY": 312,
+      "footprint": { "shape": "box", "centre": [-9, 8], "size": [5, 4] },
+      "arrival": [-7, 6],
+      "trigger": { "shape": "circle", "centre": [-7, 6], "radius": 2 },
+      "cameraAnchor": { "position": [0, 7, 20], "lookAt": [-9, 0.6, 8] }
+    }
+  ],
+  "props": [
+    {
+      "model": "props/fence-straight",
+      "instances": [
+        { "position": [6, 0, -3], "rotationY": 0 },
+        { "position": [8, 0, -3], "rotationY": 0 },
+        { "position": [10, 0, -3], "rotationY": 0 },
+        { "position": [12, 0, -3], "rotationY": 0 },
+        { "position": [14, 0, -3], "rotationY": 0 },
+        { "position": [6, 0, -1], "rotationY": 90 },
+        { "position": [6, 0, 1], "rotationY": 90 },
+        { "position": [6, 0, 3], "rotationY": 90 },
+        { "position": [6, 0, 5], "rotationY": 90 },
+        { "position": [6, 0, 7], "rotationY": 90 }
+      ]
+    },
+    {
+      "model": "props/hay-bale",
+      "instances": [
+        { "position": [5.5, 0, -6.5], "rotationY": 20 },
+        { "position": [4.5, 0, -7.5], "rotationY": 75 },
+        { "position": [8.5, 0, -3.5], "rotationY": 340 }
+      ]
+    },
+    {
+      "model": "props/water-trough",
+      "instances": [{ "position": [9, 0, 4], "rotationY": 90 }]
+    }
+  ]
+}

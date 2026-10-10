@@ -1,0 +1,20 @@
+{
+  "name": "@sf/world",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The farm layout: where the ground, paths, hotspots and camera anchors are. Plain data plus the rules that check it — no Three.js, no React, no DOM.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@sf/config": "workspace:*",
+    "typescript": "~6.0.2",
+    "vitest": "^5.0.0"
+  }
+}
