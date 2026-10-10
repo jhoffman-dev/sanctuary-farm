@@ -1,4 +1,4 @@
-import type { TileWorld } from '@sf/world'
+import type { HotspotId, TileWorld } from '@sf/world'
 import { Suspense, use } from 'react'
 import { SceneChunkBoundary } from './SceneChunkBoundary'
 import { SceneLoading } from './SceneLoading'
@@ -34,17 +34,23 @@ function loadScene(loadWorld: WorldLoader): Promise<LoadedScene> {
   return started
 }
 
-function WorldScene({ loadWorld }: { loadWorld: WorldLoader }) {
+type LazyFarmSceneProps = {
+  loadWorld: WorldLoader
+  /** The keeper has stopped on a hotspot's doorstep. */
+  onArrive?: (hotspot: HotspotId) => void
+}
+
+function WorldScene({ loadWorld, onArrive }: LazyFarmSceneProps) {
   const { scene, world } = use(loadScene(loadWorld))
-  return <scene.FarmScene world={world} />
+  return <scene.FarmScene world={world} {...(onArrive ? { onArrive } : {})} />
 }
 
 /** The 3D world, fetched and built in the background while the game is already playable. */
-export function LazyFarmScene({ loadWorld }: { loadWorld: WorldLoader }) {
+export function LazyFarmScene({ loadWorld, onArrive }: LazyFarmSceneProps) {
   return (
     <SceneChunkBoundary>
       <Suspense fallback={<SceneLoading />}>
-        <WorldScene loadWorld={loadWorld} />
+        <WorldScene loadWorld={loadWorld} {...(onArrive ? { onArrive } : {})} />
       </Suspense>
     </SceneChunkBoundary>
   )

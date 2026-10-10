@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { findIdleClip } from './idle-clip'
+import { findClipNamed, findIdleClip } from './idle-clip'
 
 const clips = (...names: string[]) => names.map((name) => ({ name }))
 
@@ -14,5 +14,15 @@ describe('findIdleClip', () => {
 
   it('finds nothing in a model without clips', () => {
     expect(findIdleClip([])).toBeUndefined()
+  })
+})
+
+describe('findClipNamed', () => {
+  it.each(['walk', 'Walk', 'CharacterArmature|Walk'])('finds the walk clip named %s', (name) => {
+    expect(findClipNamed(clips('idle', name, 'sprint'), 'walk')?.name).toBe(name)
+  })
+
+  it('does not take a walk-like clip for the walk', () => {
+    expect(findClipNamed(clips('wheelchair-move-forward', 'walk-back'), 'walk')).toBeUndefined()
   })
 })

@@ -97,4 +97,22 @@ describe('PracticePanel', () => {
     expect(game.calls.startRound).toHaveLength(2)
     expect(screen.getByTestId('question')).toHaveTextContent('3 × 3 = ?')
   })
+
+  it('shows a round the game started elsewhere — the keeper reaching the paddock — exactly as the button would', async () => {
+    const game = createFakeFarmGame(THREE_QUESTIONS)
+    game.startRound(PADDOCK_ROUND)
+
+    render(<PracticePanel game={game} onFarmChanged={vi.fn()} openOnRoundInFlight />)
+
+    expect(screen.getByTestId('question')).toHaveTextContent('7 × 8 = ?')
+    expect(screen.getByTestId('progress')).toHaveTextContent('Question 1 of 5')
+    expect(game.calls.startRound).toHaveLength(1)
+  })
+
+  it('opens idle when asked to show the round in flight but the game has none', () => {
+    const game = createFakeFarmGame(THREE_QUESTIONS)
+    render(<PracticePanel game={game} onFarmChanged={vi.fn()} openOnRoundInFlight />)
+
+    expect(screen.getByTestId('start-paddock')).toBeInTheDocument()
+  })
 })

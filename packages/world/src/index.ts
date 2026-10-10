@@ -121,6 +121,18 @@ export {
   removeEditsAt,
 } from './world-editing'
 
+// Keeper movement (SF-77): where the keeper may stand, how it gets there, and which doorstep it is on.
+export {
+  GROUND_STEP_COST,
+  NEAREST_WALKABLE_RADIUS,
+  PATH_STEP_COST,
+  hotspotArrivedAt,
+  nearestWalkable,
+  stepCost,
+  walkable,
+} from './walkability'
+export { findRoute, planWalk } from './route-finding'
+
 export type { EditHistory } from './edit-history'
 export { amendStep, recordStep, redo, startHistory, undo } from './edit-history'
 

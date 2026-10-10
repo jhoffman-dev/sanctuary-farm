@@ -44,3 +44,18 @@
   workspace package's extensionless TypeScript imports. The editor e2e
   writes the real files and restores them, so it runs in its own Playwright
   project after the other dev specs.
+- **Keeper movement (SF-77).** Rules in `@sf/world` (`walkability.ts`,
+  `route-finding.ts`): `walkable` (grass/dirt/path, fence gates, a fenced
+  pen's floor; never water, decor, other structures, building or open
+  footprints), `findRoute` (8-way A*, paths cost 1 vs 1.6, no diagonal corner
+  cutting, tie-break on f → h → z → x), `nearestWalkable` (keeper-side
+  tie-break), `planWalk` for a tap, `hotspotArrivedAt` (arrival *or* entrance
+  tile). The tile grid is the nav-grid, so ADR-0004's open navmesh question is
+  answered "not needed" for one farm. What an arrival opens is
+  `@sf/application`'s `createHotspotArrivals(game)`; `apps/web` only plays it
+  out (`scene/keeper-walk.ts` steering, `keyboard-step.ts`, `camera-follow.ts`
+  dead-zone follow). `?perf=1` also publishes `[data-testid=keeper-probe]`
+  (position, tile, clip history, destination, view-projection matrix,
+  hotspot tiles) — `e2e/keeper-walk.spec.ts` taps tiles through it. The React
+  compiler lint forbids mutating props, so per-frame shared state is a class
+  with methods (`KeeperTelemetry`), not a mutated object or ref.

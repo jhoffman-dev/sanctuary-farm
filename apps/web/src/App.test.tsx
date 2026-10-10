@@ -10,7 +10,16 @@ import { App } from './App'
 // would compete with the app's own. Its rules are covered elsewhere: the
 // frameloop by the a11y hook tests and an e2e case, the lazy chunk's fallback
 // and failure by LazyFarmScene.test.tsx.
-vi.mock('./scene/LazyFarmScene', () => ({ LazyFarmScene: () => null }))
+// The stand-in keeps one thing of the scene: buttons that say "the keeper
+// stopped here", which is all the scene ever tells the app.
+vi.mock('./scene/LazyFarmScene', () => ({
+  LazyFarmScene: ({ onArrive }: { onArrive?: (hotspot: string) => void }) => (
+    <>
+      <button type="button" data-testid="arrive-paddock" onClick={() => onArrive?.('paddock')} />
+      <button type="button" data-testid="arrive-barn" onClick={() => onArrive?.('barn')} />
+    </>
+  ),
+}))
 
 type RecordingAudioBus = AudioBus & { muted: boolean }
 
@@ -133,5 +142,53 @@ describe('App', () => {
     ))
     expect(screen.getByTestId('mute')).toHaveAttribute('aria-pressed', 'false')
     expect(audio.isMuted()).toBe(false)
+  })
+
+  it('opens the practice panel on a question when the keeper arrives at the paddock, as the button does', async () => {
+    const { game } = playableGame()
+    const user = renderApp(game)
+    await screen.findByTestId('start-paddock')
+
+    await user.click(screen.getByTestId('arrive-paddock'))
+
+    expect(screen.getByTestId('question')).toHaveTextContent(/\d+ × \d+ = \?/)
+    expect(screen.getByTestId('progress')).toHaveTextContent('Question 1 of 5')
+    expect(screen.queryByTestId('start-paddock')).not.toBeInTheDocument()
+  })
+
+  it('keeps the question on screen when the keeper arrives at the paddock mid-round', async () => {
+    const { game } = playableGame()
+    const user = renderApp(game)
+    await user.click(await screen.findByTestId('start-paddock'))
+    const asked = screen.getByTestId('question').textContent
+
+    await user.click(screen.getByTestId('arrive-paddock'))
+
+    expect(screen.getByTestId('question')).toHaveTextContent(asked ?? '')
+    expect(screen.getByTestId('progress')).toHaveTextContent('Question 1 of 5')
+  })
+
+  it('says another place is coming soon, and starts no round there', async () => {
+    const { game } = playableGame()
+    const user = renderApp(game)
+    await screen.findByTestId('start-paddock')
+
+    await user.click(screen.getByTestId('arrive-barn'))
+
+    expect(screen.getByTestId('coming-soon')).toHaveTextContent('The barn is coming soon!')
+    expect(screen.queryByTestId('question')).not.toBeInTheDocument()
+    expect(game.roundProgress().total).toBe(0)
+  })
+
+  it('ignores an arrival before the farm has loaded', async () => {
+    const { game, saveStore } = playableGame()
+    vi.spyOn(saveStore, 'load').mockReturnValue(new Promise(() => {}))
+    const startRound = vi.spyOn(game, 'startRound')
+    const user = renderApp(game)
+
+    await user.click(screen.getByTestId('arrive-paddock'))
+
+    expect(startRound).not.toHaveBeenCalled()
+    expect(screen.getByRole('status')).toHaveTextContent('Waking up the farm')
   })
 })
