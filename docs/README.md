@@ -19,6 +19,7 @@ is the agent entry point).
 | `docs/board.md` — The board (GitHub Issues + Project) | [The board — Sanctuary Farm DB](https://app.notion.com/p/3cd672aa2c4a81da9d1ed7d9485ef7f6) |
 | `docs/adr/0001-stack-choice.md` — ADR-0001 — Stack choice | [ADR-0001 — Stack choice](https://app.notion.com/p/3cd672aa2c4a817ba78efec138934090) |
 | `docs/adr/0002-identity-and-save.md` — ADR-0002 — Identity and save | [ADR-0002 — Identity and save](https://app.notion.com/p/3cd672aa2c4a81248dc7e3fe500b1e02) |
+| `docs/adr/0005-world-layout-tooling.md` — ADR-0005 — World layout tooling: procedural tile world with authored overrides (proposed, SF-65, revised for SF-87) | to mirror under ADR's after merge (skill: `notion-docs`) |
 | `docs/definition-of-done.md` — Definition of Done | [Definition of Done](https://app.notion.com/p/3d5672aa2c4a81e3b249d3d0eadd617f) |
 | `docs/secrets.md` — Secrets | [Secrets](https://app.notion.com/p/3d5672aa2c4a81579d29fec27113d844) |
 | `docs/curriculum.md` — Curriculum | [Curriculum](https://app.notion.com/p/3d5672aa2c4a811abf0fdab381a16881) |
@@ -29,6 +30,7 @@ is the agent entry point).
 | `docs/art-direction.md` — Art direction | [Art direction](https://app.notion.com/p/3d5672aa2c4a81529810c1d09a0a4d84) |
 | `docs/sound-design.md` — Sound design | [Sound design](https://app.notion.com/p/3d5672aa2c4a817cb90ac1dde2cfeb58) |
 | `docs/firestore-backup.md` — Firestore backup strategy | [Firestore backup strategy](https://app.notion.com/p/3d5672aa2c4a815e83eec341bd398b13) |
+| `docs/deploy.md` — Deploying into the shared Student Games project | *not mirrored yet — add under Docs and link here* |
 
 Repo-only, not mirrored: `docs/notion-migration.md` (the SF-1 … SF-80 → issue
 #30 … #109 map from the 2026-10-04 board move).
