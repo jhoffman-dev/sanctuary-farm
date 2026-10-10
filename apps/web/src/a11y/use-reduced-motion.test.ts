@@ -1,7 +1,6 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { useReducedMotion } from './use-reduced-motion'
-import { useSceneFrameloop } from './use-scene-frameloop'
 
 type ChangeListener = () => void
 
@@ -88,28 +87,5 @@ describe('useReducedMotion', () => {
     vi.stubGlobal('matchMedia', undefined)
     const { result } = renderHook(() => useReducedMotion())
     expect(result.current).toBe(false)
-  })
-})
-
-describe('useSceneFrameloop', () => {
-  it("runs the loop always when motion is welcome", () => {
-    stubMatchMedia(false)
-    const { result } = renderHook(() => useSceneFrameloop())
-    expect(result.current).toBe('always')
-  })
-
-  it('drops to on-demand — a still frame — when motion is reduced', () => {
-    stubMatchMedia(true)
-    const { result } = renderHook(() => useSceneFrameloop())
-    expect(result.current).toBe('demand')
-  })
-
-  it('switches to on-demand the moment the preference changes', () => {
-    const media = stubMatchMedia(false)
-    const { result } = renderHook(() => useSceneFrameloop())
-
-    media.change(true)
-
-    expect(result.current).toBe('demand')
   })
 })

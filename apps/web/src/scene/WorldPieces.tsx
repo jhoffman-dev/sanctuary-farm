@@ -57,13 +57,20 @@ type WorldPiecesProps = {
    * its walking keeper; without one the keeper stands idling (the editor).
    */
   renderKeeper?: (keeper: { model: PieceModel; scene: Object3D; at: Placement }) => ReactNode
+  /** The animals play their idle clips (the editor and the high tier); off, they hold a pose. */
+  idleLoops?: boolean
 }
 
 function idlingKeeper({ model, scene, at }: { model: PieceModel; scene: Object3D; at: Placement }): ReactNode {
   return <IdlingModel model={model} scene={scene} at={at} />
 }
 
-export function WorldPieces({ world, extraPieces = NO_EXTRA_PIECES, renderKeeper = idlingKeeper }: WorldPiecesProps) {
+export function WorldPieces({
+  world,
+  extraPieces = NO_EXTRA_PIECES,
+  renderKeeper = idlingKeeper,
+  idleLoops = true,
+}: WorldPiecesProps) {
   // An edit regroups the world, but each untouched type keeps its placements, and so its instanced mesh.
   const [keepUnchanged] = useState(pieceGroupKeeper)
   const pieces = useMemo(() => keepUnchanged(groupPieces(world.chunks)), [keepUnchanged, world.chunks])
@@ -90,6 +97,7 @@ export function WorldPieces({ world, extraPieces = NO_EXTRA_PIECES, renderKeeper
           model={KENNEY_ANIMALS[animal.species]}
           scene={loadedScene(scenes, KENNEY_ANIMALS[animal.species])}
           at={animal}
+          animate={idleLoops}
         />
       ))}
       {renderKeeper({ model: KEEPER, scene: loadedScene(scenes, KEEPER), at: staging.keeper })}

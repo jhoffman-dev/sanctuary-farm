@@ -1,14 +1,20 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { type HotspotId, hotspotArrivedAt, type TileCoord, type TileWorld } from '@sf/world'
-import { Suspense, useCallback, useEffect, useMemo, useRef } from 'react'
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Object3D } from 'three'
 import { type PieceModel, quarterTurnsToRadians } from '../world-assets'
-import { useSceneFrameloop } from '../a11y/use-scene-frameloop'
+import { useReducedMotion } from '../a11y/use-reduced-motion'
 import { type CameraView, devView, HOME_VIEW } from './camera-views'
 import { GroundSurface } from './GroundSurface'
 import { HORIZON_GRASS, surfaceOf } from './ground-palette'
 import { HorizonGrass, Sun } from './SceneBackdrop'
-import { DPR_RANGE, FOV, SKY } from './scene-look'
+import { FOV, SKY } from './scene-look'
+import { sceneFrameloop } from './frameloop'
+import { FrameloopGovernor } from './FrameloopGovernor'
+import { qualitySettings, renderDpr } from './quality-settings'
+import { QualityProbe } from './QualityProbe'
+import { SteadyClock } from './steady-clock'
+import { useQualityTier } from './use-quality-tier'
 import { PerfProbe } from './PerfProbe'
 import { sceneParams } from './scene-params'
 import { WorldPieces } from './WorldPieces'
@@ -81,9 +87,13 @@ const IGNORE_ARRIVAL = () => {}
 
 /** The 3D world. Draws the `TileWorld` it is given — it knows nothing about facts or coins. */
 export function FarmScene({ world, onArrive = IGNORE_ARRIVAL }: FarmSceneProps) {
-  const frameloop = useSceneFrameloop()
-  const reducedMotion = frameloop === 'demand'
+  const reducedMotion = useReducedMotion()
   const params = useMemo(() => sceneParams(window.location.search, import.meta.env.DEV), [])
+  const quality = useQualityTier(params.quality)
+  // While the probe decides, the farm draws the high tier: that is the look being timed.
+  const settings = qualitySettings(quality.tier ?? 'high')
+  const [settled, setSettled] = useState(false)
+  const frameloop = sceneFrameloop({ reducedMotion, probing: quality.tier === null, settled, ...settings })
   const view = useMemo(() => (params.view ? devView(world, params.view) : HOME_VIEW), [params.view, world])
   const probeTarget = useRef<HTMLOutputElement>(null)
   const keeperProbeTarget = useRef<HTMLOutputElement>(null)
@@ -117,8 +127,9 @@ export function FarmScene({ world, onArrive = IGNORE_ARRIVAL }: FarmSceneProps) 
     <>
       <Canvas
         shadows
-        dpr={DPR_RANGE}
+        dpr={renderDpr({ deviceDpr: window.devicePixelRatio, maxDpr: settings.maxDpr })}
         frameloop={frameloop}
+        onCreated={({ set }) => set({ clock: new SteadyClock() })}
         camera={{ position: [...view.position], fov: FOV, far: 200 }}
         style={{ position: 'absolute', inset: 0 }}
         aria-hidden
@@ -126,23 +137,27 @@ export function FarmScene({ world, onArrive = IGNORE_ARRIVAL }: FarmSceneProps) 
         // without reaching into WebGL.
         data-testid="scene"
         data-frameloop={frameloop}
+        data-quality={quality.tier ?? 'probing'}
+        data-quality-reason={quality.reason}
       >
         <color attach="background" args={[SKY]} />
         {foggy && <fog attach="fog" args={[SKY, FOG_NEAR, FOG_FAR]} />}
         <hemisphereLight args={[SKY, HORIZON_GRASS, 0.9]} />
-        <Sun />
+        <Sun castShadow={settings.shadows} />
         <HorizonGrass />
         {world.chunks.map((chunk) => (
           <GroundSurface key={`${chunk.coord.cx},${chunk.coord.cz}`} chunk={chunk} surfaceOf={surfaceOf} />
         ))}
         <Suspense fallback={null}>
-          <WorldPieces world={world} renderKeeper={renderKeeper} />
+          <WorldPieces world={world} renderKeeper={renderKeeper} idleLoops={settings.idleLoops && !reducedMotion} />
+          {quality.tier === null && <QualityProbe sampleFrames={!reducedMotion} onDecided={quality.decide} />}
+          <FrameloopGovernor telemetry={telemetry} onSettledChange={setSettled} />
           {params.perf && <PerfProbe target={probeTarget} hotspots={world.hotspots} />}
           {params.perf && <KeeperProbe target={keeperProbeTarget} telemetry={telemetry} />}
         </Suspense>
         <FarmCamera
           view={view}
-          sway={!reducedMotion && params.view === null}
+          sway={settings.cameraSway && !reducedMotion && params.view === null}
           keeper={params.view === null ? telemetry : null}
           reducedMotion={reducedMotion}
         />

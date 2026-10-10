@@ -27,21 +27,25 @@ Target is what we build to; ceiling fails the gate or blocks a merge.
 
 ### Load (cold cache, throttled network, reference device)
 
-| Budget | Target | Ceiling | Measured (2026-09-08) | How measured |
+Measured 2026-10-08 (SF-80). Build-time sizes are exact; the Lighthouse
+numbers are **a laptop running headless Chrome** with simulated throttling
+(below), median of three runs — a regression guard, not the reference device.
+
+| Budget | Target | Ceiling | Measured (2026-10-08) | How measured |
 | --- | --- | --- | --- | --- |
-| Shell JS transfer (practice-first: React, `@sf/*`, HUD, number pad) | 70 kB gz | 100 kB gz | **68.7 kB gz** (was 303.2 kB) | `size-limit`, `pnpm size` in `pnpm gate` |
-| World JS chunk (three, r3f, drei subset) | 250 kB gz | 350 kB gz | **230.8 kB gz** (was: none, it was in the shell) | `size-limit` |
-| CSS transfer | 15 kB gz | 30 kB gz | 3.8 kB gz | `size-limit` |
+| Shell JS transfer (practice-first: React, `@sf/*`, HUD, number pad) | 70 kB gz | 100 kB gz | **69.5 kB gz** | `size-limit`, `pnpm size` in `pnpm gate` |
+| World JS chunk (three, r3f, drei subset) | 250 kB gz | 350 kB gz | **262.5 kB gz** — over target since SF-75/77, under ceiling | `size-limit` |
+| CSS transfer | 15 kB gz | 30 kB gz | 5.0 kB gz | `size-limit` |
 | 3D assets for the first hotspot (ground, keeper, barn exteriors) | 1.5 MB | 2.5 MB | 2.24 MB raw for the whole SF-82 catalogue (every piece, six animals, four keepers), more than one hotspot needs | `size-limit` on `public/models/**/*.{glb,png}`, uncompressed, at the ceiling |
 | Audio (synth only today) | 0 | see below | 0 | — |
-| Total transfer to first playable question | 100 kB | 150 kB | — | Lighthouse `total-byte-weight` on the shell |
-| Total transfer incl. first hotspot world | 2.5 MB | 4 MB | Lighthouse, world loaded |
-| Largest Contentful Paint | 2.5 s | 4 s | Lighthouse |
-| Time to Interactive (shell) | 3 s | 5 s | Lighthouse |
-| Time to first playable question (pad accepts a key, fact shown) | 3.5 s | 6 s | Playwright timer, monthly device run |
-| Total Blocking Time | 300 ms | 600 ms | Lighthouse |
-| Cumulative Layout Shift | 0.05 | 0.1 | Lighthouse |
-| World visible after first tap (cold / warm) | 6 s / 2 s | 10 s / 3 s | Playwright timer, monthly device run |
+| Total transfer to first playable question | 100 kB | 150 kB | **74.9 kB gz** (shell JS + CSS + `index.html`) | `size-limit` "first playable question" — Lighthouse can't isolate it, the world loads straight after the shell |
+| Total transfer incl. first hotspot world | 2.5 MB | 4 MB | **1.51 MB** (laptop/headless) | Lighthouse `total-byte-weight`, `pnpm lhci` |
+| Largest Contentful Paint | 2.5 s | 4 s | **1.82 s** (laptop/headless, simulated) | Lighthouse, `pnpm lhci` |
+| Time to Interactive (shell) | 3 s | 5 s | — (Lighthouse 10+ dropped TTI) | Playwright timer below covers it |
+| Time to first playable question (pad accepts a key, fact shown) | 3.5 s | 6 s | — | Playwright timer, monthly device run |
+| Total Blocking Time | 300 ms | 600 ms | **211 ms** median (runs: 2,973 / 211 / 183 ms) (laptop/headless, simulated) | Lighthouse, `pnpm lhci` |
+| Cumulative Layout Shift | 0.05 | 0.1 | **0** (laptop/headless) | Lighthouse, `pnpm lhci` |
+| World visible after first tap (cold / warm) | 6 s / 2 s | 10 s / 3 s | — | Playwright timer, monthly device run |
 
 ### Runtime (reference device, low tier, 60 s walk incl. one hatch ceremony)
 
@@ -60,7 +64,7 @@ Target is what we build to; ceiling fails the gate or blocks a merge.
 | Budget | Target | Ceiling | Notes |
 | --- | --- | --- | --- |
 | Triangles on screen | 150 k | 250 k | keeper ≤ 8 k, animal ≤ 3 k, prop ≤ 1.5 k |
-| Draw calls | 100 | 150 | `renderer.info.render.calls`; instancing for repeated props |
+| Draw calls | 100 | 150 | `renderer.info.render.calls`; instancing for repeated props. Measured 2026-10-08 at 1280×800: **high 91, low 48** (`e2e/quality-tiers.spec.ts`; draw calls don't depend on the device) |
 | Unique materials | 12 | 20 | one asset pack, one atlas per category |
 | Lights | 1 directional + 1 hemisphere | 2 | no point/spot lights on low tier |
 | Shadow maps | 1 × 1024² (low) / 1 × 2048² (high) | 1 map | casters: keeper + animals only; ground receives |
@@ -81,12 +85,30 @@ Target is what we build to; ceiling fails the gate or blocks a merge.
    tap; nest, paddock, training, zoo assets fetched when the keeper walks there.
 3. **One asset pack, instanced.** Repeated props (fences, feed bags, hay) are
    `InstancedMesh`; every model shares the pack's atlases.
-4. **Quality tier switch.** A 2 s FPS probe after the world mounts picks
-   `low` (< 45 fps) or `high`; `devicePixelRatio` is capped at 1.5 on both;
-   `low` disables shadows above 1024², post-processing and camera sway.
-   The tier is remembered in `localStorage` and overridable with `?tier=`.
-5. **`frameloop="demand"` when idle.** The scene only renders on input,
-   animation or a scheduled invalidate; a farm with nobody moving costs 0 ms.
+4. **Quality tier switch** (SF-80, `scene/quality-tier.ts`). On a first
+   visit the probe reads the device, then times ~1 s of frames on the high
+   tier once the world is drawn. `low` if any of: a software renderer
+   (SwiftShader, llvmpipe), an entry-level GPU (Intel HD/UHD 400–605, old
+   Mali/Adreno, PowerVR), ≤ 2 logical cores (ignored for Safari's masked
+   "Apple GPU" — WebKit reports 2 cores on every iOS device), ≤ 2 GB
+   `deviceMemory`, or a median frame over 22.2 ms (under 45 fps) across 60
+   frames after a 10-frame warm-up. Else `high`. Under reduced motion there
+   are no frames to time, so only the device signals count. `high` is the
+   full look at a DPR capped at 1.5; `low` is DPR 1, no sun shadow (about
+   half the draw calls), no camera sway and no idle clips. The verdict is
+   remembered in `localStorage`; `?quality=low|high` forces a tier for that
+   load without being remembered.
+5. **`frameloop="demand"` when idle** (`scene/frameloop.ts`). The loop runs
+   every frame only while something moves — the keeper walking, the camera
+   easing, and 0.5 s after (the walk → idle crossfade) — or while the tier
+   probe is timing frames. Idle clips and camera sway count as movement, so
+   **only the low tier ever rests**: its idle loops are paused (animals and
+   the resting keeper hold a pose), and a still farm draws nothing. The high
+   tier keeps its breathing animals and sway, so it renders continuously —
+   a device that passed the probe can afford it, and a still farm with
+   frozen animals reads as broken. Each frame's delta is capped at 0.1 s
+   (`SteadyClock`), so the first frame after a long rest does not carry the
+   whole rest.
 6. **Reduced motion saves work too.** The reduced-motion path (already used for
    camera sway) also skips particle ceremonies and idle animations, so it is
    both an accessibility path and a floor for the slowest device.
@@ -98,7 +120,7 @@ Target is what we build to; ceiling fails the gate or blocks a merge.
 | Where | What | Fails on |
 | --- | --- | --- |
 | `pnpm size` — in `pnpm gate` right after `pnpm build` (gate + CI) | `size-limit` with `@size-limit/file` | any chunk over its ceiling |
-| CI, after build | Lighthouse CI (`@lhci/cli`) on the built shell | ceilings in the load table |
+| `pnpm lhci` — local today; a CI job once the workflow (PR #123, SF-39) lands | Lighthouse CI (`@lhci/cli`) on `vite preview` of the production build | ceilings in the load table |
 | Any URL | `?perf=1` mounts `r3f-perf` `<Perf>` (lazy-loaded) | manual reading |
 | Monthly | Hand run on the reference device, row appended below | any ceiling |
 
@@ -118,7 +140,8 @@ number between target and ceiling:
 ```json
 "size-limit": [
   { "name": "shell (everything the first question needs)", "path": "dist/assets/index-*.js", "limit": "100 kB", "gzip": true },
-  { "name": "world (three, r3f, the farm scene)", "path": ["dist/assets/FarmScene-*.js", "dist/assets/react-three-fiber.esm-*.js"], "limit": "350 kB", "gzip": true },
+  { "name": "first playable question (shell JS + CSS + HTML)", "path": ["dist/index.html", "dist/assets/index-*.js", "dist/assets/*.css"], "limit": "150 kB", "gzip": true },
+  { "name": "world (three, r3f, the farm scene, the tile-world generator)", "path": ["dist/assets/FarmScene-*.js", "dist/assets/tile-world-*.js", "dist/assets/build-farm-world-*.js"], "limit": "350 kB", "gzip": true },
   { "name": "models (every Kenney piece in the catalogue, uncompressed)", "path": "public/models/**/*.{glb,png}", "limit": "2.5 MB", "brotli": false },
   { "name": "css", "path": "dist/assets/*.css", "limit": "30 kB", "gzip": true }
 ]
@@ -136,11 +159,18 @@ table above quotes `size-limit`, because that is what fails the gate.
 `rollup-plugin-visualizer` stays a diagnostic (`pnpm --filter @sf/web build
 --mode analyze`), not a gate — it explains a failure, it doesn't detect one.
 
-Lighthouse CI (`lighthouserc.cjs`): `throttlingMethod: 'simulate'`, `rttMs: 150`,
-`throughputKbps: 10240`, `cpuSlowdownMultiplier: 4` (CI runners are far faster
-than an N4000). Assertions, all `error`: `largest-contentful-paint ≤ 4000`,
-`interactive ≤ 5000`, `total-blocking-time ≤ 600`, `cumulative-layout-shift ≤ 0.1`,
-`total-byte-weight ≤ 153600` on the shell URL. Three runs, median.
+Lighthouse CI (`lighthouserc.cjs`, run by `pnpm lhci`, which builds first):
+`throttlingMethod: 'simulate'`, `rttMs: 150`, `throughputKbps: 10240`,
+`cpuSlowdownMultiplier: 4` (CI runners are far faster than an N4000), desktop
+form factor at 1366×768, DPR 1. Assertions, all `error`, on the median run of
+three: `largest-contentful-paint ≤ 4000`, `total-blocking-time ≤ 600`,
+`cumulative-layout-shift ≤ 0.1`, `total-byte-weight ≤ 4 MB`. The game fetches
+the world straight after the shell, so Lighthouse's byte weight is the "incl.
+first hotspot world" line; the 150 kB shell line is `size-limit`'s "first
+playable question" entry. Lighthouse 10+ has no `interactive` audit. TBT is
+the noisy one: one run in three measured 2.97 s on a laptop, so the median is
+what is asserted. To add to CI when PR #123 lands, a job after `pnpm install`:
+`pnpm lhci` (Chrome is preinstalled on `ubuntu-latest`).
 
 ### Monthly device runs
 
@@ -148,6 +178,7 @@ than an N4000). Assertions, all `error`: `largest-contentful-paint ≤ 4000`,
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 2026-09 | shell (Phase 1) | none yet — SF-34 | 302 kB gz | — | — | — | — | — | — | throttled desktop only |
 | 2026-09 | world split out (Phase 2) | none yet — SF-34 | 69 kB gz shell + 234 kB gz world | — | — | — | — | — | — | build output only, not a device run |
+| 2026-10-08 | SF-80 tiers | none yet — SF-34; laptop, headless Chromium (SwiftShader) | 1.51 MB (LH) | — | — | high 7.5 at rest / low 25.7 walking (software GL, not comparable to a device) | — | — | high 91 / low 48 | laptop/headless only; draw calls are the device-independent number |
 
 ## Current state vs budget (Phase 2, world code-split)
 
@@ -171,20 +202,21 @@ already answer.
 | CSS | 14.95 kB raw / 3.8 kB gz | 30 kB gz | ok |
 | Code-splitting | `React.lazy` + Suspense; HUD and pad render and grade answers before the world lands (e2e holds the chunk on the wire to prove it) | practice first | met |
 | Stale chunk after a deploy | one reload, counted in `sessionStorage`; then the farm plays on without scenery | no white screen | met |
-| Frameloop / DPR | always unless reduced motion (then demand); no DPR cap | demand when idle; cap 1.5 | not met |
+| Frameloop / DPR | low tier: demand when still, always while moving; high tier: always; reduced motion: demand. DPR capped at 1.5 (1 on low) | demand when idle; cap 1.5 | met (SF-80) |
+| Quality tiers | probe on first visit, remembered; `?quality=` overrides; high 91 / low 48 draw calls at 1280×800 | tier switch | met (SF-80) |
 | Reduced motion | camera sway off; the loading ring does not spin | also skips ceremonies | partial |
 | Scene | 3 meshes, 2 lights, 1 shadow map | scene table | trivially ok |
-| Gate | `pnpm gate` (typecheck · lint · boundaries · tests · build · **size**) + `pnpm e2e` | + size-limit + LHCI | size-limit met; LHCI outstanding |
+| Gate | `pnpm gate` (typecheck · lint · boundaries · tests · build · **size**) + `pnpm e2e` + `pnpm lhci` | + size-limit + LHCI | met locally; LHCI joins CI with PR #123 |
 
 ### Next two actions for Phase 2
 
 1. ~~**Split the world out**~~ — done: `scene/LazyFarmScene.tsx`, with
    `size-limit` in `pnpm gate`.
-2. **Tier switch + demand frameloop + `?perf=1`** — the 2 s probe, DPR cap 1.5,
-   `frameloop="demand"` with invalidate on input/animation, lazy `<Perf>`.
-3. **Lighthouse CI in the gate + first device run** — LHCI with the assertions
-   above; run the monthly table once on the SF-34 device and recalibrate every
-   target this doc guessed.
+2. ~~**Tier switch + demand frameloop + `?perf=1`**~~ — done (SF-80); the
+   `<Perf>` overlay is still not built: `?perf=1` publishes numbers to the DOM.
+3. **Lighthouse in CI + first device run** — `pnpm lhci` exists (SF-80); add
+   it as a CI job when PR #123 lands, then run the monthly table once on the
+   SF-34 device and recalibrate every target and tier threshold this doc guessed.
 
 ## Open questions for James
 

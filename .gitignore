@@ -44,3 +44,6 @@ test-results
 
 # Firebase
 functions/lib
+
+# Lighthouse CI reports (`pnpm lhci`)
+.lighthouseci

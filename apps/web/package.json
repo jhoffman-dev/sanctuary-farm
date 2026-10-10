@@ -20,6 +20,16 @@
       "gzip": true
     },
     {
+      "name": "first playable question (shell JS + CSS + HTML)",
+      "path": [
+        "dist/index.html",
+        "dist/assets/index-*.js",
+        "dist/assets/*.css"
+      ],
+      "limit": "150 kB",
+      "gzip": true
+    },
+    {
       "name": "world (three, r3f, the farm scene, the tile-world generator)",
       "path": [
         "dist/assets/FarmScene-*.js",
