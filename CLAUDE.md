@@ -113,6 +113,10 @@ this file → human merges. Move the ticket across the board as you go (skill:
 Branch names: `feat/SF-123-short-slug`, `fix/…`, `chore/…`. One ticket per PR.
 PR description links the ticket and states what changed + how it was verified.
 
+`CONTRIBUTING.md` states this same workflow for humans outside the agent fleet;
+`CODE_OF_CONDUCT.md` covers conduct and the kid-safety reporting address. Keep
+all three in step when the workflow changes.
+
 ## Agents & skills
 
 `.claude/agents/`: `architect`, `domain-dev`, `app-dev`, `qa`, `reviewer`,

@@ -35,13 +35,8 @@ If a future release adds a database id, point these tests at `sanctuary-farm`.
 
 **Not part of `pnpm gate`.** The Firestore emulator needs a JDK, which the gate
 does not otherwise require; keeping it out means `pnpm gate` stays runnable on a
-bare checkout. CI should run it as its own step, after `pnpm gate`:
-
-```yaml
-- uses: actions/setup-java@v4
-  with: { distribution: temurin, java-version: '21' }
-- run: pnpm test:rules
-```
+bare checkout. CI runs it as its own `rules` job in `.github/workflows/ci.yml`
+(Temurin 21 + a pinned `firebase-tools`), in parallel with the gate.
 
 The tests are a deny-all contract: no client — signed in or not — may read or
 write anything until Phase 4 (ADR-0002) adds per-save ownership rules. When
