@@ -30,18 +30,23 @@ before a migration, for drills, and because `import` (unlike `databases restore`
 loads into the *existing* database. The bucket's lifecycle matches weekly retention.
 
 Recommendation: PITR on, daily backup kept 14 days, weekly kept 8 weeks, plus the
-bucket. `PROJECT_ID` and `REGION` are placeholders; `REGION` is the Firestore
-location (a multi-region `nam5` database → bucket location `US`).
+bucket. `PROJECT_ID` is `student-games-be188`, the project Sanctuary Farm shares
+with the Student Games homepage and Math Invaders (`docs/deploy.md`); `REGION` is
+a placeholder for the Firestore location (a multi-region `nam5` database → bucket
+location `US`). Every `--database` below is our **named** database
+`sanctuary-farm`, never `(default)`: PITR, backup schedules and restores are all
+per-database settings, so naming ours is what keeps this runbook from touching
+another game's data.
 
 ```sh
-gcloud firestore databases update --database='(default)' --enable-pitr --project=PROJECT_ID
-gcloud firestore backups schedules create --database='(default)' --recurrence=daily  --retention=14d --project=PROJECT_ID
-gcloud firestore backups schedules create --database='(default)' --recurrence=weekly --day-of-week=SUN --retention=8w --project=PROJECT_ID
-gcloud storage buckets create gs://PROJECT_ID-firestore-exports --location=REGION \
+gcloud firestore databases update --database='sanctuary-farm' --enable-pitr --project=PROJECT_ID
+gcloud firestore backups schedules create --database='sanctuary-farm' --recurrence=daily  --retention=14d --project=PROJECT_ID
+gcloud firestore backups schedules create --database='sanctuary-farm' --recurrence=weekly --day-of-week=SUN --retention=8w --project=PROJECT_ID
+gcloud storage buckets create gs://PROJECT_ID-sanctuary-farm-exports --location=REGION \
   --uniform-bucket-level-access --public-access-prevention --project=PROJECT_ID
-gcloud storage buckets update gs://PROJECT_ID-firestore-exports \
+gcloud storage buckets update gs://PROJECT_ID-sanctuary-farm-exports \
   --lifecycle-file=lifecycle.json   # {"rule":[{"action":{"type":"Delete"},"condition":{"age":56}}]}
-gcloud firestore export gs://PROJECT_ID-firestore-exports/$(date -u +%Y%m%dT%H%M) --database='(default)' --project=PROJECT_ID
+gcloud firestore export gs://PROJECT_ID-sanctuary-farm-exports/$(date -u +%Y%m%dT%H%M) --database='sanctuary-farm' --project=PROJECT_ID
 ```
 
 Bucket rules: same location as Firestore (cross-region exports are slow and pay
@@ -72,7 +77,7 @@ corrupt." Order matters; do not skip the freeze.
    Older: `gcloud firestore backups list --location=REGION`, then
    `gcloud firestore databases restore --source-backup=<name> --destination-database=restore-<date>`
    and either repoint the app or export from it.
-4. **Import**: `gcloud firestore import gs://…/<path> --database='(default)'`. Import
+4. **Import**: `gcloud firestore import gs://…/<path> --database='sanctuary-farm'`. Import
    overwrites matching ids and leaves other documents alone — delete the corrupted
    collection first if the goal is "exactly as of T."
 5. **Verify** with `functions/scripts/count-saves.ts` (aggregate count per collection)

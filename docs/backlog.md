@@ -45,7 +45,7 @@ _P0 · agents_ — Housekeeping before feature work: docs, agents, skills, board
 | Task | Notion: create integration, share DB + a Docs page, add credentials | Ready | James | XS | P0 |
 | Task | Notion: build the board and import the backlog | Ready | — | S | P0 |
 | Task | Notion: push the docs and verify the sync | Ready | — | S | P0 |
-| Task | Firebase: auth and create the project | Ready | James | S | P0 |
+| Task | Firebase: auth and set up our tenancy in student-games-be188 | Ready | James | S | P0 |
 | Task | Decide GitHub Project vs Notion-only board | Ready | James | XS | P0 |
 | Task | Decide analytics stance | Ready | James | XS | P0 |
 | Task | Decide error monitoring | Ready | James | XS | P0 |
@@ -117,7 +117,7 @@ _P0 · agents_ — Housekeeping before feature work: docs, agents, skills, board
 
 **Notion: push the docs and verify the sync** — After the token + the Docs page exist: run node scripts/notion/sync-docs.mjs, open each created page, confirm headings / tables / code render acceptably, commit the manifest with its page ids and the updated docs/README.md. Fix mdToBlocks in scripts/notion/lib.mjs for anything mangled. AC: every manifest doc has a working Notion link.
 
-**Firebase: auth and create the project** — Interactive. firebase login; create a project; pick a project id (e.g. sanctuary-farm-app); add two Hosting sites (game, landing); enable Firestore + Functions. Hand the project id back.
+**Firebase: auth and set up our tenancy in student-games-be188** — Interactive. No new project: Sanctuary Farm joins the existing shared `student-games-be188` project (SF-29). firebase login; create the two Hosting sites `sanctuary-farm` and `sanctuary-farm-landing`; create the named Firestore database `sanctuary-farm`; first scoped deploy. Exact commands: `docs/deploy.md`.
 
 **Decide GitHub Project vs Notion-only board** — Dual boards mean double bookkeeping. Recommendation: Notion is the single board; GitHub only for code + PRs + Actions. Record the call.
 
@@ -141,9 +141,9 @@ _P0 · agents_ — Housekeeping before feature work: docs, agents, skills, board
 
 **GitHub branch protection on main** — After CI exists: require CI checks + one review before merge to main; no direct pushes.
 
-**firebase.json and emulator config** — firebase.json (two hosting targets: game, landing), .firebaserc, Firestore rules + indexes stubs, functions/ scaffold, emulator config. Blocked on the Firebase project. AC: firebase emulators:start boots.
+**firebase.json and emulator config** — firebase.json (two hosting targets: game, landing), .firebaserc, Firestore rules + indexes stubs, functions/ scaffold, emulator config. AC: `pnpm emulators` boots on `demo-sanctuary-farm`.
 
-**PR preview deploy workflow** — Action: Firebase Hosting preview channel per PR, prod on merge to main. Needs a Firebase CI token in GH secrets (James). Blocked on firebase.json.
+**PR preview deploy workflow** — Action: Firebase Hosting preview channel per PR, prod on merge to main. Needs a Firebase CI token in GH secrets (James). Must use the scoped `pnpm deploy:*` commands — the project is shared, so a bare `firebase deploy` from CI would break another game (`docs/deploy.md`).
 
 **Secrets management doc for agents** — docs/secrets.md — what secrets exist, where each lives, and the rule: never commit one, never put one in client code.
 
@@ -173,7 +173,7 @@ _P0 · agents_ — Housekeeping before feature work: docs, agents, skills, board
 
 **Landing: favicon, social meta, OG image** — apps/landing/ — favicon, description/OG/Twitter meta, a simple 1200x630 share image. AC: link preview renders.
 
-**Landing: verify in browser and deploy** — Run the landing page in a real browser, screenshot desktop + mobile, check contrast + keyboard focus, then deploy to the landing Hosting site. Blocked on firebase.json.
+**Landing: verify in browser and deploy** — Run the landing page in a real browser, screenshot desktop + mobile, check contrast + keyboard focus, then deploy to the landing Hosting site with `pnpm deploy:landing`. Blocked on the sites existing (see the Firebase tenancy task).
 
 ## Phase 1 — Clean Architecture refactor
 
