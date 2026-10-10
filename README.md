@@ -72,3 +72,9 @@ Playwright · oxlint · dependency-cruiser.
 No multiple choice. No punishment for absence — animals get glum, never gone.
 Latency drives promotion, not mere correctness. Sessions end on time. Interleave
 families, never block-drill. No ads, no purchases, no PII.
+
+## License
+
+The code is [MIT](LICENSE), © 2026 James Hoffman. The 3D models under
+`apps/web/public/models/` are by [Kenney](https://kenney.nl) and are CC0
+(public domain); each kit keeps its own `License.txt`.
