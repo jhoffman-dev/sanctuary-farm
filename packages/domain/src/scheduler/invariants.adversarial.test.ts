@@ -315,10 +315,12 @@ describe('structural invariants hold at every step of long seeded runs (maxTable
   })
 
   it('a family is mastered (progress exactly 1) only when every fact in it is mastered', () => {
+    // Membership is fixed, so build it once rather than at each of the 4500 steps.
+    const members = new Map([1, 2, 3, 10, 12].map((family) => [family, factsInFamily(family)]))
     const violation = firstStepViolation(RUNS_12, (step) => {
       const state = step.afterGrade
-      for (const family of [1, 2, 3, 10, 12]) {
-        const expected = factsInFamily(family).every((fact) => isFactMastered(state.facts[fact.id]))
+      for (const [family, facts] of members) {
+        const expected = facts.every((fact) => isFactMastered(state.facts[fact.id]))
         if (isFamilyMastered(state, family) !== expected) return `family ${family} mastered != ${expected}`
         if ((familyProgress(state, family) === 1) !== expected) return `family ${family} progress`
       }
