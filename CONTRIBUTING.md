@@ -58,8 +58,8 @@ it. See [`docs/definition-of-done.md`](docs/definition-of-done.md) §3.
 
 ## Branches, commits, PRs
 
-Work is tracked on the Notion board ([`docs/board.md`](docs/board.md)), **not**
-GitHub Issues. One ticket per PR.
+Work is tracked as GitHub Issues on the **Sanctuary Farm Project** board
+([`docs/board.md`](docs/board.md)). One ticket per PR.
 
 - Branch: `feat/SF-123-short-slug`, also `fix/…`, `chore/…`, `docs/…`.
 - Commit subject: `type: what changed` in the imperative, lower-case, no
@@ -69,7 +69,8 @@ GitHub Issues. One ticket per PR.
 - Fill in [`.github/pull_request_template.md`](.github/pull_request_template.md):
   the ticket link, what changed, how it was verified (gate/e2e output,
   screenshots for visual changes), and the inward-dependencies + tests
-  checklist. Move the Notion ticket to **In review** with the PR linked.
+  checklist. Put `Closes #<issue>` in the body and move the issue's project
+  Status to **In review**.
 - A changed doc under `docs/` is pushed to its Notion page after merge; a new
   doc is added to `docs/README.md`.
 

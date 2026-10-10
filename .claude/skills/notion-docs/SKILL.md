@@ -45,7 +45,7 @@ doc. Keep it current when you add or move a page.
    markdown (minus the `# H1`).
 2. Add a row to `docs/README.md` with the new page URL.
 3. If the doc started as a `Ready` ticket ("write docs/X.md"), move that ticket
-   to review/Done as usual.
+   to review/Done as usual (the ticket is a GitHub issue — skill: `github-board`).
 
 ## Not yet written
 

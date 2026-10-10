@@ -6,6 +6,6 @@
   and run `node scripts/notion/gen-backlog.mjs` to regenerate those two files.
   Do not hand-edit them.
 
-New tickets are created directly in Notion with the `notion-board` skill (Notion
-MCP connector) — not by re-importing the CSV. Board schema and setup:
+The board moved to GitHub Issues on 2026-10-04: new tickets are GitHub issues
+created with the `github-board` skill — never by re-importing the CSV. See
 `docs/board.md`.
