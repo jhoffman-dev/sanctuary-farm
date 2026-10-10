@@ -264,10 +264,11 @@ stay out.
    colours keeps every species pair apart under simulation, or children in a
    playtest still confuse species at 64 px, revisit — first with chunkier
    distinguishing features in Blender, then with the HUD name tag made
-   mandatory, and only then with another source.
+   mandatory, and only then with a whole-project switch to another source.
 2. **The Blender gap-fill cannot match the style.** If the sheep, horse or hen
    look visibly foreign beside Cube Pets, the farm stops being one world; then
-   the choice is fewer species or another source.
+   the choice is fewer species or a whole-project switch to another source
+   (never one borrowed animal or prop, which §8 forbids).
 3. **Kenney publishes a farm kit or more Cube Pets.** Adopt it and retire the
    matching Blender models.
 4. **Fantasy animals (Phase 6).** Cube Pets has no dragon or unicorn; those
