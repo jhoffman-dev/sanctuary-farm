@@ -31,11 +31,11 @@
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.2",
     "@playwright/test": "^1.63.0",
-    "@vitest/coverage-v8": "^5.0.0",
-    "dependency-cruiser": "^18.2.0",
-    "firebase": "^12.18.0",
-    "oxlint": "^1.79.0",
+    "@vitest/coverage-v8": "^5.0.3",
+    "dependency-cruiser": "^18.5.0",
+    "firebase": "^12.19.0",
+    "oxlint": "^1.87.0",
     "typescript": "~6.0.2",
-    "vitest": "^5.0.0"
+    "vitest": "^5.0.3"
   }
 }
