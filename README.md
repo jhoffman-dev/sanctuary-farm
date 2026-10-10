@@ -22,6 +22,8 @@ Reachable by any kid on any device from a link.
 | [`docs/implementation-plan.md`](docs/implementation-plan.md) | phases 0–6 |
 | [`docs/adr/`](docs/adr/) | decisions that are expensive to reverse (stack, identity) |
 | [`docs/board.md`](docs/board.md) | the Notion board + docs — schema, views, flow |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | setup, the gate, branches and PRs, secrets, reporting a kid-safety concern |
+| [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) | how we behave here — Contributor Covenant 2.1, plus what a kid audience demands |
 
 The prose docs are mirrored to **Notion** (that's where to read them) —
 `docs/README.md` has the links; the markdown here is the authoring surface,
@@ -72,3 +74,9 @@ Playwright · oxlint · dependency-cruiser.
 No multiple choice. No punishment for absence — animals get glum, never gone.
 Latency drives promotion, not mere correctness. Sessions end on time. Interleave
 families, never block-drill. No ads, no purchases, no PII.
+
+## License
+
+The code is [MIT](LICENSE), © 2026 James Hoffman. The 3D models under
+`apps/web/public/models/` are by [Kenney](https://kenney.nl) and are CC0
+(public domain); each kit keeps its own `License.txt`.

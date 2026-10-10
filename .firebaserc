@@ -1,8 +1,15 @@
 {
   "projects": {
-    "default": "demo-sanctuary-farm"
+    "default": "student-games-be188",
+    "emulator": "demo-sanctuary-farm"
   },
   "targets": {
+    "student-games-be188": {
+      "hosting": {
+        "game": ["sanctuary-farm"],
+        "landing": ["sanctuary-farm-landing"]
+      }
+    },
     "demo-sanctuary-farm": {
       "hosting": {
         "game": ["demo-sanctuary-farm-game"],

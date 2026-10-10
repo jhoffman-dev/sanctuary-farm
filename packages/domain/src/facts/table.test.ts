@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { Fact, Tier } from './fact'
 import { assertTableSize, buildFacts, factsInFamily, factsInTier, getFact } from './table'
 import { MAX_TABLE_DEFAULT, MIN_TABLE, commuteId, factId, familyOf, tierOf } from './tuning'
 
@@ -65,4 +66,47 @@ describe('fact table', () => {
       expect(() => factsInTier(1, maxTable)).toThrow(RangeError)
     },
   )
+})
+
+describe('family and tier membership is computed once per table size (SF-88)', () => {
+  const sizes = Array.from({ length: MAX_TABLE_DEFAULT - MIN_TABLE + 1 }, (_, i) => MIN_TABLE + i)
+  const TIERS: Tier[] = [1, 2, 3, 4, 5, 6]
+
+  it.each(sizes)('matches a fresh build of the %s-table for every family and tier', (maxTable) => {
+    const fresh = buildFacts(maxTable)
+    for (let family = 0; family <= MAX_TABLE_DEFAULT + 1; family++) {
+      expect(factsInFamily(family, maxTable), `family ${family}`).toEqual(
+        fresh.filter((fact) => fact.family === family),
+      )
+    }
+    for (const tier of TIERS) {
+      expect(factsInTier(tier, maxTable), `tier ${tier}`).toEqual(fresh.filter((fact) => fact.tier === tier))
+    }
+  })
+
+  it('hands out the same frozen arrays and facts on every call, so no caller can change them', () => {
+    const family = factsInFamily(7, 9)
+    const tier = factsInTier(1, 9)
+    expect(factsInFamily(7, 9)).toBe(family)
+    expect(factsInTier(1, 9)).toBe(tier)
+    for (const facts of [family, tier, factsInFamily(13), factsInTier(6, 4)]) {
+      expect(Object.isFrozen(facts)).toBe(true)
+      expect(() => (facts as Fact[]).push(ALL[0] as Fact)).toThrow(TypeError)
+      for (const fact of facts) expect(Object.isFrozen(fact)).toBe(true)
+    }
+    const first = family[0] as Fact
+    expect(() => {
+      first.answer = 0
+    }).toThrow(TypeError)
+    expect(factsInFamily(7, 9)[0]?.answer).toBe(first.a * first.b)
+  })
+
+  it('still refuses an invalid table size and leaves the valid sizes untouched', () => {
+    for (const maxTable of [0, 13, 2.5, Number.NaN]) {
+      expect(() => factsInFamily(1, maxTable)).toThrow(RangeError)
+      expect(() => factsInTier(1, maxTable)).toThrow(RangeError)
+    }
+    expect(factsInFamily(12)).toHaveLength(23)
+    expect(factsInTier(1, 3)).toEqual(buildFacts(3).filter((fact) => fact.tier === 1))
+  })
 })
