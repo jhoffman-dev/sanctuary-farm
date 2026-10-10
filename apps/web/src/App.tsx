@@ -2,7 +2,7 @@ import type { FarmGame, FarmSummary } from '@sf/application'
 import { useCallback, useEffect, useState } from 'react'
 import { Hud } from './hud/Hud'
 import { PracticePanel } from './practice/PracticePanel'
-import { FarmScene } from './scene/FarmScene'
+import { LazyFarmScene } from './scene/LazyFarmScene'
 
 type AppProps = {
   game: FarmGame
@@ -43,7 +43,7 @@ export function App({ game }: AppProps) {
 
   return (
     <main className="relative h-full w-full">
-      <FarmScene />
+      <LazyFarmScene />
       <div className="pointer-events-none absolute inset-0 flex flex-col">
         {summary ? (
           <>

@@ -6,9 +6,11 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { App } from './App'
 
-// The 3D world needs WebGL, which jsdom has none of. Its own rule — the
-// frameloop — is covered by the a11y hook tests and an e2e case.
-vi.mock('./scene/FarmScene', () => ({ FarmScene: () => null }))
+// The 3D world needs WebGL, which jsdom has none of, and its loading status
+// would compete with the app's own. Its rules are covered elsewhere: the
+// frameloop by the a11y hook tests and an e2e case, the lazy chunk's fallback
+// and failure by LazyFarmScene.test.tsx.
+vi.mock('./scene/LazyFarmScene', () => ({ LazyFarmScene: () => null }))
 
 type RecordingAudioBus = AudioBus & { muted: boolean }
 
