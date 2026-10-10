@@ -1,4 +1,4 @@
-import { type TileWorld, chunkOrigin, CHUNK_SIZE, tileCentre, tilesOfChunk } from '@sf/world'
+import { type ChunkCoord, type TileWorld, chunkOrigin, CHUNK_SIZE, tileCentre, tilesOfChunk } from '@sf/world'
 import { footprintCentre } from './piece-placement'
 
 export type Vec3 = readonly [number, number, number]
@@ -18,13 +18,16 @@ export type DevViewName = (typeof DEV_VIEW_NAMES)[number]
 /** Height above the land's centre that fits every chunk in a 35° frame, looking almost straight down. */
 const OVERVIEW_HEIGHT_PER_TILE = 1.75
 
-/** High above the middle of the land, tipped just off vertical so `lookAt` keeps north at the top. */
-function overview(world: TileWorld): CameraView {
-  const origins = world.chunks.map((chunk) => chunkOrigin(chunk.coord))
-  const minX = Math.min(...origins.map((origin) => origin.x))
-  const minZ = Math.min(...origins.map((origin) => origin.z))
-  const maxX = Math.max(...origins.map((origin) => origin.x)) + CHUNK_SIZE
-  const maxZ = Math.max(...origins.map((origin) => origin.z)) + CHUNK_SIZE
+/**
+ * High above the middle of the chunks, tipped just off vertical so `lookAt`
+ * keeps north at the top; `margin` tiles of the land around them stay in frame too.
+ */
+export function overviewOf(chunks: readonly ChunkCoord[], margin = 0): CameraView {
+  const origins = chunks.map(chunkOrigin)
+  const minX = Math.min(...origins.map((origin) => origin.x)) - margin
+  const minZ = Math.min(...origins.map((origin) => origin.z)) - margin
+  const maxX = Math.max(...origins.map((origin) => origin.x)) + CHUNK_SIZE + margin
+  const maxZ = Math.max(...origins.map((origin) => origin.z)) + CHUNK_SIZE + margin
   const centre: Vec3 = [(minX + maxX) / 2, 0, (minZ + maxZ) / 2]
   const height = Math.max(maxX - minX, maxZ - minZ) * OVERVIEW_HEIGHT_PER_TILE
   return { position: [centre[0], height, centre[2] + 0.01], lookAt: centre }
@@ -60,5 +63,5 @@ function paddockCorner(world: TileWorld): CameraView {
 }
 
 export function devView(world: TileWorld, name: DevViewName): CameraView {
-  return name === 'overview' ? overview(world) : paddockCorner(world)
+  return name === 'overview' ? overviewOf(world.chunks.map((chunk) => chunk.coord)) : paddockCorner(world)
 }

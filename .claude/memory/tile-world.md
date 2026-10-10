@@ -5,7 +5,8 @@
   only domain *types*, so its composition root passes the domain's
   `createRng` as re-exported by `@sf/application` (never a copy);
   `@sf/world` tests use `seededRngFactory` from `test-fixtures.ts`. Never store generated
-  tiles; store the seed, the chunk list and `layouts/overrides.json`.
+  tiles; store `layouts/world.json` (seed + chunk list, `parseWorldSettings`)
+  and `layouts/overrides.json`.
 - **Grid:** `TILE_SIZE` 1 unit (Kenney kits are 1 × 1), `CHUNK_SIZE` 16. North
   is −Z; rotations are `QuarterTurns` clockwise from above.
 - **Chunks never depend on which chunks exist.** A chunk's neighbours are
@@ -30,3 +31,16 @@
   are marked by their gate/door. `?perf=1` publishes draw calls, FPS and
   hotspot screen positions as `data-*` on `[data-testid=perf-probe]`;
   `?view=overview|paddock-corner` cameras exist in dev builds only.
+- **World editor (SF-76, `?edit=1`, dev only).** Rules live in `@sf/world`
+  (`world-editing.ts`: `applyEdit(spec, edit)` keeps the file minimal — it
+  replaces same-layer edits on the tile and drops an edit that leaves the
+  tile as generated; `eraseAt`, `hotspotMoveProblem`, `neighbouringChunks`;
+  `edit-history.ts`; `world-draft.ts`). `apps/web/src/editor/` only maps
+  input to reducer actions. Saving goes through a dev-server plugin
+  (`apps/web/src/dev-server/`) that writes both layout files in the
+  canonical text from `serialize-world.ts`; a gate test fails if either
+  file is not in that shape. The plugin loads `@sf/world` through
+  `server.ssrLoadModule`, because Vite's config loader cannot resolve the
+  workspace package's extensionless TypeScript imports. The editor e2e
+  writes the real files and restores them, so it runs in its own Playwright
+  project after the other dev specs.

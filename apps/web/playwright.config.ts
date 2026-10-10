@@ -4,8 +4,14 @@ const PROD_PORT = 4173
 const DEV_PORT = 5174
 const prodURL = `http://localhost:${PROD_PORT}`
 const devURL = `http://localhost:${DEV_PORT}`
-/** Specs for dev-only routes (`?assets=1`, `?view=`), which the production build does not contain. */
+/** Specs for dev-only routes (`?assets=1`, `?view=`, `?edit=1`), which the production build does not contain. */
 const DEV_ONLY = /\.dev\.spec\.ts$/
+/**
+ * The world editor's spec saves into `packages/world/layouts/` and restores
+ * the files afterwards. Other dev specs read those files through the same dev
+ * server, so it runs only once they have finished.
+ */
+const WRITES_LAYOUTS = /editor\.dev\.spec\.ts$/
 
 export default defineConfig({
   testDir: './e2e',
@@ -23,7 +29,18 @@ export default defineConfig({
   },
   projects: [
     { name: 'chromium', testIgnore: DEV_ONLY, use: { ...devices['Desktop Chrome'], baseURL: prodURL } },
-    { name: 'chromium-dev', testMatch: DEV_ONLY, use: { ...devices['Desktop Chrome'], baseURL: devURL } },
+    {
+      name: 'chromium-dev',
+      testMatch: DEV_ONLY,
+      testIgnore: WRITES_LAYOUTS,
+      use: { ...devices['Desktop Chrome'], baseURL: devURL },
+    },
+    {
+      name: 'chromium-dev-editor',
+      testMatch: WRITES_LAYOUTS,
+      dependencies: ['chromium-dev'],
+      use: { ...devices['Desktop Chrome'], baseURL: devURL },
+    },
   ],
   webServer: [
     {

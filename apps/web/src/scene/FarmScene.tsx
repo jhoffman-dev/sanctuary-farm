@@ -5,34 +5,18 @@ import { useSceneFrameloop } from '../a11y/use-scene-frameloop'
 import { type CameraView, devView, HOME_VIEW } from './camera-views'
 import { GroundSurface } from './GroundSurface'
 import { HORIZON_GRASS, surfaceOf } from './ground-palette'
+import { HorizonGrass, Sun } from './SceneBackdrop'
+import { DPR_RANGE, FOV, SKY } from './scene-look'
 import { PerfProbe } from './PerfProbe'
 import { sceneParams } from './scene-params'
 import { WorldPieces } from './WorldPieces'
 
-const SKY = '#bfe3f5'
-const FOV = 35
 /** Fog in the sky colour hides the far grass's edge as a soft horizon. */
 const FOG_NEAR = 35
 const FOG_FAR = 90
-const HORIZON_SIZE = 200
-/** Below the chunks' ground (and below water), so the land always wins. */
-const HORIZON_HEIGHT = -0.2
 /** Very slow, very slight — a breath, not a ride. */
 const SWAY_RADIANS_PER_SECOND = 0.15
 const SWAY_METRES = 0.35
-/** Performance budget: devicePixelRatio is capped at 1.5 on every tier. */
-const DPR_RANGE: [number, number] = [1, 1.5]
-/** The sun's shadow camera has to cover the whole farm, not three.js's default 10 × 10 units. */
-const SHADOW_HALF_EXTENT = 22
-
-function HorizonGrass() {
-  return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, HORIZON_HEIGHT, 0]}>
-      <planeGeometry args={[HORIZON_SIZE, HORIZON_SIZE]} />
-      <meshStandardMaterial color={HORIZON_GRASS} roughness={1} />
-    </mesh>
-  )
-}
 
 function FarmCamera({ view, sway }: { view: CameraView; sway: boolean }) {
   const camera = useThree((state) => state.camera)
@@ -50,25 +34,6 @@ function FarmCamera({ view, sway }: { view: CameraView; sway: boolean }) {
   })
 
   return null
-}
-
-function Sun() {
-  const half = SHADOW_HALF_EXTENT
-  return (
-    <directionalLight
-      position={[10, 18, 8]}
-      intensity={1.3}
-      castShadow
-      shadow-mapSize={[1024, 1024]}
-      shadow-camera-left={-half}
-      shadow-camera-right={half}
-      shadow-camera-top={half}
-      shadow-camera-bottom={-half}
-      shadow-camera-far={60}
-      shadow-bias={-0.0005}
-      shadow-normalBias={0.03}
-    />
-  )
 }
 
 /** The 3D world. Draws the `TileWorld` it is given — it knows nothing about facts or coins. */

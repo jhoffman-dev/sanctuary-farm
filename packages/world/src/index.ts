@@ -95,6 +95,34 @@ export { parseWorldOverrides } from './parse-world-overrides'
 
 export type { Chunk, PlacedHotspot, Tile, TileWorld } from './tile-world-types'
 export type { WorldSpec } from './tile-world'
-export { addChunk, buildTileWorld, tileOf } from './tile-world'
+export { addChunk, buildTileWorld, rebuildTileWorld, tileOf } from './tile-world'
 
-export { FARM_WORLD_SEED, farmStartingChunks, farmWorldSpec, loadWorldOverrides } from './farm-tile-world'
+export { farmStartingChunks, farmWorldSpec, loadWorldOverrides, loadWorldSettings } from './farm-tile-world'
+
+// The world editor (#105): seed and land settings, canonical files, edit operations and history.
+export type { WorldSettings } from './world-settings'
+export { MAX_WORLD_SEED, WORLD_SETTINGS_SCHEMA_VERSION } from './world-settings'
+
+export type { ParsedWorldSettings } from './parse-world-settings'
+export { parseWorldSettings } from './parse-world-settings'
+
+export { serializeWorldOverrides, serializeWorldSettings } from './serialize-world'
+
+export type { TileLayer } from './world-editing'
+export {
+  applyEdit,
+  builtTileAt,
+  eraseAt,
+  hotspotAt,
+  hotspotMoveProblem,
+  isHotspotMoved,
+  neighbouringChunks,
+  overriddenLayersAt,
+  removeEditsAt,
+} from './world-editing'
+
+export type { EditHistory } from './edit-history'
+export { amendStep, recordStep, redo, startHistory, undo } from './edit-history'
+
+export type { WorldDraft } from './world-draft'
+export { countPendingChanges, sameDraft, withChunk, withOverrides, withSeed } from './world-draft'

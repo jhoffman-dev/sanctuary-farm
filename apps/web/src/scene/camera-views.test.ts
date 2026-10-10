@@ -1,13 +1,24 @@
 import { loadFarmLayout } from '@sf/world'
 import { describe, expect, it } from 'vitest'
 import { buildFarmWorld } from '../composition/build-farm-world'
-import { devView, HOME_VIEW } from './camera-views'
+import { devView, HOME_VIEW, overviewOf } from './camera-views'
 
 const world = buildFarmWorld()
 
 describe('HOME_VIEW', () => {
   it('is farm.json\'s home camera, so the layout rules check the camera the child actually gets', () => {
     expect(HOME_VIEW).toEqual(loadFarmLayout().camera.home)
+  })
+})
+
+describe('overviewOf', () => {
+  it('rises higher to keep a margin of land round the chunks in frame', () => {
+    const chunks = world.chunks.map((chunk) => chunk.coord)
+    const tight = overviewOf(chunks)
+    const roomy = overviewOf(chunks, 8)
+    expect(roomy.lookAt).toEqual(tight.lookAt)
+    // 32 tiles across become 48, so the camera climbs by half again.
+    expect(roomy.position[1]).toBeCloseTo(tight.position[1] * 1.5)
   })
 })
 

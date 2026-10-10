@@ -1,9 +1,14 @@
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
+import { worldEditorSave } from './src/dev-server/editor-save-plugin.ts'
+
+/** Where the world editor (`?edit=1`, dev only) saves the overrides and the world settings. */
+const WORLD_LAYOUTS = fileURLToPath(new URL('../../packages/world/layouts', import.meta.url))
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), worldEditorSave({ layoutsDir: WORLD_LAYOUTS })],
   build: {
     // The world chunk is meant to be big — it is three + r3f and nothing else,
     // and it is lazy. Its real budget is in gzipped bytes and enforced by
