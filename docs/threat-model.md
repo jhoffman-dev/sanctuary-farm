@@ -14,7 +14,7 @@ mitigation, and a phase by which it is done.
 | A child's attention and safety | No stranger contact, no manipulation, no upsetting content. The whole point. |
 | Progress data | A save is a farm and a mastery record. Losing or exposing it breaks trust. |
 | The no-PII promise | ADR-0002. One slip (an email field, a tracker) voids the compliance story. |
-| The hosting account | Firebase project, GitHub repo, deploy secrets. Compromise = we serve whatever the attacker wants to kids. |
+| The hosting account | The shared `student-games-be188` Firebase project, GitHub repo, deploy secrets. Compromise = we serve whatever the attacker wants to kids — and, because the project is shared, the same is true for the Student Games homepage and Math Invaders. |
 
 **Actors**
 
@@ -53,7 +53,7 @@ Likelihood is judged for a public link used in classrooms. Status: **Done** ·
 | 14 | Abuse of "visit a friend's farm" | Phase 6 feature | Stranger contact, harassment | Medium | Read-only: a visitor can look, never write. No free text anywhere in the visit (row 1). Nothing is written, so no report/block system is needed; if that changes, this row reopens. Visiting needs a code shared out-of-band — no directory, no search. | Phase 6 |
 | 15 | COPPA posture | Whole product | Legal exposure; loss of teacher trust | Low | ADR-0002: persistent identifier used solely for internal operations (giving the kid back their farm). No behavioural ads, no third-party trackers, no profiling. IP logs short-retention, never analysed. Plain-language privacy notice. Lawyer sanity check before the public link. | Phase 4–5 |
 | 16 | Availability | Firebase Hosting / Firestore | A class of 30 hits the game and it's down | Low | Firebase quotas monitored with budget alerts; Firestore reads are one doc per session. Local save keeps the game playable offline. A static fallback page on Hosting if Functions or Firestore are unavailable ("the farm is resting, your progress is safe on this device"). | Phase 5 |
-| 17 | We deploy a bad change | CI / prod | Any of the above, by accident | Medium | Branch protection, PR previews, the gate (typecheck · lint · boundaries · tests · rules tests) must be green. Prod deploys only from `main`. Rules and functions deploy separately from hosting so a UI change cannot loosen a rule. | Phase 5 |
+| 17 | We deploy a bad change | CI / prod | Any of the above, by accident | Medium | Branch protection, PR previews, the gate (typecheck · lint · boundaries · tests · rules tests) must be green. Prod deploys only from `main`. Rules and functions deploy separately from hosting so a UI change cannot loosen a rule. The project is shared with two other games, so a bad deploy can also break *them*: every deploy is `--only`-scoped to our own sites, our own functions codebase `sanctuary-farm`, and our own named Firestore database `sanctuary-farm` — never `(default)`, never a bare `firebase deploy` (`docs/deploy.md`). | Phase 5 |
 
 ## 3. What we will never build
 
