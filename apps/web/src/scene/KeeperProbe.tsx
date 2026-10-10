@@ -22,8 +22,8 @@ function tileText(tile: TileCoord | null): string {
 }
 
 /**
- * `?perf=1`: puts the keeper's position, facing, tile, clip, destination
- * and any "can't get there" cue on the DOM, with the camera's ground
+ * `?perf=1`: puts the keeper's position, facing, tile, clip, pose (radians
+ * off her bind pose), destination and any "can't get there" cue on the DOM, with the camera's ground
  * position and view-projection matrix so a browser test can turn a tile into
  * a point to tap — how Playwright reads a WebGL scene (ADR-0004).
  */
@@ -35,7 +35,7 @@ export function KeeperProbe({ target, telemetry }: KeeperProbeProps) {
     const element = target.current
     if (!element) return
     sinceLast.current += delta
-    const { position, destination, clip, clipsSeen, yaw, cue, cuesShown } = telemetry
+    const { position, destination, clip, clipsSeen, yaw, cue, cuesShown, pose } = telemetry
     const tile = tileAt([position.x, position.z])
     // A change of tile, clip, destination, cue or (coarse) facing is published at
     // once: under reduced motion the loop draws on demand, and the frame that
@@ -53,6 +53,7 @@ export function KeeperProbe({ target, telemetry }: KeeperProbeProps) {
       clipsSeen: clipsSeen.join(','),
       destination: tileText(destination),
       yaw: rounded(yaw),
+      pose: rounded(pose),
       cue: tileText(cue),
       cuesShown: String(cuesShown),
       camera: `${rounded(camera.position.x)},${rounded(camera.position.z)}`,

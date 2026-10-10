@@ -7,7 +7,7 @@ import { saveDocImage } from './doc-image'
 // practice. SF-89: a tap she cannot reach gets a gentle cue, she turns to face
 // the camera on arrival, and a phone-sized screen keeps her in view.
 // `?perf=1` makes the scene publish the keeper's position, facing, tile, clip
-// history, destination and cue, plus the camera's ground position and
+// history, pose off bind, destination and cue, plus the camera's ground position and
 // view-projection matrix, on `[data-testid=keeper-probe]` — so a test can turn
 // a tile into a point to tap and read where the keeper went without sniffing
 // pixels.
@@ -27,6 +27,7 @@ type KeeperState = {
   clipsSeen: string
   destination: string
   yaw: number
+  pose: number
   camera: { x: number; z: number }
   cue: string
   cuesShown: number
@@ -46,6 +47,13 @@ const tileKey = ({ x, z }: Tile) => `${x},${z}`
 /** `@sf/world`'s CHUNK_SIZE and NEAREST_WALKABLE_RADIUS; its entry point needs Vite to load, so they are restated here. */
 const CHUNK_SIZE = 16
 const NEAREST_WALKABLE_RADIUS = 8
+/**
+ * The Mini Characters' idle sways her arms 30–45° down from the bind T-pose,
+ * so a pose under ~17° off bind means no clip is reaching her skeleton.
+ */
+const OFF_BIND_POSE_RADIANS = 0.3
+/** Longer than the idle's 1.33 s cycle. */
+const CLIP_SAMPLE_MS = 2_000
 /** A three-quarter view is 30° off the camera's line to the keeper; the probe rounds, and the camera sways a little. */
 const FACING_CAMERA_RADIANS = (35 * Math.PI) / 180
 
@@ -96,6 +104,7 @@ async function readKeeper(page: Page): Promise<KeeperState> {
     clipsSeen: element.dataset.clipsSeen ?? '',
     destination: element.dataset.destination ?? '',
     yaw: Number(element.dataset.yaw),
+    pose: Number(element.dataset.pose),
     camera: (([x, z]) => ({ x: Number(x), z: Number(z) }))((element.dataset.camera ?? '').split(',')),
     cue: element.dataset.cue ?? '',
     cuesShown: Number(element.dataset.cuesShown ?? 0),
@@ -163,6 +172,30 @@ function hotspotNamed(state: KeeperState, id: string): HotspotTiles {
 }
 
 /**
+ * How many different poses, each clearly off the bind pose, the keeper shows
+ * while `clip` plays (for up to `CLIP_SAMPLE_MS`): a skeleton the clip never
+ * reaches shows none. Sampled in the page, so a loaded machine's slow
+ * round-trips cannot miss a short walk.
+ */
+async function posesWhile(page: Page, clip: string): Promise<number> {
+  return page.getByTestId('keeper-probe').evaluate(
+    (probe, { playing, offBind, sampleMs }) =>
+      new Promise<number>((resolve) => {
+        const poses = new Set<string>()
+        const until = performance.now() + sampleMs
+        const sample = () => {
+          const { dataset } = probe as HTMLElement
+          if (dataset.clip !== playing || performance.now() > until) return resolve(poses.size)
+          if (Number(dataset.pose) > offBind) poses.add(dataset.pose ?? '')
+          setTimeout(sample, 50)
+        }
+        sample()
+      }),
+    { playing: clip, offBind: OFF_BIND_POSE_RADIANS, sampleMs: CLIP_SAMPLE_MS },
+  )
+}
+
+/**
  * Waits for a walk that has happened, not one in progress. `data-clip="walk"` and
  * `data-destination` last only while the keeper walks — at CI's software-rendered
  * ~1 fps that can be two frames, between two polls. `data-clips-seen` keeps them.
@@ -201,6 +234,20 @@ test.describe('the keeper walks the farm, 1280 × 800', () => {
     expect(end.x).toBeCloseTo(target.x + 0.5, 2)
     expect(end.z).toBeCloseTo(target.z + 0.5, 2)
     expect(end.clipsSeen).toBe('idle,walk,idle')
+  })
+
+  test('her skeleton plays the clips: idle sways off the bind pose, and walking moves it', async ({ page }) => {
+    test.setTimeout(LONG_TEST_MS)
+    const start = await openFarm(page)
+    expect(await posesWhile(page, 'idle')).toBeGreaterThan(2)
+
+    // The farthest doorstep: the longest walk, so a slow headless frame rate still samples several poses.
+    const farthest = start.hotspots
+      .map(({ arrival }) => arrival)
+      .reduce((far, tile) => (Math.hypot(tile.x - start.x, tile.z - start.z) > Math.hypot(far.x - start.x, far.z - start.z) ? tile : far))
+    await tapTile(page, farthest)
+    await expect(page.getByTestId('keeper-probe')).toHaveAttribute('data-clip', 'walk', { timeout: WALK_MS })
+    expect(await posesWhile(page, 'walk')).toBeGreaterThan(1)
   })
 
   test('tapping the paddock gate walks there and opens practice; the number pad takes an answer', async ({ page }, testInfo) => {

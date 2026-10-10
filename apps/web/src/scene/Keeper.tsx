@@ -12,6 +12,7 @@ import { clipFor, followRoute, type KeeperWalk, stepWalk } from './keeper-walk'
 import type { KeeperTelemetry } from './keeper-telemetry'
 import { cameraForward, heldDirection, routeForKeys } from './keyboard-step'
 import { PlacedPiece } from './PlacedPiece'
+import { SkeletonPose } from './skeleton-pose'
 import { respondToTap } from './tap-response'
 import { TargetMarker, UnreachableCue } from './TargetMarker'
 import { useGroundTaps } from './use-ground-taps'
@@ -68,6 +69,7 @@ export function Keeper({ world, model, scene, start, reducedMotion, telemetry, o
     return copy
   }, [scene])
   const { mixer, crossfade } = useCrossfade(object, model.url)
+  const pose = useMemo(() => new SkeletonPose(object), [object])
   const body = useRef<Group>(null)
   const walk = useRef(start)
   const steeredByKeys = useRef(false)
@@ -158,6 +160,7 @@ export function Keeper({ world, model, scene, start, reducedMotion, telemetry, o
     telemetry.movedTo(step.walk.position)
     telemetry.turnedTo(walk.current.yaw)
     telemetry.playing(clip)
+    telemetry.posed(pose.offsetFromBind())
     // One more frame after arriving or turning, so everything that reads the keeper sees it settled.
     if (walk.current.waypoints.length > 0 || step.arrived || turning) invalidate()
   })
