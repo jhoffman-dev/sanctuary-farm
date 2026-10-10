@@ -41,4 +41,4 @@ in the PR for anything visual); performance budget respected; only presentation 
 adapter files touched; PR links the ticket and says how it was verified.
 
 ## Hand-off
-Move the ticket to review. Append gotchas to `.claude/memory/`.
+Move the ticket to review (skill: `github-board`). Append gotchas to `.claude/memory/`.

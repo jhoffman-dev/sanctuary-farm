@@ -16,9 +16,11 @@ is the agent entry point).
 | `docs/PRD.md` — PRD | [PRD](https://app.notion.com/p/3cd672aa2c4a8113bb55cd14ae8ba037) |
 | `docs/implementation-plan.md` — Implementation plan | [Implementation plan](https://app.notion.com/p/3cd672aa2c4a81d8980fe750603fc217) |
 | `docs/architecture.md` — Architecture | [Architecture](https://app.notion.com/p/3cd672aa2c4a819ebe7dff338eff761b) |
-| `docs/board.md` — The board — Sanctuary Farm DB | [The board — Sanctuary Farm DB](https://app.notion.com/p/3cd672aa2c4a81da9d1ed7d9485ef7f6) |
+| `docs/board.md` — The board (GitHub Issues + Project) | [The board — Sanctuary Farm DB](https://app.notion.com/p/3cd672aa2c4a81da9d1ed7d9485ef7f6) |
 | `docs/adr/0001-stack-choice.md` — ADR-0001 — Stack choice | [ADR-0001 — Stack choice](https://app.notion.com/p/3cd672aa2c4a817ba78efec138934090) |
 | `docs/adr/0002-identity-and-save.md` — ADR-0002 — Identity and save | [ADR-0002 — Identity and save](https://app.notion.com/p/3cd672aa2c4a81248dc7e3fe500b1e02) |
+| `docs/adr/0003-asset-pack.md` — ADR-0003 — Asset pack: Kenney (accepted 2026-10-07, SF-64) | to mirror under ADR's after merge (skill: `notion-docs`) |
+| `docs/adr/0004-3d-foundation.md` — ADR-0004 — 3D foundation (proposed, SF-63) | to mirror under ADR's after merge (skill: `notion-docs`) |
 | `docs/adr/0005-world-layout-tooling.md` — ADR-0005 — World layout tooling: procedural tile world with authored overrides (proposed, SF-65, revised for SF-87) | to mirror under ADR's after merge (skill: `notion-docs`) |
 | `docs/definition-of-done.md` — Definition of Done | [Definition of Done](https://app.notion.com/p/3d5672aa2c4a81e3b249d3d0eadd617f) |
 | `docs/secrets.md` — Secrets | [Secrets](https://app.notion.com/p/3d5672aa2c4a81579d29fec27113d844) |
@@ -32,6 +34,9 @@ is the agent entry point).
 | `docs/firestore-backup.md` — Firestore backup strategy | [Firestore backup strategy](https://app.notion.com/p/3d5672aa2c4a815e83eec341bd398b13) |
 | `docs/deploy.md` — Deploying into the shared Student Games project | *not mirrored yet — add under Docs and link here* |
 | [`docs/world-editor.md`](world-editor.md) — World editor: how to use it (`pnpm dev`, `?edit=1`) | not yet mirrored; push after merge |
+
+Repo-only, not mirrored: `docs/notion-migration.md` (the SF-1 … SF-80 → issue
+#30 … #109 map from the 2026-10-04 board move).
 
 History only, not mirrored: `docs/original-spec.md` and `docs/redesign-notes.md`
 (the prototype era; the prototype itself was removed in the rebuild — see git

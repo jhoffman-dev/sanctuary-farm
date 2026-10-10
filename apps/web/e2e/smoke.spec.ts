@@ -20,6 +20,12 @@ async function typeOnPad(page: Page, value: number) {
   await page.getByTestId('submit').click()
 }
 
+// The day-one loop is DOM and saves, not animation. Under reduced motion (a mode the game
+// supports, game rule 8) the farm draws on demand instead of every frame, so on a software
+// renderer each tap is not queued behind a 300 ms–1 s frame (CI run 38070609364: 1.4–1.8 s
+// a click, 31 s for the round). `reduced-motion.spec.ts` covers the animated default.
+test.use({ reducedMotion: 'reduce' })
+
 test('day-one loop: practise in the paddock, earn coins, coins survive a reload', async ({ page }) => {
   await page.goto('/')
 
