@@ -42,9 +42,15 @@ the chick ≈ 35 px — legibility is the rig ticket's job to win back.
 
 ## 3. Shape language
 
-- **Readable silhouette at 64 px.** Every animal and hotspot must be identifiable
-  as a black silhouette at 64 px — that is the rendered size on the smallest
-  supported device. Test by screenshotting at 360 × 640.
+- **Identifiable at 64 px by colour, size and shape together.** 64 px is the
+  rendered size on the smallest supported device. Pass criterion: a child can
+  name each animal and hotspot from a 64-px **colour** render. Each species has
+  a distinct body colour from a colour-blind-safe set (every pair stays apart
+  under deuteranopia, protanopia and tritanopia simulation), keeps its §2 size,
+  and keeps its distinguishing features chunky (cow horns, pig snout). Test by
+  rendering at 360 × 640 and checking pairwise colour distance under simulation.
+  This replaced the shape-only black-silhouette rule, which Kenney's cube
+  animals fail (ADR-0003).
 - **Rounded and chunky.** No thin details: no fence wire, no whiskers, no
   spindly legs. Legs and ears are stubs; roofs, troughs and eggs are fat.
 - **Low-poly, flat-shaded, palette-atlas textured** (not soft-textured). Why:
@@ -127,6 +133,10 @@ lives here (`accessibility.md` §3).
 
 ## 7. Asset pack candidates
 
+> **Decided (2026-10-07):** ADR-0003 chose **Kenney** — Cube Pets, Mini
+> Characters and the atlas-style world kits — CC0, $0. The table below is the
+> original paper comparison; ADR-0003 has the verified one.
+
 | | Kenney | Synty POLYGON (Farm) | Quaternius | Mixamo (keeper anim only) |
 | --- | --- | --- | --- | --- |
 | Style fit | Flat low-poly, clean but generic; little character in faces | Cohesive, stylised, strong character; slightly "adult" proportions | Chunky low-poly, big heads; closest to §3 out of the box | n/a (animation, not models) |
@@ -151,7 +161,8 @@ keeper at 1.6 units? Measure draw calls and texture memory against
 ## 8. Rules for anyone adding art
 
 - **One pack only.** No mixing sources, even for one prop; model a missing prop
-  in Blender in the pack's style instead.
+  in Blender in the pack's style instead. With Kenney this means one source and
+  one look: the kits ADR-0003 lists, not every Kenney kit.
 - **glTF/GLB only**, Y-up, 1 unit = 1 m, origin at the feet / base, facing −Z.
 - Power-of-two textures within `performance-budget.md`: one ≤ 1024² atlas per
   pack, no per-model textures. Draco/meshopt compression on.
@@ -166,8 +177,9 @@ keeper at 1.6 units? Measure draw calls and texture memory against
 
 ## 9. Open questions for James
 
-1. Is a ≈ US$50 Synty purchase acceptable if the spike needs it, and are you
-   comfortable with its EULA for a web-delivered game?
+1. ~~Is a ≈ US$50 Synty purchase acceptable if the spike needs it, and are you
+   comfortable with its EULA for a web-delivered game?~~ **Answered
+   2026-10-07: $0 — Kenney (ADR-0003).**
 2. Which is the oldest supported device? It fixes the texture and triangle
    limits and the 64-px silhouette baseline.
 3. Landscape only for the alpha, or must portrait phones frame the farm too?

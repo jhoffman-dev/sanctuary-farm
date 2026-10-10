@@ -101,15 +101,24 @@ describe('rebuildTileWorld', () => {
       (at) => ({ op: 'remove-structure', at }),
       (at) => ({ op: 'place-decor', at, kind: 'rock', rotation: 0 }),
     ]
+    // Two chunks side by side: every edit lands on their shared border or on an outer edge, and
+    // each full-build oracle generates 8 chunk bases instead of the 16 that LAND needs (CI ran
+    // the 60-step LAND version past vitest's 5 s timeout).
+    const strip: ChunkCoord[] = [middle, { cx: middle.cx + 1, cz: middle.cz }]
     let edits: WorldEdit[] = []
-    let world = buildTileWorld(specWith(edits), LAND)
-    for (let step = 0; step < 60; step += 1) {
-      const at = local(pick(LAND), pick(offsets), pick([4, 5]))
+    let world = buildTileWorld(specWith(edits), strip)
+    let bothRebuilt = 0
+    for (let step = 0; step < 40; step += 1) {
+      const at = local(pick(strip), pick(offsets), pick([4, 5]))
       const next = rng() < 0.2 && edits.length > 0 ? edits.slice(0, -1) : [...edits, pick(makers)(at)]
-      world = rebuildTileWorld({ world, spec: specWith(edits) }, specWith(next), LAND)
+      const rebuilt = rebuildTileWorld({ world, spec: specWith(edits) }, specWith(next), strip)
+      if (rebuilt.chunks.every((chunk) => chunk !== chunkAt(world, chunk.coord))) bothRebuilt += 1
+      world = rebuilt
       edits = next
-      expect(world, `step ${step}`).toEqual(buildTileWorld(specWith(edits), LAND))
+      expect(world, `step ${step}`).toEqual(buildTileWorld(specWith(edits), strip))
     }
+    // The run must really cross the border, not only touch the outer edges.
+    expect(bothRebuilt).toBeGreaterThanOrEqual(5)
   })
 
   it('builds new land, drops land that is gone, and keeps the rest', () => {

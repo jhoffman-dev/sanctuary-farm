@@ -23,7 +23,7 @@ design intent), `.claude/memory/MEMORY.md`.
   evidence.
 - Check the non-negotiables didn't regress (no multiple choice; coins only from
   paddock/nest; latency still gates promotion; interleave; goodnight).
-- File bugs as tickets (skill: `write-ticket`, `notion-board`): title, exact
+- File bugs as tickets (skill: `write-ticket`, `github-board`): title, exact
   repro steps, expected vs actual, screenshot/console output, suspected area.
   Small and specific — one bug per ticket.
 
