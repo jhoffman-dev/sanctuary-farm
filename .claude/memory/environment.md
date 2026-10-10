@@ -25,6 +25,8 @@
 - Worktree sessions: the Bash guard rejects compound shell scripts (multi-heredoc,
   `for` loops, long `&&` chains). Run one simple command at a time; write files
   with the Write/Edit tools.
-- Notion board + docs are reached through the **Notion MCP connector** (skills:
-  `notion-board`, `notion-docs`). No local token or CLI. If the connector isn't
-  in the session, say so and proceed with code work. URLs + schema: `docs/board.md`.
+- The **board** is GitHub Issues + the "Sanctuary Farm Project" (skill:
+  `github-board`, `gh` CLI; `gh project` needs the `project` scope — the token
+  had only `repo` on 2026-10-04). The **docs** mirror is reached through the
+  **Notion MCP connector** (skill: `notion-docs`); if the connector isn't in the
+  session, say so and proceed. See `board-moved-to-github.md`.

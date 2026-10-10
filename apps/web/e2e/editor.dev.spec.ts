@@ -111,8 +111,9 @@ function unsaved(page: Page) {
 
 test('edit the farm in the browser and save exactly those edits to the repo', async ({ page }, testInfo) => {
   // A cold dev-server load plus a dozen edits that each redraw a WebGL scene:
-  // ~14 s alone, but twice that when the whole suite shares the machine.
-  test.setTimeout(60_000)
+  // ~14 s alone here, but CI draws it in software at 0.5–3 s an action and
+  // reached the final save at 59 s (run 38072679725). 120 s is twice that.
+  test.setTimeout(120_000)
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
 

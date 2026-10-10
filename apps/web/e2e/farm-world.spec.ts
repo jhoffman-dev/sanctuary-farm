@@ -11,6 +11,12 @@ import { saveDocImage } from './doc-image'
 /** docs/performance-budget.md: draw calls, target 100, ceiling 150. */
 const DRAW_CALL_CEILING = 150
 const HOTSPOT_COUNT = 7
+/**
+ * This test needs real frames: models in, two probe windows, a screenshot. CI draws this view
+ * in software at 1.1–1.4 fps (run 38071145788), where that took 30 s before the screenshot
+ * began, so 30 s (the default) is not enough; 90 s is three times what CI measured.
+ */
+const RENDER_TEST_MS = 90_000
 
 type HotspotOnScreen = { id: string; left: number; top: number }
 type Probe = { drawCalls: number; triangles: number; fps: number; hotspots: HotspotOnScreen[] }
@@ -48,6 +54,7 @@ test.describe('the farm world at the §2 camera, 1280 × 800', () => {
   test.use({ viewport: { width: 1280, height: 800 } })
 
   test('renders the tile world with no errors, every hotspot in frame, inside the draw-call budget', async ({ page }, testInfo) => {
+    test.setTimeout(RENDER_TEST_MS)
     const errors = collectErrors(page)
     await page.goto('/?perf=1&quality=high')
     await expect(page.locator('canvas')).toBeVisible()
@@ -76,6 +83,7 @@ test.describe('the farm world on a phone, 360 × 640', () => {
   test.use({ viewport: { width: 360, height: 640 } })
 
   test('renders the tile world with no errors', async ({ page }, testInfo) => {
+    test.setTimeout(RENDER_TEST_MS)
     const errors = collectErrors(page)
     await page.goto('/?perf=1&quality=high')
     const probe = await readSettledProbe(page)
