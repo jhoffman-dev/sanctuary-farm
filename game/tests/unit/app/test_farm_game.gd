@@ -304,14 +304,14 @@ func test_trades_coins_for_a_feed_bundle_and_persists() -> void:
 	var built := await _loaded(_farm_with({"coins": 10}))
 	var bought: Result = await built.game.buy_feed()
 	assert_true(bought.ok)
-	assert_eq([bought.value.coins, bought.value.feed], [10 - Coins.FEED_BUNDLE_PRICE, Coins.STARTING_FEED + Coins.FEED_BUNDLE_UNITS])
-	assert_eq([built.store.stored.coins, built.store.stored.feed], [10 - Coins.FEED_BUNDLE_PRICE, Coins.STARTING_FEED + Coins.FEED_BUNDLE_UNITS])
+	assert_eq([bought.value.coins, bought.value.feed], [10 - FeedShed.SACK_PRICE, Coins.STARTING_FEED + FeedShed.SACK_FEED])
+	assert_eq([built.store.stored.coins, built.store.stored.feed], [10 - FeedShed.SACK_PRICE, Coins.STARTING_FEED + FeedShed.SACK_FEED])
 
 
 func test_refuses_without_enough_coins_and_writes_nothing() -> void:
 	var built := await _loaded()
 	var bought: Result = await built.game.buy_feed()
-	assert_eq(bought.error, Coins.NOT_ENOUGH_COINS)
+	assert_eq(bought.error, FeedShed.NOT_ENOUGH_COINS)
 	assert_eq(built.store.saved.size(), 0)
 	assert_eq(built.game.summary().value.feed, Coins.STARTING_FEED)
 

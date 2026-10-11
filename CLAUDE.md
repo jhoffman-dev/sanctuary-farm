@@ -90,6 +90,7 @@ No snapshot test as a stand-in for a behaviour test.
 | `E2E_REUSE_SERVER=1 pnpm e2e` | run against servers you already started on the fixed ports — `vite preview` :4173, `pnpm dev --port 5174`, landing :4180 (Playwright starts any that are not up). Pin a single port with `E2E_WEB_PREVIEW_PORT` / `E2E_WEB_DEV_PORT` / `E2E_LANDING_PORT` |
 | `pnpm vitest run --project domain` | one package's tests (`domain` · `application` · `persistence` · `audio` · `web`) |
 | `pnpm emulators` / `pnpm test:rules` | Firebase emulators / Firestore rules tests, both pinned to `demo-sanctuary-farm` (needs a JDK) |
+| `pnpm test:auth` | sign-in functions (SF-113) against the Functions + Firestore + Auth emulators on `demo-sanctuary-farm` (needs a JDK; `docs/sign-in.md`) |
 | `pnpm deploy:game` · `:landing` · `:functions` · `:rules` | the only sanctioned deploys — see `docs/deploy.md` |
 | `pnpm godot:import` · `godot:test` · `godot:export:web` · `godot:e2e:web` · `godot:gate` | the Godot client (`game/`): headless import, layer check + GUT, web export to `game/build/web`, Playwright smoke on it; `GODOT_BIN` overrides the macOS Godot path |
 

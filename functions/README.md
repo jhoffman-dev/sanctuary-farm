@@ -1,8 +1,18 @@
 # functions/
 
-Firebase Cloud Functions (Node 22, TypeScript, ESM). Today: one `health`
-HTTPS function so the emulator and the deploy pipeline can be verified. Phase 4
-adds custom auth — save codes and username + PIN — per ADR-0002.
+Firebase Cloud Functions (Node 22, TypeScript, ESM): a `health` probe and the
+no-PII sign-in callables `createAccount`, `signInWithCode`,
+`signInWithUsernamePin` (SF-113, ADR-0002 — full design in `docs/sign-in.md`).
+
+`src/auth/` keeps the layers apart: `domain/` (codes, word lists, PINs,
+lockout and rate-limit rules — pure), `application/` (use-cases + ports),
+`adapters/` (Firestore, Auth, node:crypto, the callable wrappers),
+`composition.ts` (wiring). `src/index.ts` only declares the functions.
+
+```bash
+pnpm test:functions   # unit tests + coverage (in `pnpm gate`)
+pnpm test:auth        # emulator integration: Functions + Firestore + Auth (needs a JDK)
+```
 
 ```bash
 pnpm --filter @sf/functions build      # tsc → lib/
@@ -30,8 +40,8 @@ only this directory and runs its own `npm install` — the root `pnpm-lock.yaml`
 does not travel with it. Dependabot bumps the pins.
 
 The emulator runs the function on the host's Node (26 here) while the runtime is
-`nodejs22`; the skew is accepted for a health endpoint and must be revisited
-before Phase 4 code uses Node APIs.
+`nodejs22`. The sign-in code uses only `node:crypto` APIs that are stable in
+both (`scrypt`, `createHmac`, `randomBytes`, `timingSafeEqual`).
 
 Secrets never live here — see `docs/secrets.md`. Runtime secrets are declared
 with `defineSecret` and set with `firebase functions:secrets:set`.

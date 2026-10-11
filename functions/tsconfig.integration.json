@@ -1,0 +1,6 @@
+{
+  // Typechecks the emulator integration tests, which sit outside `src` so they never ship.
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "noEmit": true, "rootDir": "." },
+  "include": ["src", "test", "vitest.integration.config.ts"]
+}
