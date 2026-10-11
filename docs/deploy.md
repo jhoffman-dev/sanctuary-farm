@@ -23,8 +23,8 @@ one repo's deploy can never touch another's.
    belongs to the homepage repo, and deploying it from here would delete the
    homepage's `feedback` function.
 3. **Own named Firestore database.** `sanctuary-farm`, never `(default)`. Our
-   `firestore.rules` is deny-all (Phase 4 opens it per ADR-0002); on `(default)`
-   that would be another game's rules too.
+   `firestore.rules` opens only `saves/{uid}` to its owner and denies the rest
+   (`docs/cloud-save.md`); on `(default)` that would be another game's rules too.
 4. **Never a bare `firebase deploy`.** It deploys every product in
    `firebase.json` at once. Use the `deploy:*` scripts, which are all
    `--only`-scoped.

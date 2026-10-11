@@ -1,6 +1,6 @@
 ## Text <-> FarmSave for the save file — `@sf/persistence`'s parseFarmSave,
-## field by field. Parse, don't trust: anything that is not a well-formed v3
-## save the rules can actually play decodes to null (a fresh farm), never to a
+## field by field. Parse, don't trust: anything that is not a well-formed v4
+## (or v3, see below) save the rules can actually play decodes to null (a fresh farm), never to a
 ## half-read value and never to a crash. Every dictionary is rebuilt from
 ## checked values, so stray keys never reach the rules, and whole numbers come
 ## back as ints (JSON hands every number over as a float).
@@ -8,6 +8,8 @@ class_name FarmSaveCodec
 extends RefCounted
 
 const SCHEMA_VERSION := FarmSave.SCHEMA_VERSION
+## v3 predates the barn: it loads with the starting animals and is written back as v4.
+const BEFORE_ANIMALS_VERSION := 3
 ## The largest whole number a JSON float holds exactly (2^53 - 1); a count
 ## beyond it could not round-trip.
 const MAX_COUNT := 9007199254740991
@@ -28,7 +30,10 @@ static func decode(text: String) -> Variant:
 
 ## The FarmSave in `raw`, or null when it is not one the game could have written.
 static func parse_farm_save(raw: Variant) -> Variant:
-	if not raw is Dictionary or _count(raw.get("schema_version")) != SCHEMA_VERSION:
+	if not raw is Dictionary:
+		return null
+	var version := _count(raw.get("schema_version"))
+	if version != SCHEMA_VERSION and version != BEFORE_ANIMALS_VERSION:
 		return null
 	var scheduler: Variant = _scheduler(raw.get("scheduler"))
 	if scheduler == null:
@@ -37,7 +42,8 @@ static func parse_farm_save(raw: Variant) -> Variant:
 	var sessions: Variant = _sessions(raw.get("sessions"))
 	var coins := _count(raw.get("coins"))
 	var feed := _count(raw.get("feed"))
-	if settings == null or sessions == null or coins < 0 or feed < 0:
+	var animals: Variant = _animals(raw, version)
+	if settings == null or sessions == null or coins < 0 or feed < 0 or animals == null:
 		return null
 	return {
 		"schema_version": SCHEMA_VERSION,
@@ -46,7 +52,14 @@ static func parse_farm_save(raw: Variant) -> Variant:
 		"feed": feed,
 		"sessions": sessions,
 		"settings": settings,
+		"animals": animals,
 	}
+
+
+static func _animals(raw: Dictionary, version: int) -> Variant:
+	if version == BEFORE_ANIMALS_VERSION:
+		return Barn.starting_animals()
+	return AnimalsCodec.parse(raw.get("animals"))
 
 
 static func _scheduler(value: Variant) -> Variant:

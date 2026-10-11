@@ -38,7 +38,7 @@ func _without(raw: Dictionary, path: Array) -> Dictionary:
 	return raw
 
 
-func test_accepts_a_well_formed_v3_save() -> void:
+func test_accepts_a_well_formed_v4_save() -> void:
 	var farm := FarmSave.with_changes(_fresh(), {"coins": 3})
 	assert_eq(_round_trip(farm), farm)
 
@@ -80,8 +80,8 @@ func test_rejects_every_malformed_or_unplayable_blob() -> void:
 		"an array": [],
 		"an empty object": {},
 		"a v2 blob": _raw({"schema_version": 2}),
-		"a future schema": _raw({"schema_version": 4}),
-		"a string schema_version": _raw({"schema_version": "3"}),
+		"a future schema": _raw({"schema_version": 5}),
+		"a string schema_version": _raw({"schema_version": "4"}),
 		"no scheduler": _without(_raw({}), ["scheduler"]),
 		"a scheduler with facts as an array": _with_scheduler({"facts": []}),
 		"a scheduler with a non-record fact": _with_scheduler({"facts": {"7x8": 5}}),
