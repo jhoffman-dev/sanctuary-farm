@@ -53,6 +53,7 @@ static func parse_farm_save(raw: Variant) -> Variant:
 		"sessions": sessions,
 		"settings": settings,
 		"animals": animals,
+		"play_session": _play_session(raw.get("play_session")),
 	}
 
 
@@ -60,6 +61,22 @@ static func _animals(raw: Dictionary, version: int) -> Variant:
 	if version == BEFORE_ANIMALS_VERSION:
 		return Barn.starting_animals()
 	return AnimalsCodec.parse(raw.get("animals"))
+
+
+## Missing (a v3 save, or a v4 one written before the session clock) or not
+## well-formed reads as null: the next play begins a fresh session. Safe to
+## forgive rather than lose the farm over — the worst case is one extra
+## session, and only for a save edited by hand.
+static func _play_session(value: Variant) -> Variant:
+	if not value is Dictionary:
+		return null
+	var started := _count(value.get("started_at"))
+	var last := _count(value.get("last_played_at"))
+	var played := _count(value.get("played_msec"))
+	var day: Variant = FactTuning.whole_number(value.get("day"))
+	if started < 0 or last < 0 or played < 0 or day == null:
+		return null
+	return {"started_at": started, "last_played_at": last, "played_msec": played, "day": day}
 
 
 static func _scheduler(value: Variant) -> Variant:
@@ -170,7 +187,8 @@ static func _sessions(value: Variant) -> Variant:
 
 
 ## Entries are informational and never fed back into the rules, so their shape
-## is not re-checked; only asked_at is restored to an int.
+## is not re-checked (DayTally skips one it cannot read); only asked_at is
+## restored to an int.
 static func _session_log(value: Variant) -> Variant:
 	if not value is Dictionary:
 		return null

@@ -42,6 +42,15 @@ func test_a_farm_round_trips_through_a_fresh_store() -> void:
 	assert_eq(UserFileSaveStore.new(TEST_PATH).load_farm(), farm)
 
 
+## A page reload reads the session clock back from the file: the limit cannot be reset by reloading.
+func test_the_session_clock_round_trips_through_the_file() -> void:
+	var session := PlaySession.played(PlaySession.begin(1_728_640_000_000, 20_006), 1_728_640_240_000, 20_006)
+	assert_eq(_store.save_farm(FarmSave.with_changes(Fixtures.fresh_farm(), {"play_session": session})), OK)
+	var reloaded: Dictionary = UserFileSaveStore.new(TEST_PATH).load_farm()
+	assert_eq(reloaded.play_session, session)
+	assert_eq(PlaySession.left_msec(reloaded.play_session, 1_728_640_240_000, 20_006), PlaySession.LENGTH_MSEC - 240_000)
+
+
 func test_a_later_save_replaces_an_earlier_one() -> void:
 	_store.save_farm(_farm_with(1))
 	_store.save_farm(_farm_with(9))

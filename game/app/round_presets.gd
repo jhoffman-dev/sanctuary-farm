@@ -4,10 +4,17 @@ class_name RoundPresets
 extends RefCounted
 
 const PADDOCK_QUESTIONS := 5
+## Prototype `constants.ts` (`EGG_PRACTICE_QUESTIONS`).
+const EGG_QUESTIONS := 5
 
 
 static func paddock() -> RoundPlan:
 	return RoundPlan.new(SessionContext.PADDOCK, PADDOCK_QUESTIONS)
+
+
+## An egg's round: one family's facts, at the nest, where answers earn coins.
+static func egg(family: int) -> RoundPlan:
+	return RoundPlan.new(SessionContext.EGG, EGG_QUESTIONS, family)
 
 
 ## A care task's round: mixed practice in the stall (curriculum.md), as long
