@@ -92,3 +92,19 @@ func test_opens_one_round_when_two_arrivals_wait_on_the_same_save() -> void:
 func test_rejects_when_the_farm_has_not_loaded_as_starting_a_round_would() -> void:
 	var arrived: Result = await HotspotArrivals.new(Harness.new().game).arrive_at("paddock")
 	assert_string_contains(arrived.error, "load_farm()")
+
+
+func test_drops_a_paddock_arrival_once_the_keeper_has_stopped_somewhere_newer() -> void:
+	# Codex on #130: with a slow save she can reach the paddock, walk on and stop
+	# at the barn before the save lands; practice must not open behind her.
+	var built := await _loaded()
+	built.store.hold_writes = true
+	built.game.set_muted(true)
+	var arrivals := HotspotArrivals.new(built.game)
+	var outcomes := []
+	_arrive_into(arrivals, "paddock", outcomes)
+	await arrivals.arrive_at("barn")
+	built.store.release()
+	assert_eq(outcomes.size(), 1)
+	assert_false(outcomes[0].value.started)
+	assert_eq(built.game.round_progress().total, 0, "no round opened behind her")
