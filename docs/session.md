@@ -14,8 +14,8 @@ constant.
 | What counts | every step between two moments of play (starting a round, an answer, closing a round); walking about before the first round does not | `PlaySession.played` | ticket: "measured with the injected Clock from session start" |
 | Winding down | the last 60 s; the scene settles the farm once — no countdown, no ticking | `PlaySession.WIND_DOWN_MSEC`, `is_winding_down` | `accessibility.md:45` ("announced once, calmly, ≥ 60 s ahead; no countdown") |
 | A running round finishes | answers and `end_round` are never refused for time | `FarmGame._grade` / `_end_round` have no session check | `accessibility.md:45` ("the current question is always allowed to finish") |
-| Goodnight | no new round, no care, no feed purchase; refused with `PlaySession.GOODNIGHT` — a state, not an error | `FarmGame._ready_to_start`, `_buy_feed` | `original-spec.md:427` ("says goodnight rather than offering another round") |
-| Shop after goodnight | **shut** — the farm settles down; buying feed only matters next session anyway | `FarmGame._buy_feed` | decision (see tuning questions) |
+| Goodnight | no new round, no care, no feed purchase; refused with `PlaySession.GOODNIGHT` — a state, not an error | `FarmGame._ready_to_start`, `_buy` | `original-spec.md:427` ("says goodnight rather than offering another round") |
+| Shop after goodnight | **shut** — the farm settles down; buying feed only matters next session anyway | `FarmGame._buy`, `shop()` | decision (see tuning questions) |
 | Next session | after **30 minutes** with no play, or on a later local day, whichever comes first | `PlaySession.REST_MSEC`, `starts_anew` | spec is silent beyond "she can start a free session whenever she wants, but the game never asks" (`original-spec.md:427`); least restrictive rule that still ends a session |
 | Refusals don't count | asking to play after goodnight is not play, so it never pushes the next session back | `FarmGame._played_now` only on play | — |
 | Clock set back | adds nothing and becomes the new reference: time used stays used, real time keeps counting; a day earlier never starts a session | `PlaySession.played`, `starts_anew` | `Clock.now_msec` contract ("it may step backwards") |
@@ -31,8 +31,9 @@ threatens or counts down (rule 6, `accessibility.md:45`).
   `answered_today`, `correct_today`, `fluent_today`, `faster_facts`
   (fact ids), `animals_cared_for_today`. The times are for a parent view and
   tests; the child's scene shows no clock.
-- The goodnight hook: `start_round`, `start_care` and `buy_feed` return
-  `Result.failure(PlaySession.GOODNIGHT)` once the time is used. The scene
+- The goodnight hook: `start_round`, `start_care`, `start_egg`, `buy` (and
+  `buy_feed`) return `Result.failure(PlaySession.GOODNIGHT)` once the time is
+  used, and `shop()` shows every offer unavailable with that reason. The scene
   shows goodnight on that reason, or when `session().goodnight` turns true
   after `end_round`. It polls `session()` to catch `winding_down` once.
 
