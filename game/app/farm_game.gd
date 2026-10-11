@@ -221,17 +221,20 @@ func end_round() -> Result:
 
 
 ## The value is a ShopSummary — coins, feed, and each feed shed offer with
-## whether it can be bought now; refused before load_farm.
+## whether it can be bought now (after goodnight, none can); refused before
+## load_farm.
 func shop() -> Result:
 	if _farm == null:
 		return Result.failure(NOT_LOADED)
-	return Result.success(ShopSummary.of(_farm))
+	return Result.success(ShopSummary.of(_farm, _shed_closed_because()))
 
 
 ## Spends coins on a feed shed offer; the value is the new ShopSummary. No
-## question is asked: spending is not a learning action. Refused, writing
-## nothing, with FeedShed.NOT_ENOUGH_COINS ("earn coins in the paddock or the
-## nest") or FeedShed.UNKNOWN_OFFER, and when the save fails.
+## question is asked: spending is not a learning action, nor play that keeps
+## the session clock running. Refused, writing nothing, with
+## FeedShed.NOT_ENOUGH_COINS ("earn coins in the paddock or the nest") or
+## FeedShed.UNKNOWN_OFFER, after goodnight (PlaySession.GOODNIGHT), and when
+## the save fails. Allowed mid-round: the round's question stays in flight.
 func buy(offer_id: String) -> Result:
 	return await _serialized(_buy.bind(offer_id))
 
@@ -307,6 +310,8 @@ func _end_round() -> Result:
 func _buy(offer_id: String) -> Result:
 	if _farm == null:
 		return Result.failure(NOT_LOADED)
+	if _is_goodnight():
+		return Result.failure(PlaySession.GOODNIGHT)
 	var bought := FeedShed.buy(_farm, offer_id)
 	if not bought.ok:
 		return bought
@@ -352,6 +357,10 @@ func _zoo_closed_because() -> String:
 	if _is_goodnight():
 		return PlaySession.GOODNIGHT
 	return ""
+
+
+func _shed_closed_because() -> String:
+	return PlaySession.GOODNIGHT if _is_goodnight() else ""
 
 
 func _set_muted(muted: bool) -> Result:

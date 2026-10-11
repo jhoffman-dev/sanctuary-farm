@@ -143,10 +143,11 @@ func test_buying_any_offer_is_refused_after_goodnight_and_writes_nothing() -> vo
 	var built := await _loaded(FarmSave.with_changes(Fixtures.fresh_farm(), {"coins": 50}))
 	await _tired(built)
 	var writes := built.store.saved.size()
+	var coins_before: int = built.game.shop().value.coins
 	var refused: Result = await built.game.buy(FeedShed.FEED_SACK)
 	assert_eq([refused.ok, refused.error], [false, PlaySession.GOODNIGHT])
 	assert_eq(built.store.saved.size(), writes)
-	assert_eq(built.game.shop().value.coins, 50, "no coins were spent")
+	assert_eq(built.game.shop().value.coins, coins_before, "no coins were spent")
 
 
 func test_after_goodnight_the_shop_shows_every_offer_shut_for_the_night() -> void:
