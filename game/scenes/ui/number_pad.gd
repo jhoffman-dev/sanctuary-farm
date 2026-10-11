@@ -1,6 +1,6 @@
 ## The number pad: shows a question, collects digits from taps or the keyboard,
 ## and emits the typed answer. It renders what it is given and decides nothing
-## about the game — grading happens in PracticeSession.
+## about the game — grading happens in FarmGame.
 class_name NumberPad
 extends PanelContainer
 
@@ -25,7 +25,7 @@ func _ready() -> void:
 	_refresh_answer()
 
 
-func show_question(question: QuestionView) -> void:
+func show_question(question: Question) -> void:
 	_question_label.text = "%d × %d" % [question.a, question.b]
 	_typed = ""
 	_refresh_answer()
@@ -33,10 +33,11 @@ func show_question(question: QuestionView) -> void:
 
 ## Feedback stays gentle: a right answer is celebrated, a wrong one just shows
 ## the fact and moves on. No red, no buzzer, no "wrong".
-func show_result(question: QuestionView, result: AnswerResult) -> void:
-	var fact := "%d × %d = %d" % [question.a, question.b, result.correct_answer]
-	if result.correct:
-		_feedback_label.text = "Yes! %s  (+%d)" % [fact, result.coins_awarded]
+func show_result(feedback: AnswerFeedback) -> void:
+	var question := feedback.question
+	var fact := "%d × %d = %d" % [question.a, question.b, feedback.correct_answer]
+	if feedback.correct:
+		_feedback_label.text = "Yes! %s  (+%d)" % [fact, feedback.coins_earned]
 	else:
 		_feedback_label.text = "%s — you'll get it next time." % fact
 
