@@ -17,9 +17,11 @@ Command line, from the repo root (the scripts find Godot at
 | --- | --- |
 | `pnpm godot:import` | import assets headless (needed once after a fresh clone, before tests) |
 | `pnpm godot:test` | the layer check, then every GUT test, headless |
-| `pnpm godot:export:web` | web build into `game/build/web/` (needs the 4.7.2 export templates) |
+| `pnpm godot:export:web` | web build into `game/build/web/` with our own size-optimised engine (below); needs `gh` logged in the first time |
+| `pnpm godot:size` | the export's raw / gzip / brotli sizes; fails over the ceilings in `docs/performance-budget.md` |
 | `pnpm godot:e2e:web` | Playwright plays one question against that build |
-| `pnpm godot:gate` | all four, in order |
+| `pnpm godot:load:web` | times the first question on throttled school Wi-Fi (10 Mbps, 150 ms, 4× CPU), cold and warm |
+| `pnpm godot:gate` | import, tests, export, size, smoke, in order |
 
 Tests also run inside the editor: the **GUT** panel at the bottom (enabled as a
 plugin) → Run All.
@@ -59,6 +61,22 @@ What this means in practice when you build a scene:
   supports. What you see in the editor is what the browser gets.
 - Web export is **single-threaded** (`variant/thread_support=false`): it runs on
   iPad/macOS Safari and on Firebase Hosting without special headers.
+- **The engine is our own build** (SF-100): Godot 4.7.2 compiled without the
+  parts the game does not use, listed in `tools/web_template.gdbuild`, which
+  cuts the download by about a third. `pnpm godot:export:web` fetches it from a
+  GitHub release (`tools/web_template.lock`) and checks its checksum. If a
+  scene needs something the profile turned off — **2D physics or navigation,
+  Jolt physics, CSG, regular expressions, visual shaders, GLTF loading at
+  runtime, JPG/TGA/BMP/HDR images, networking, complex-script text (Arabic,
+  Hindi, ...)** — the web build fails or shows nothing while the editor works
+  fine. Remove that line from the profile and push: the "Godot web template"
+  workflow builds a new engine and prints the two lines to put in the lock.
+  To try a change locally first: `bash game/tools/build_web_template.sh`
+  (~5 min on an M-series Mac after the first ~2 GB download), then
+  `SF_WEB_TEMPLATE=local pnpm godot:export:web`.
+- The export's engine and pack get content-hashed names (`engine-<hash>.wasm`,
+  `game-<hash>.pck`) so Hosting can cache them for a year; only `index.html`
+  is re-checked on every visit.
 - No procedural audio on the web: sounds must be sample files (ADR-0006).
 - Window 1280 × 800, stretch `canvas_items` / `expand`, so the UI scales to
   phones and wide screens.

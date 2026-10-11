@@ -25,14 +25,88 @@ design for.
 
 Target is what we build to; ceiling fails the gate or blocks a merge.
 
-### Load (cold cache, throttled network, reference device)
+### Load — Godot client (`game/`, ADR-0006), cold cache, throttled network
 
-> **Godot client (ADR-0006, 2026-10-11): these load lines are for `apps/web`
-> only and must be re-baselined for `game/`.** The stock Godot 4.7.2 web export
-> is ~7.5 MB brotli / 10.7 MB gzip to the first question (engine wasm 6.90 MB
-> br / 10.05 MB gz; pack 0.49 / 0.53 MB) — two orders of magnitude over the
-> 100 kB shell line. ADR-0006 lists how the new lines will be measured (CI size
-> report, a throttled Playwright timer to the first question, the device run).
+Re-baselined 2026-10-11 (SF-100). A Godot game cannot meet the r3f lines
+below: the engine alone is megabytes of WebAssembly, and at 10 Mbps every
+megabyte is 0.8 s. So the Godot lines budget three things separately — the
+engine download (fixed cost, shrunk by building our own engine), the game pack
+(grows with content), and the times a child actually waits. The 3.5 s / 6 s
+first-question line of the r3f shell is not reachable on 10 Mbps by any engine
+build (4.6 MB brotli is 3.7 s of transfer before the wasm even compiles); the
+lines below replace it for the Godot client.
+
+| Budget | Target | Ceiling | Measured (2026-10-11) | How measured |
+| --- | --- | --- | --- | --- |
+| Engine download — wasm + loader, brotli | 4.0 MB | **5.0 MB** (fails CI) | **4.58 MB** (stock template: 6.96 MB) | `pnpm godot:size` in the CI `godot` job; ceilings in `game/tools/web_export/budget.ts` |
+| Game pack (`.pck`: scenes, models, audio), brotli | 1.5 MB | **2.5 MB** (fails CI) | **0.52 MB** (0.62 MB raw — mostly already-compressed imports) | `pnpm godot:size` |
+| Total transfer to first question (page, engine, pack, splash) | 5.5 MB | 7.5 MB | **5.12 MB** brotli / 7.35 MB gzip (stock: 7.51 / 10.7 MB) | Resource Timing `transferSize`, `pnpm godot:load:web` |
+| First question, cold cache (10 Mbps, 150 ms, 4× CPU) | 8 s | 12 s | **7.85 s** brotli / 9.62 s gzip (stock: 10.08 s brotli) — laptop/headless | `pnpm godot:load:web` (median of 3), monthly device run |
+| First question, warm cache (engine and pack cached) | 2 s | 4 s | **2.97 s** (stock 2.74 s; 600 B on the wire — `index.html` revalidated, the rest from cache) — laptop/headless at 4× CPU: all of it is wasm compile + start-up | same |
+| Frame rate, placeholder farm (5 s of `requestAnimationFrame` after the first question) | 60 | 30 | 16–19 fps — software GL (SwiftShader) at 4× CPU, **not comparable to a device**; stock and ours are within run-to-run noise | same; the device run decides |
+
+"Laptop/headless" means an M4 MacBook Air running headless Chromium
+with Chrome DevTools throttling: 10 Mbps down, 150 ms latency, CPU slowed 4×.
+Nothing here ran on the reference Chromebook or iPad (SF-34 still has no
+device); the first device run recalibrates every number. The server in the
+timer (`game/tests/web/serve.mjs --encoding br|gzip`) compresses like a CDN at
+its best (brotli 11 / gzip 9) and caches like `firebase.json`.
+
+**How the engine got smaller** — our own export template
+(`game/tools/build_web_template.sh`, Godot 4.7.2 + Emscripten 4.0.20,
+published by `.github/workflows/godot-template.yml`, fetched by checksum):
+wasm 39.5 → 27.2 MB raw, 10.05 → 6.70 MB gzip, 6.90 → 4.52 MB brotli. It
+keeps 3D, the Compatibility renderer, 3D physics (GodotPhysics3D) and 3D
+navigation — the keeper (SF-97, #146) will walk with `NavigationRegion3D` /
+`NavigationAgent3D` and pick the ground with a ray — and audio (Ogg Vorbis,
+MP3, WAV, interactive music), WebP/PNG/SVG images and GridMap. The profile
+(`game/tools/web_template.gdbuild`) turns off, each because nothing in
+`game/` uses it at runtime: the advanced text server (complex scripts and BiDi;
+the fallback server renders Latin text and digits), 2D physics and 2D
+navigation, Jolt (the project runs GodotPhysics3D), XR, GLTF/FBX loading at
+runtime (models are imported to Godot scenes in the editor), CSG, Basis
+Universal/KTX/DDS/BMP/TGA/HDR/JPG loaders, Theora video, camera, RegEx,
+visual shaders, networking (ENet, multiplayer, WebRTC, WebSocket, UPnP,
+JSON-RPC, mbedTLS — `JavaScriptBridge` and `HTTPRequest` use the browser's own
+stack), and editor-only helpers (lightmapper, xatlas, V-HACD, meshoptimizer,
+raycast, ObjectDB profiler). Plus `deprecated=no`, full LTO (the official
+templates use thin), `optimize=size`, single-threaded, release only — no
+debugger in the shipped engine.
+
+Measured and **not** taken, with the reason (each a one-line profile change):
+
+| Lever | Saves (brotli) | Why not now |
+| --- | --- | --- |
+| `disable_advanced_gui` | 0.33 MB | Removes `RichTextLabel`, `OptionButton`, `PopupMenu`, `AcceptDialog`, `SpinBox`, `SubViewportContainer` — the obvious picks for the SF-95 HUD/pad rebuild in the editor |
+| `optimize=size_extra` | 0.16 MB (and 5.9 MB raw) | Turns off forced inlining in the engine core; costs CPU per frame on the N4000, which no measurement here can see |
+| `disabled_classes` for 2D nodes, TileMap, soft/vehicle bodies, GI | 0.21 MB | A class list breaks a scene the moment it uses one; "Detect from Project" is editor-only |
+
+**Caching.** `pnpm godot:export:web` renames the engine and pack after their
+content (`engine-<hash>.wasm/.js/.audio*.worklet.js`, `game-<hash>.pck`,
+`game/tools/web_export/run_fingerprint.ts`), and `firebase.json`'s game
+target serves those `public, max-age=31536000, immutable`; `index.html` stays
+`no-cache`. A second visit fetches only the page (a 304), so the warm line is
+wasm compile time, not network. Godot's PWA option stays off: its service
+worker lists the export's files by their original names, so it would need the
+same rewrite, and an offline mode is its own backlog item.
+
+**Hosting compression** (checked against the Hosting emulator, firebase-tools
+15.28.2, 2026-10-11; not yet against production — no deploy in SF-100):
+`.wasm` and `.js` come back `Content-Encoding: br`; `.pck` is not compressed
+and was served as `Content-Type: false` until `firebase.json` set
+`application/octet-stream`. The pack barely compresses (0.62 → 0.52 MB), so
+precompressing it would save ~0.1 s; not done. Production Hosting compresses
+with brotli or gzip by `Accept-Encoding` (Firebase blog, 2020-08,
+"request logging, Brotli compression, and internationalization"); its
+compression level is not documented — at a low brotli level (5) the engine
+is 8.3 MB instead of 6.9 MB for the stock build, so **the first preview
+deploy of the Godot client must check** `curl -sI -H 'Accept-Encoding: br'
+https://<site>/engine-<hash>.wasm` for `content-encoding: br` and compare
+`content-length` with the brotli column of `pnpm godot:size`. When the game
+target switches to `game/build/web` (SF-96), its CSP also needs
+`'wasm-unsafe-eval'` in `script-src`, or the engine cannot compile.
+
+### Load — r3f client (`apps/web`, retiring with SF-96), cold cache, throttled network, reference device
 
 Measured 2026-10-08 (SF-80). Build-time sizes are exact; the Lighthouse
 numbers are **a laptop running headless Chrome** with simulated throttling
@@ -129,6 +203,8 @@ numbers are **a laptop running headless Chrome** with simulated throttling
 | `pnpm size` — in `pnpm gate` right after `pnpm build` (gate + CI) | `size-limit` with `@size-limit/file` | any chunk over its ceiling |
 | `pnpm lhci` — local today; a CI job once the workflow (PR #123, SF-39) lands | Lighthouse CI (`@lhci/cli`) on `vite preview` of the production build | ceilings in the load table |
 | Any URL | `?perf=1` mounts `r3f-perf` `<Perf>` (lazy-loaded) | manual reading |
+| `pnpm godot:size` — CI `godot` job, after the export | Godot export sizes (raw / gzip 9 / brotli 11) against `game/tools/web_export/budget.ts` | engine or pack over its brotli ceiling |
+| `pnpm godot:load:web` — CI `godot` job, reported in the summary, not enforced | Throttled Playwright timer: cold and warm first question, frame rate | nothing (shared runner + software GL); the device run is the gate |
 | Monthly | Hand run on the reference device, row appended below | any ceiling |
 
 `size-limit` config lives in `apps/web/package.json` and is run by the root
@@ -186,6 +262,7 @@ what is asserted. To add to CI when PR #123 lands, a job after `pnpm install`:
 | 2026-09 | shell (Phase 1) | none yet — SF-34 | 302 kB gz | — | — | — | — | — | — | throttled desktop only |
 | 2026-09 | world split out (Phase 2) | none yet — SF-34 | 69 kB gz shell + 234 kB gz world | — | — | — | — | — | — | build output only, not a device run |
 | 2026-10-08 | SF-80 tiers | none yet — SF-34; laptop, headless Chromium (SwiftShader) | 1.51 MB (LH) | — | — | high 7.5 at rest / low 25.7 walking (software GL, not comparable to a device) | — | — | high 91 / low 48 | laptop/headless only; draw calls are the device-independent number |
+| 2026-10-11 | SF-100 Godot, own template | none yet — SF-34; M4 laptop, headless Chromium (SwiftShader), 10 Mbps / 150 ms / 4× CPU | 5.12 MB br | — | 7.85 s cold / 2.97 s warm | 16–19 (software GL) | — | — | — | stock template on the same harness: 7.51 MB, 10.08 s / 2.74 s |
 
 ## Current state vs budget (Phase 2, world code-split)
 
