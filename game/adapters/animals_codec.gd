@@ -1,7 +1,11 @@
 ## The barn's animals inside a save — FarmSaveCodec's helper for the v4 field.
 ## Parse, don't trust: an animal the rules could not have written (an unknown
-## species, health outside FLOOR..MAX, a missing task, a repeated id) makes
-## the whole list null, and each record is rebuilt from checked values.
+## species, health outside FLOOR..MAX, a missing task, a repeated id, a
+## second animal of one species — each family hatches once, a home that is
+## neither the barn nor the zoo, more visitors than the zoo holds) makes the
+## whole list null, and each record is rebuilt from checked values. An animal
+## saved before the petting zoo has no `home`: it lives in the barn, so those
+## v4 saves load unchanged, and the schema version stays 4.
 class_name AnimalsCodec
 extends RefCounted
 
@@ -15,13 +19,15 @@ static func parse(value: Variant) -> Variant:
 		return null
 	var animals := []
 	var ids := {}
+	var species := {}
 	for item: Variant in value:
 		var animal: Variant = _animal(item)
-		if animal == null or ids.has(animal.id):
+		if animal == null or ids.has(animal.id) or species.has(animal.species):
 			return null
 		ids[animal.id] = true
+		species[animal.species] = true
 		animals.append(animal)
-	return animals
+	return animals if Zoo.within_capacity(animals) else null
 
 
 static func _animal(value: Variant) -> Variant:
@@ -31,11 +37,14 @@ static func _animal(value: Variant) -> Variant:
 	var species: Variant = value.get("species")
 	var health: Variant = FactTuning.whole_number(value.get("health"))
 	var done: Variant = _done(value.get("done"))
+	var home: Variant = value.get("home", Zoo.BARN)
 	if not id is String or id.is_empty() or not species is String or not Species.ALL.has(species):
 		return null
 	if health == null or health < AnimalHealth.FLOOR or health > AnimalHealth.MAX or done == null:
 		return null
-	return {"id": id, "species": species, "health": health, "done": done}
+	if not home is String or not Zoo.HOMES.has(home):
+		return null
+	return {"id": id, "species": species, "home": home, "health": health, "done": done}
 
 
 ## Exactly one entry per care task, each a day number or null; built in

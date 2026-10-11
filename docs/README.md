@@ -38,6 +38,9 @@ is the agent entry point).
 | [`docs/sign-in.md`](sign-in.md) — Sign-in without personal data: save codes, username + PIN, hashing, rate limits, what James configures (SF-113) | not yet mirrored; push after merge |
 | [`docs/world-editor.md`](world-editor.md) — World editor: how to use it (`pnpm dev`, `?edit=1`) — retires with apps/web (SF-96, #144) | [World editor](https://app.notion.com/p/3f6672aa2c4a81a78d19c63059fb8cfc) |
 | [`docs/barn-care.md`](barn-care.md) — Barn care rules: health, the four care tasks, glum not gone (SF-107) | not yet mirrored; push after merge |
+| [`docs/nest.md`](nest.md) — Nest rules: eggs, family practice, hatching (SF-106) | not yet mirrored; push after merge |
+| [`docs/petting-zoo.md`](petting-zoo.md) — Petting zoo rules: visitors, room, moving animals (SF-110) | not yet mirrored; push after merge |
+| [`docs/session.md`](session.md) — Sessions end on time: the goodnight rules (SF-111) | not yet mirrored; push after merge |
 | `docs/notion-migration.md` — Notion → GitHub board migration (the SF-1 … SF-80 → issue #30 … #109 map from the 2026-10-04 board move) | [Notion → GitHub board migration](https://app.notion.com/p/3f6672aa2c4a81e882c7f3d91597c3da) |
 
 History only, not mirrored: `docs/original-spec.md` and `docs/redesign-notes.md`
