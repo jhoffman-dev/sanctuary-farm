@@ -92,7 +92,7 @@ No snapshot test as a stand-in for a behaviour test.
 | `pnpm emulators` / `pnpm test:rules` | Firebase emulators / Firestore rules tests, both pinned to `demo-sanctuary-farm` (needs a JDK) |
 | `pnpm test:auth` | sign-in functions (SF-113) against the Functions + Firestore + Auth emulators on `demo-sanctuary-farm` (needs a JDK; `docs/sign-in.md`) |
 | `pnpm deploy:game` · `:landing` · `:functions` · `:rules` | the only sanctioned deploys — see `docs/deploy.md` |
-| `pnpm godot:import` · `godot:test` · `godot:export:web` · `godot:e2e:web` · `godot:gate` | the Godot client (`game/`): headless import, layer check + GUT, web export to `game/build/web`, Playwright smoke on it; `GODOT_BIN` overrides the macOS Godot path |
+| `pnpm godot:import` · `godot:test` · `godot:export:web` · `godot:size` · `godot:e2e:web` · `godot:load:web` · `godot:gate` | the Godot client (`game/`): headless import, layer check + GUT, web export to `game/build/web` with our own engine template (fetched by `godot:template` from the release in `game/tools/web_template.lock`; needs `gh`), the size ceilings, Playwright smoke on it, the throttled load timer; `GODOT_BIN` overrides the macOS Godot path |
 
 Node is Homebrew-installed — prefix bash calls with `export PATH="/opt/homebrew/bin:$PATH"`.
 

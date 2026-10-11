@@ -7,6 +7,8 @@ export default defineConfig({
       'apps/web',
       // The e2e tooling the Playwright configs share (SF-90).
       { test: { name: 'e2e-tooling', environment: 'node', include: ['scripts/e2e/**/*.test.ts'] } },
+      // The Godot web export tooling: fingerprinting and the size ceilings (SF-100).
+      { test: { name: 'godot-web-tooling', environment: 'node', include: ['game/tools/web_export/**/*.test.ts'] } },
     ],
     coverage: {
       provider: 'v8',

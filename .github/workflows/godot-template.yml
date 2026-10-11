@@ -1,0 +1,82 @@
+# SF-100: builds the size-optimised Godot web export template from source
+# (game/tools/build_web_template.sh with game/tools/web_template.gdbuild) and
+# publishes it as a GitHub release asset with its SHA-256, so the CI `godot`
+# job downloads ~7 MB instead of compiling the engine. The release tag is the
+# template id (game/tools/web_template_id.sh: Godot version + a hash of the
+# profile and the build script), so one set of inputs is built once; a later
+# run with the same inputs only reprints the lock lines.
+#
+# After a run, copy the two lines from the job summary into
+# game/tools/web_template.lock and commit them.
+name: Godot web template
+
+on:
+  workflow_dispatch:
+  # No branch filter: a PR that changes the profile needs its template before
+  # its own `godot` job can export.
+  push:
+    paths:
+      - game/tools/web_template.gdbuild
+      - game/tools/build_web_template.sh
+      - game/tools/web_template_id.sh
+      - .github/workflows/godot-template.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: godot-template-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  template:
+    name: build + publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      # Creating the release and uploading its asset.
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: template
+        name: Template id
+        run: |
+          tag="$(bash game/tools/web_template_id.sh)"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if gh release view "$tag" > /dev/null 2>&1; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Build the template (Godot 4.7.2 + Emscripten 4.0.20, full LTO)
+        if: steps.template.outputs.published != 'true'
+        run: bash game/tools/build_web_template.sh "$RUNNER_TEMP/template"
+      - name: Publish the release asset
+        if: steps.template.outputs.published != 'true'
+        env:
+          TAG: ${{ steps.template.outputs.tag }}
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/template"
+          sha256sum --check --strict web_nothreads_release.zip.sha256
+          gh release create "$TAG" web_nothreads_release.zip web_nothreads_release.zip.sha256 \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --latest=false --prerelease \
+            --title "Godot web export template ($TAG)" \
+            --notes "Built by the Godot web template workflow from $GITHUB_SHA: Godot 4.7.2-stable, Emscripten 4.0.20, game/tools/web_template.gdbuild, optimize=size, lto=full, threads=no, template_release. Fetched by game/tools/fetch_web_template.sh (SF-100)."
+      - name: Lock lines
+        env:
+          TAG: ${{ steps.template.outputs.tag }}
+        run: |
+          set -euo pipefail
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern web_nothreads_release.zip --dir "$RUNNER_TEMP/check"
+          sha="$(sha256sum "$RUNNER_TEMP/check/web_nothreads_release.zip" | cut -d' ' -f1)"
+          {
+            echo "### game/tools/web_template.lock"
+            echo '```sh'
+            echo "WEB_TEMPLATE_TAG=$TAG"
+            echo "WEB_TEMPLATE_SHA256=$sha"
+            echo '```'
+            echo "Engine wasm: $(unzip -l "$RUNNER_TEMP/check/web_nothreads_release.zip" godot.wasm | awk 'NR==4 {print $1}') bytes raw"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
