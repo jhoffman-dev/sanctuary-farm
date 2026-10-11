@@ -9,10 +9,12 @@ var feed: int
 var offers: Array[OfferSummary] = []
 
 
-static func of(farm: Dictionary) -> ShopSummary:
+## `closed_because` (PlaySession.GOODNIGHT) shuts every offer; empty while
+## the shed is open.
+static func of(farm: Dictionary, closed_because: String = "") -> ShopSummary:
 	var summary := ShopSummary.new()
 	summary.coins = farm.coins
 	summary.feed = farm.feed
 	for offer: Dictionary in FeedShed.offers():
-		summary.offers.append(OfferSummary.of(farm, offer))
+		summary.offers.append(OfferSummary.of(farm, offer, closed_because))
 	return summary

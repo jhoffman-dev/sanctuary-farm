@@ -1,9 +1,9 @@
 # Art direction
 
 The look of Sanctuary Farm, and the rules that keep it coherent as agents add
-art. The asset pack itself is **not decided here** — that is the Phase 2 ADR
-(ticket "Spike: asset pack decision"). This doc sets the direction and compares
-the candidates so that ADR can be short. Accessibility bounds come from
+art. The asset pack itself is **not decided here** — ADR-0003 chose Kenney
+(2026-10-07) and ADR-0006 moved the game to Godot 4.7. This doc sets the
+direction; §7 keeps the original comparison of candidates. Accessibility bounds come from
 `accessibility.md`; texture and triangle limits from `performance-budget.md`.
 
 ## 1. The feeling
@@ -88,9 +88,9 @@ the chick ≈ 35 px — legibility is the rig ticket's job to win back.
 - **Rounded and chunky.** No thin details: no fence wire, no whiskers, no
   spindly legs. Legs and ears are stubs; roofs, troughs and eggs are fat.
 - **Low-poly, flat-shaded, palette-atlas textured** (not soft-textured). Why:
-  it reads at small sizes, the whole scene fits one 1024² colour atlas (tiny
-  texture memory, no filtering shimmer on low-end GPUs), all three candidate
-  packs share it, and colours can be re-tuned centrally for colour-blindness.
+  it reads at small sizes, each Kenney kit needs only its one 512² colour atlas
+  (tiny texture memory, no filtering shimmer on low-end GPUs; ADR-0003), and
+  colours can be re-tuned centrally for colour-blindness.
 - **Animals: big head, simple eyes, one body colour plus one marking.** The
   prototype's eye styles — `big / sleepy / sparkly / wide` — stay as the
   personality axis: one eye style per animal, authored by us as a swappable face
@@ -197,32 +197,37 @@ lives here (`accessibility.md` §3).
 | Formats | glTF/GLB, FBX, OBJ | FBX + Unity package → convert in Blender | glTF, FBX, Blend | FBX → GLB via Blender |
 | Risk | Style-mixing to get animals | Cost; EULA check; conversion pipeline; fantasy expansion means buying more packs | Fewer scenery props; face expressiveness needs our face kit | Foot-slide on chunky proportions; needs retarget QA |
 
-**Recommendation for the ADR:** Quaternius as the single pack, Mixamo for the
-keeper's clips, our own Blender face kit for eyes/mood. It is free, CC0, ships
-glTF and animated animals, and its proportions already match §3. Buy Synty
-POLYGON Farm only if the spike fails one of the two checks below.
-
-**Phase 2 spike (timeboxed):** load Quaternius cow + chicken + a humanoid in
-r3f at the §2 camera; (1) do the animals pass the 64-px silhouette test and take
-the face kit cleanly? (2) does a Mixamo idle↔walk crossfade look right on the
-keeper at 1.6 units? Measure draw calls and texture memory against
-`performance-budget.md`. Screenshots at 1280 × 800 and 360 × 640 go in the ADR.
+**Superseded:** this section originally recommended Quaternius (Mixamo for the
+keeper, Synty as a paid fallback) and a Phase 2 spike to test it. The spike ran
+(SF-63, ADR-0004) and ADR-0003 chose Kenney instead; its 2026-10-08 addendum
+rules out Synty in any form. ADR-0003 has the spike's numbers and screenshots.
 
 ## 8. Rules for anyone adding art
+
+> **Updated 2026-10-11:** GLBs now ship unmodified with no compression or
+> conversion step, one atlas per kit, imported by Godot into `game/assets/` —
+> matching ADR-0003 (Kenney, addendum 2026-10-08) and ADR-0006 (Godot 4.7).
 
 - **One pack only.** No mixing sources, even for one prop; model a missing prop
   in Blender in the pack's style instead. With Kenney this means one source and
   one look: the kits ADR-0003 lists, not every Kenney kit.
-- **glTF/GLB only**, Y-up, 1 unit = 1 m, origin at the feet / base, facing −Z.
-- Power-of-two textures within `performance-budget.md`: one ≤ 1024² atlas per
-  pack, no per-model textures. Draco/meshopt compression on.
+- **GLB only, exactly as its author published it** — no FBX/OBJ conversion,
+  no re-encoding or compression pass (ADR-0003 addendum). Y-up, 1 unit = 1 m,
+  origin at the feet / base. Kenney models face +Z; the scene turns them, the
+  file is not edited.
+- Textures within `performance-budget.md`: each kit's own 512²
+  `Textures/colormap.png` atlas, referenced by the GLBs and loaded once per
+  kit; no per-model textures. Godot imports the atlases **lossless**
+  (`detect_3d/compress_to=0`) so palette colours stay as §3 measures them
+  (ADR-0006).
 - Animation clips baked into the model file, named `idle`, `walk`, `carry`,
   `pet`, `dance` (keeper) and `idle`, `walk`, `eat`, `happy` (animals).
-- Location and naming: `apps/web/public/models/<category>/<name>.glb`, kebab-
-  case — `animals/cow.glb`, `buildings/barn.glb`, `props/trough.glb`,
-  `keeper/keeper.glb`.
+- Location and naming: `game/assets/kenney/<kit>/<name>.glb` with the kit's
+  `Textures/` and `License.txt`, file names as Kenney ships them —
+  `cube-pets/animal-cow.glb`. The `.import` files Godot writes beside each
+  asset are committed; `.godot/` is not.
 - Every asset's source, version, author and licence goes in
-  `apps/web/public/models/LICENSES.md` in the same PR that adds it.
+  `game/assets/LICENSES.md` in the same PR that adds it.
 - Colours come from the §4 tokens — no ad-hoc hex in components or materials.
 
 ## 9. Open questions for James

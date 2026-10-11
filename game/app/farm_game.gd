@@ -3,11 +3,21 @@
 ## question is returned until it is answered, and latency is read from the
 ## injected clock, never from the caller.
 ##
-## Every persisting call (load_farm, answer, end_round, buy, buy_feed,
-## set_muted) is a coroutine — always `await` it. It saves first and commits to memory only
-## once the store has accepted the farm, so a refused save leaves the game
-## exactly where the caller last saw it. Those calls run one at a time, in the
-## order they were made, each against what the previous one committed.
+## Every persisting call (load_farm, answer, end_round, buy, buy_feed, hatch,
+## move_to_zoo, move_to_barn, set_muted) is a coroutine — always `await` it. It saves first and commits
+## to memory only once the store has accepted the farm, so a refused save
+## leaves the game exactly where the caller last saw it. Those calls run one
+## at a time, in the order they were made, each against what the previous one
+## committed.
+##
+## Sessions end on time (PlaySession): once a session's time is used, starting
+## a round, care or an egg and buying feed are refused with
+## PlaySession.GOODNIGHT — the scene's cue to say goodnight — while a round
+## already running still finishes. The petting zoo settles down for the night
+## too: moving animals is refused the same way.
+##
+## The training ring (start_training … end_training) is in memory only and
+## runs on its own: no round starts while it is under way, nor it during one.
 class_name FarmGame
 extends RefCounted
 
@@ -16,6 +26,10 @@ signal _settled
 
 const NOT_LOADED := "FarmGame: call load_farm() first"
 const NO_ACTIVE_ROUND := "FarmGame: no active round"
+const NO_TRAINING := "FarmGame: no training under way"
+## Animals stay put while a round runs: the round's screen is in front of the
+## farm, and the animal being cared for stays where its care began.
+const ROUND_IS_ACTIVE := "round-is-active"
 const _FAMILY_CONTEXTS: Array[String] = [SessionContext.EGG, SessionContext.STALL]
 
 
@@ -48,6 +62,9 @@ var _clock: Clock
 var _rng: Rng
 var _farm: Variant = null
 var _active: ActiveRound = null
+## The training ring visit under way, or null. Held in memory only: nothing
+## the ring does is saved (docs/training-ring.md).
+var _training: Training = null
 var _queue: Array[_Queued] = []
 var _draining := false
 var _pending := 0
@@ -74,7 +91,8 @@ func summary() -> Result:
 
 ## Serves the round's first question (the value). Refused before load_farm,
 ## while a round is active (a finished round stays active until end_round),
-## while a save is still in progress, and for a plan that cannot be played.
+## while a save is still in progress, after goodnight (PlaySession.GOODNIGHT),
+## and for a plan that cannot be played.
 func start_round(plan: RoundPlan) -> Result:
 	var ready := _ready_to_start("start_round")
 	if not ready.ok:
@@ -115,6 +133,130 @@ func barn() -> Result:
 	return Result.success(BarnSummary.of(_farm, _today()))
 
 
+## The value is a NestSummary: the eggs and their progress, the egg waiting
+## for its hatch ceremony (never while a round runs), and the animals hatched.
+## Refused before load_farm.
+func nest() -> Result:
+	if _farm == null:
+		return Result.failure(NOT_LOADED)
+	return Result.success(NestSummary.of(_farm, _active != null))
+
+
+## Starts a round practising one egg's family and serves its first question
+## (the value): the family's facts in rotation, at the nest, earning coins.
+## Refused as start_round is, and with a Nest reason (Nest.UNKNOWN_EGG,
+## Nest.READY_TO_HATCH) that writes nothing.
+func start_egg(egg_id: String) -> Result:
+	var ready := _ready_to_start("start_egg")
+	if not ready.ok:
+		return ready
+	var egg := Nest.check_practice(_farm, egg_id)
+	if not egg.ok:
+		return egg
+	return _begin(PracticeRound.begin(RoundPresets.egg(egg.value.family), _clock.now_msec()))
+
+
+## The value is a RingSummary: the facts the ring offers and the training
+## under way. Refused before load_farm.
+func ring() -> Result:
+	if _farm == null:
+		return Result.failure(NOT_LOADED)
+	return Result.success(RingSummary.of(_farm.scheduler.max_table, _training))
+
+
+## Starts the training ring on `fact_id` — any fact of the table; "" picks an
+## offered one — at its first strategy. The value is a TrainingSummary.
+## Refused as start_round is (goodnight included), and with a TrainingRing
+## reason (UNKNOWN_FACT, NOTHING_TO_BREAK_DOWN). Starting counts as play.
+func start_training(fact_id: String = "") -> Result:
+	var ready := _ready_to_start("start_training")
+	if not ready.ok:
+		return ready
+	var max_table: int = _farm.scheduler.max_table
+	var chosen := TrainingRing.pick_fact(max_table, _rng) if fact_id == "" else Result.success(fact_id)
+	if not chosen.ok:
+		return chosen
+	var checked := TrainingRing.check_fact(chosen.value, max_table)
+	if not checked.ok:
+		return checked
+	_training = TrainingRing.begin(checked.value)
+	_farm = FarmSave.with_changes(_farm, {"play_session": _played_now()})
+	return Result.success(TrainingSummary.of(_training))
+
+
+## Answers the training step on the pad; the value is a StepFeedback. Never
+## graded by the scheduler and never paid: strategy steps are scaffolded, not
+## recall, so they move no fact's mastery (docs/training-ring.md). Refused
+## with no training, or with TrainingRing.STRATEGY_DONE.
+func answer_step(given: float) -> Result:
+	if _training == null:
+		return Result.failure(NO_TRAINING)
+	var answered := TrainingRing.answer_step(_training, given)
+	if not answered.ok:
+		return answered
+	_training = answered.value
+	return Result.success(StepFeedback.of(_training))
+
+
+## "Show me another way": the fact's next strategy, from its first step. The
+## value is a TrainingSummary. Allowed after goodnight, as a running round is.
+func another_way() -> Result:
+	if _training == null:
+		return Result.failure(NO_TRAINING)
+	_training = TrainingRing.another_way(_training)
+	return Result.success(TrainingSummary.of(_training))
+
+
+## Leaves the ring — any time, done or not. Refused with no training.
+func end_training() -> Result:
+	if _training == null:
+		return Result.failure(NO_TRAINING)
+	_training = null
+	return Result.success()
+
+
+## Confirms the hatch once the scene's ceremony has played: the egg's animal
+## joins the barn and the egg leaves the nest. The value is the new animal's
+## AnimalSummary. Allowed after goodnight — the egg was earned by answers
+## already given. Refused before load_farm, while a round is active, with
+## Nest.UNKNOWN_EGG or Nest.NOT_READY (writing nothing), or when the save fails.
+func hatch(egg_id: String) -> Result:
+	return await _serialized(_hatch.bind(egg_id))
+
+
+## The value is a ZooSummary: the visitors, the barn animals that could come
+## over, the room left, and which moves would be accepted now. Refused before
+## load_farm.
+func zoo() -> Result:
+	if _farm == null:
+		return Result.failure(NOT_LOADED)
+	return Result.success(ZooSummary.of(_farm, _today(), _zoo_closed_because()))
+
+
+## Sends a barn animal to visit the petting zoo; the value is the new
+## ZooSummary. Free — it costs, earns and asks nothing, and is not play that
+## keeps the session clock running. Refused, writing nothing, before
+## load_farm, while a round is active (ROUND_IS_ACTIVE), after goodnight
+## (PlaySession.GOODNIGHT), with a Zoo reason (Zoo.ZOO_FULL,
+## Zoo.ALREADY_THERE, Barn.UNKNOWN_ANIMAL), or when the save fails.
+func move_to_zoo(animal_id: String) -> Result:
+	return await _serialized(_move.bind(animal_id, Zoo.ZOO))
+
+
+## Brings a visiting animal home to the barn; refused as move_to_zoo is
+## (the barn always has room).
+func move_to_barn(animal_id: String) -> Result:
+	return await _serialized(_move.bind(animal_id, Zoo.BARN))
+
+
+## The value is a SessionSummary: time used and left, winding down, goodnight,
+## and today's tally for the goodnight summary. Refused before load_farm.
+func session() -> Result:
+	if _farm == null:
+		return Result.failure(NOT_LOADED)
+	return Result.success(SessionSummary.of(_farm, _clock.now_msec(), _clock.utc_offset_minutes()))
+
+
 ## The question in flight, or null.
 func current_question() -> Question:
 	if _active == null or _active.in_flight == null:
@@ -145,17 +287,20 @@ func end_round() -> Result:
 
 
 ## The value is a ShopSummary — coins, feed, and each feed shed offer with
-## whether it can be bought now; refused before load_farm.
+## whether it can be bought now (after goodnight, none can); refused before
+## load_farm.
 func shop() -> Result:
 	if _farm == null:
 		return Result.failure(NOT_LOADED)
-	return Result.success(ShopSummary.of(_farm))
+	return Result.success(ShopSummary.of(_farm, _shed_closed_because()))
 
 
 ## Spends coins on a feed shed offer; the value is the new ShopSummary. No
-## question is asked: spending is not a learning action. Refused, writing
-## nothing, with FeedShed.NOT_ENOUGH_COINS ("earn coins in the paddock or the
-## nest") or FeedShed.UNKNOWN_OFFER, and when the save fails.
+## question is asked: spending is not a learning action, nor play that keeps
+## the session clock running. Refused, writing nothing, with
+## FeedShed.NOT_ENOUGH_COINS ("earn coins in the paddock or the nest") or
+## FeedShed.UNKNOWN_OFFER, after goodnight (PlaySession.GOODNIGHT), and when
+## the save fails. Allowed mid-round: the round's question stays in flight.
 func buy(offer_id: String) -> Result:
 	return await _serialized(_buy.bind(offer_id))
 
@@ -183,6 +328,7 @@ func _load() -> FarmSummary:
 		loaded = FarmSave.empty().value
 	_farm = loaded
 	_active = null
+	_training = null
 	return FarmSummary.of(loaded)
 
 
@@ -200,7 +346,7 @@ func _grade(given: float, tapped: InFlight) -> Result:
 	var active: ActiveRound = still.value
 	var coins := AnswerFeedbacks.coins_earned_for(active.plan.context, moment.result)
 	var answered := PracticeRound.record_answer(active, AnswerFeedbacks.session_entry_for(moment))
-	var changes := {"scheduler": graded.value.state, "coins": _farm.coins + coins}
+	var changes := {"scheduler": graded.value.state, "coins": _farm.coins + coins, "play_session": _played_now()}
 	var advanced := _advance(answered, FarmSave.with_changes(_farm, changes))
 	if not advanced.ok:
 		return advanced
@@ -218,7 +364,8 @@ func _end_round() -> Result:
 	var session_log := PracticeRound.session_log(_active, _clock.now_msec())
 	var sessions: Array = _farm.sessions.duplicate()
 	sessions.append(session_log)
-	var cared := _with_care_applied(FarmSave.with_changes(_farm, {"sessions": sessions}), _active)
+	var closed := FarmSave.with_changes(_farm, {"sessions": sessions, "play_session": _played_now()})
+	var cared := _with_care_applied(closed, _active)
 	if not cared.ok:
 		return cared
 	var committed: Result = await _commit(_Snapshot.new(cared.value, null, null))
@@ -230,6 +377,8 @@ func _end_round() -> Result:
 func _buy(offer_id: String) -> Result:
 	if _farm == null:
 		return Result.failure(NOT_LOADED)
+	if _is_goodnight():
+		return Result.failure(PlaySession.GOODNIGHT)
 	var bought := FeedShed.buy(_farm, offer_id)
 	if not bought.ok:
 		return bought
@@ -237,6 +386,48 @@ func _buy(offer_id: String) -> Result:
 	if not committed.ok:
 		return committed
 	return Result.success(ShopSummary.of(bought.value))
+
+
+func _hatch(egg_id: String) -> Result:
+	if _farm == null:
+		return Result.failure(NOT_LOADED)
+	if _active != null:
+		return Result.failure("hatch: a round is active")
+	var hatched := Nest.hatch(_farm, egg_id)
+	if not hatched.ok:
+		return hatched
+	var committed: Result = await _commit(_Snapshot.new(hatched.value, null, null))
+	if not committed.ok:
+		return committed
+	return Result.success(AnimalSummary.of(hatched.value.animals.back(), _today()))
+
+
+func _move(animal_id: String, home: String) -> Result:
+	if _farm == null:
+		return Result.failure(NOT_LOADED)
+	var closed := _zoo_closed_because()
+	if not closed.is_empty():
+		return Result.failure(closed)
+	var moved := Zoo.move(_farm, animal_id, home)
+	if not moved.ok:
+		return moved
+	var committed: Result = await _commit(_Snapshot.new(moved.value, null, null))
+	if not committed.ok:
+		return committed
+	return Result.success(ZooSummary.of(moved.value, _today(), ""))
+
+
+## Why no animal may move now, or empty when the zoo is open.
+func _zoo_closed_because() -> String:
+	if _active != null:
+		return ROUND_IS_ACTIVE
+	if _is_goodnight():
+		return PlaySession.GOODNIGHT
+	return ""
+
+
+func _shed_closed_because() -> String:
+	return PlaySession.GOODNIGHT if _is_goodnight() else ""
 
 
 func _set_muted(muted: bool) -> Result:
@@ -253,14 +444,18 @@ func _ready_to_start(caller: String) -> Result:
 		return Result.failure(NOT_LOADED)
 	if _active != null:
 		return Result.failure("%s: a round is already active" % caller)
+	if _training != null:
+		return Result.failure("%s: training is under way" % caller)
 	# Serving is synchronous and unsaved; a commit landing afterwards would overwrite it.
 	if _pending > 0:
 		return Result.failure("%s: a save is still in progress" % caller)
+	if _is_goodnight():
+		return Result.failure(PlaySession.GOODNIGHT)
 	return Result.success()
 
 
 func _begin(active: ActiveRound) -> Result:
-	var served := _serve(active, _farm)
+	var served := _serve(active, FarmSave.with_changes(_farm, {"play_session": _played_now()}))
 	if not served.ok:
 		return served
 	var snapshot: _Snapshot = served.value
@@ -277,6 +472,18 @@ func _with_care_applied(farm: Dictionary, finished: ActiveRound) -> Result:
 	if finished.care == null or not PracticeRound.is_complete(finished):
 		return Result.success(farm)
 	return Barn.apply_care(farm, finished.care, _today())
+
+
+## The session after play now. Starting a round counts as play (and starts a
+## session); a refusal does not, so asking after goodnight never delays the next.
+func _played_now() -> Dictionary:
+	var now := _clock.now_msec()
+	return PlaySession.played(_farm.play_session, now, CareDay.of(now, _clock.utc_offset_minutes()))
+
+
+func _is_goodnight() -> bool:
+	var now := _clock.now_msec()
+	return PlaySession.is_goodnight(_farm.play_session, now, CareDay.of(now, _clock.utc_offset_minutes()))
 
 
 func _today() -> int:

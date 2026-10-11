@@ -25,7 +25,7 @@ func _done(feed_day: Variant = null, water_day: Variant = null) -> Dictionary:
 func test_a_new_farm_starts_with_a_cow_a_pig_and_a_chick_at_start_health() -> void:
 	var animals: Array = _farm().animals
 	assert_eq(animals.map(func(a: Dictionary) -> String: return a.id), ["cow", "pig", "chick"])
-	assert_eq(animals.map(func(a: Dictionary) -> String: return a.species), Array(Species.ALL))
+	assert_eq(animals.map(func(a: Dictionary) -> String: return a.species), Array(Species.STARTING))
 	assert_true(animals.all(func(a: Dictionary) -> bool: return a.health == AnimalHealth.START))
 	assert_eq(Barn.starting_animals(), animals)
 
