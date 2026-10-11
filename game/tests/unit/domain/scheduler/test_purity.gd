@@ -41,9 +41,9 @@ func test_a_long_driven_run_never_mutates_any_intermediate_state() -> void:
 	assert_eq(Digest.canonical_state(state).sha256_text(), expected.state)
 
 
-func test_buy_feed_bundle_returns_a_new_save_and_leaves_the_old_one_alone() -> void:
+func test_buying_feed_returns_a_new_save_and_leaves_the_old_one_alone() -> void:
 	var farm: Dictionary = Fixtures.deep_freeze(FarmSave.with_changes(Fixtures.fresh_farm(), {"coins": 10}))
-	var bought := Coins.buy_feed_bundle(farm)
+	var bought := FeedShed.buy(farm, FeedShed.FEED_SACK)
 	assert_true(bought.ok)
 	assert_eq(farm.coins, 10)
 	assert_eq(farm.feed, 12)

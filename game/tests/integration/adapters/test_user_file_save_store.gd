@@ -83,3 +83,24 @@ func test_a_folder_that_does_not_exist_refuses_the_write_without_crashing() -> v
 func test_the_default_path_is_per_user_and_versioned() -> void:
 	assert_string_starts_with(UserFileSaveStore.DEFAULT_PATH, "user://")
 	assert_string_contains(UserFileSaveStore.DEFAULT_PATH, ".v%d." % FarmSaveCodec.SCHEMA_VERSION)
+
+
+func test_the_players_v3_save_carries_forward_until_a_v4_one_is_written() -> void:
+	var earlier := "user://test-farm-save.earlier.v3.json"
+	var current := "user://test-farm-save.current.v4.json"
+	var v3: Dictionary = JSON.parse_string(FarmSaveCodec.encode(FarmSave.with_changes(Fixtures.fresh_farm(), {"coins": 5})))
+	v3.schema_version = 3
+	v3.erase("animals")
+	var file := FileAccess.open(earlier, FileAccess.WRITE)
+	file.store_string(JSON.stringify(v3))
+	file.close()
+	var store := UserFileSaveStore.new(current, earlier)
+	var migrated: Dictionary = store.load_farm()
+	assert_eq([migrated.schema_version, migrated.coins], [FarmSave.SCHEMA_VERSION, 5])
+	assert_eq(migrated.animals, Barn.starting_animals())
+	assert_eq(store.save_farm(FarmSave.with_changes(migrated, {"coins": 6})), OK)
+	assert_eq(store.load_farm().coins, 6, "the v4 file now wins")
+	assert_true(FileAccess.file_exists(earlier), "the v3 file is left alone")
+	for path in [earlier, current]:
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+

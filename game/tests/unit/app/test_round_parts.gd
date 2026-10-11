@@ -129,3 +129,11 @@ func test_arrival_outcomes_say_what_opened() -> void:
 	assert_eq([soon.kind, soon.place], [ArrivalOutcome.COMING_SOON, "barn"])
 	var left := ArrivalOutcome.moved_on("paddock")
 	assert_eq([left.kind, left.place, left.started], [ArrivalOutcome.MOVED_ON, "paddock", false])
+
+
+func test_a_care_order_travels_with_the_round_through_every_turn() -> void:
+	var active := ActiveRound.new(RoundPresets.care(CareTask.WATER), 0)
+	active.care = CareOrder.new("pig", CareTask.WATER)
+	var next := active.with_turn(null, [{"fact_id": "2x3"}] as Array[Dictionary])
+	assert_true(is_same(next.care, active.care))
+	assert_null(ActiveRound.new(RoundPresets.paddock(), 0).with_turn(null, []).care)

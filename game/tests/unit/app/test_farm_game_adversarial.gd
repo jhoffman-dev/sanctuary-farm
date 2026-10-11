@@ -61,7 +61,7 @@ func test_buy_feed_mid_round_keeps_the_in_flight_question_and_the_purchase_survi
 	assert_eq(Harness.progress_of(built.game.round_progress()), [1, 3, false])
 	await built.game.answer(Harness.correct_answer_to(question))
 	assert_eq(built.game.summary().value.feed, Coins.STARTING_FEED + 10)
-	assert_eq(built.game.summary().value.coins, 10 - Coins.FEED_BUNDLE_PRICE + 2)
+	assert_eq(built.game.summary().value.coins, 10 - FeedShed.SACK_PRICE + 2)
 	assert_eq(built.store.stored.feed, Coins.STARTING_FEED + 10)
 
 

@@ -132,7 +132,7 @@ new gap so her feet stay on the ground).
   that can refuse returns a `Result`: check `ok`, then read `value` (or show
   nothing and read `error`). A refused call changed nothing.
 - **Saving calls are coroutines** — `load_farm`, `answer`, `end_round`,
-  `buy_feed`, `set_muted`, `when_saved`, `HotspotArrivals.arrive_at`. Always
+  `buy`, `buy_feed`, `set_muted`, `when_saved`, `HotspotArrivals.arrive_at`. Always
   `await` them. They run one at a time, and the farm only moves once the save
   has landed.
 - **An arrival only counts while she is still there.** Call
