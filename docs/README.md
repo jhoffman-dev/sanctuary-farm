@@ -35,6 +35,7 @@ is the agent entry point).
 | [`docs/cloud-save.md`](cloud-save.md) — Cloud save: Firestore schema and security rules (SF-114) | not yet mirrored; push after merge |
 | `docs/firestore-backup.md` — Firestore backup strategy | [Firestore backup strategy](https://app.notion.com/p/3d5672aa2c4a815e83eec341bd398b13) |
 | `docs/deploy.md` — Deploying into the shared Student Games project | *not mirrored yet — add under Docs and link here* |
+| [`docs/sign-in.md`](sign-in.md) — Sign-in without personal data: save codes, username + PIN, hashing, rate limits, what James configures (SF-113) | not yet mirrored; push after merge |
 | [`docs/world-editor.md`](world-editor.md) — World editor: how to use it (`pnpm dev`, `?edit=1`) | not yet mirrored; push after merge |
 | [`docs/barn-care.md`](barn-care.md) — Barn care rules: health, the four care tasks, glum not gone (SF-107) | not yet mirrored; push after merge |
 

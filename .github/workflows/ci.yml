@@ -85,6 +85,8 @@ jobs:
       # dependency; pin it to the version used locally.
       - run: npm install --global firebase-tools@15.28.2
       - run: pnpm test:rules
+      # SF-113: the sign-in functions against the Functions + Firestore + Auth emulators.
+      - run: pnpm test:auth
 
   # SF-93 / ADR-0006: the Godot client in game/. Not a required check yet —
   # James decides once it has been stable for a while.

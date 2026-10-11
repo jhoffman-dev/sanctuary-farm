@@ -10,8 +10,8 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.integration.json",
+    "test": "vitest run --coverage",
     "serve": "pnpm build && firebase emulators:start --only functions"
   },
   "dependencies": {
@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.19.0",
+    "@vitest/coverage-v8": "^5.0.0",
     "typescript": "~6.0.2",
     "vitest": "^5.0.0"
   }
