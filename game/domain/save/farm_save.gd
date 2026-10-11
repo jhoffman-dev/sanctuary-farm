@@ -9,7 +9,9 @@
 ##   settings              {"muted": bool, "max_table": int}
 ##   animals: Array        the barn's animals and their care (Barn); added in v4.
 ##                         Nest-hatched animals join it; the nest itself is
-##                         derived (Nest), so it adds no key
+##                         derived (Nest), so it adds no key. Each animal's `home`
+##                         (Zoo) says whether it is in the barn or visiting the
+##                         petting zoo; added within v4, a missing one is the barn
 ##   play_session          the session clock (PlaySession), or null before any play;
 ##                         saved so a reload cannot restart the session
 ## A session log is {"started_at", "ended_at" (epoch ms), "context" (a
