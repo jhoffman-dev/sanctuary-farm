@@ -59,7 +59,10 @@ What this means in practice when you build a scene:
   supports. What you see in the editor is what the browser gets.
 - Web export is **single-threaded** (`variant/thread_support=false`): it runs on
   iPad/macOS Safari and on Firebase Hosting without special headers.
-- No procedural audio on the web: sounds must be sample files (ADR-0006).
+- No procedural audio on the web: sounds are OGGs rendered from the synth
+  recipes (ADR-0006, SF-97). `node game/tools/render_sounds.mjs` re-renders
+  them into `assets/audio/` (needs `oggenc`: `brew install vorbis-tools`);
+  they play on the "SFX" bus (`default_bus_layout.tres`).
 - Window 1280 × 800, stretch `canvas_items` / `expand`, so the UI scales to
   phones and wide screens.
 
@@ -80,5 +83,8 @@ at the paddock on load and again after each round.
   `await` them. They run one at a time, and the farm only moves once the save
   has landed.
 - **Sounds are data.** `AnswerFeedback.sounds` names what to play (`fluent`,
-  `correct`, `wrong`, `hatch`); the scene plays its sample files for them.
+  `correct`, `wrong`, `hatch`); the scene hands the feedback to
+  `FarmAudio.play_feedback`, which plays it through the `AudioBus` port
+  (`GodotAudioBus` in the build). Mute goes through `FarmAudio.toggle_mute`
+  (await it): the bus goes quiet at once and the setting is saved with the farm.
 
