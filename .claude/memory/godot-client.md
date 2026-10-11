@@ -100,3 +100,43 @@
   read or a refusal. Round logs' `asked_at` is the scheduler counter, not a time;
   read a round's day from its `started_at`.
 
+## Audio (SF-97)
+
+- **Sounds are rendered, not synthesised.** `node game/tools/render_sounds.mjs`
+  runs the real `packages/audio` recipes in headless Chromium
+  (`OfflineAudioContext`) and encodes with `oggenc` (`brew install
+  vorbis-tools`; Homebrew's ffmpeg has no libvorbis). `--serial` is fixed so
+  reruns are byte-identical. Rerun it whenever `recipes.ts` changes.
+- **`GodotAudioBus` preloads every OGG** (const `STREAMS`) so an export filter
+  that keeps only referenced resources still ships them. Adding a sound means a
+  `Sounds` constant, a `SOUNDS` row in the render script, and a `STREAMS` entry;
+  `test_godot_audio_bus.gd` fails until all three agree.
+- **Playwright's runner makes every page user-activated** (and `page.evaluate`
+  is a user gesture), so headless Chromium never shows the autoplay block in a
+  spec. `game/tests/web/audio-unlock.spec.ts` re-imposes the policy with an
+  init script and reads AudioContext states from the console, not `evaluate`.
+  Godot resumes its context itself on the first pointer/key event.
+- **A clicked HUD button eats Enter** (ui_accept) and the pad would stop
+  submitting, so `Hud` releases focus after a pointer press; Tab still reaches it.
+
+## Keeper controller (SF-98)
+
+- **A baked navmesh floats above the ground** (≈ 2 cells: 0.3 m at the default
+  0.25 cell height). `keeper.tscn`'s `NavigationAgent3D.path_height_offset`
+  (0.3) takes it back off path points, and `KeeperController._on_navmesh`
+  subtracts the same for keyboard walking. Change both with the cell height.
+- **The navigation map takes the bake on a later physics frame**, and the first
+  one of a GUT run takes longer than a fixed 3 frames. Tests poll
+  `map_get_closest_point` frame by frame until it answers
+  (`test_keeper_navigation.gd::_navmesh_served`).
+- **Driving the keeper deterministically:** switch off her physics processing
+  and call `_physics_process(1.0 / 60.0)` yourself. She moves by
+  `global_position`, not `move_and_slide`, so the step is exactly the delta you
+  pass (move_and_slide would use the engine's delta).
+- **Arrival = she stopped inside a `HotspotArea` box**, worked out from the
+  box (`HotspotBounds`), not `body_entered` — overlap signals land a physics
+  frame late and fire when she merely passes through.
+- **Headless SceneTree scripts** (`-s script.gd`) must do their work in
+  `_initialize()`, not `_init()`, or nodes are not in the tree yet.
+- **`keeper_controller.gd` is `@tool`** so the chosen model shows in the editor;
+  everything else in it returns early under `Engine.is_editor_hint()`.

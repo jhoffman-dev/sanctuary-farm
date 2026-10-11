@@ -1,12 +1,13 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://scenes/farm/farm.gd" id="1_farm"]
-[ext_resource type="PackedScene" path="res://assets/kenney/mini-characters/character-female-a.glb" id="2_keeper"]
+[ext_resource type="PackedScene" path="res://scenes/keeper/keeper.tscn" id="2_keeper"]
 [ext_resource type="PackedScene" path="res://assets/kenney/cube-pets/animal-cow.glb" id="3_cow"]
 [ext_resource type="PackedScene" path="res://assets/kenney/cube-pets/animal-pig.glb" id="4_pig"]
 [ext_resource type="PackedScene" path="res://assets/kenney/cube-pets/animal-chick.glb" id="5_chick"]
 [ext_resource type="PackedScene" path="res://scenes/ui/number_pad.tscn" id="6_pad"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="7_hud"]
+[ext_resource type="Script" path="res://scenes/hotspot/hotspot_area.gd" id="8_hotspot"]
 
 [sub_resource type="Environment" id="Environment_farm"]
 background_mode = 1
@@ -21,6 +22,26 @@ albedo_color = Color(0.55, 0.76, 0.44, 1)
 [sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
 material = SubResource("StandardMaterial3D_grass")
 size = Vector2(120, 120)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
+size = Vector3(120, 0.2, 120)
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_farm"]
+vertices = PackedVector3Array(-59.5, 0.3, -59.5, -59.5, 0.3, 59.5, 59.5, 0.3, 59.5, 59.5, 0.3, -59.5)
+polygons = [PackedInt32Array(3, 2, 0), PackedInt32Array(0, 2, 1)]
+geometry_parsed_geometry_type = 1
+agent_height = 1.75
+agent_radius = 0.5
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_paddock"]
+size = Vector3(4, 2, 4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dirt"]
+albedo_color = Color(0.72, 0.6, 0.43, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_paddock"]
+material = SubResource("StandardMaterial3D_dirt")
+size = Vector2(4, 4)
 
 [node name="Farm" type="Node3D"]
 script = ExtResource("1_farm")
@@ -37,11 +58,34 @@ shadow_enabled = true
 transform = Transform3D(0.80274, -0.28572, 0.52342, 0, 0.87774, 0.47913, -0.59632, -0.38462, 0.7046, 13, 12.5, 18.5)
 fov = 35.0
 
-[node name="Ground" type="MeshInstance3D" parent="."]
+[node name="WalkableGround" type="NavigationRegion3D" parent="."]
+navigation_mesh = SubResource("NavigationMesh_farm")
+
+[node name="Ground" type="MeshInstance3D" parent="WalkableGround"]
 mesh = SubResource("PlaneMesh_ground")
 
+[node name="GroundBody" type="StaticBody3D" parent="WalkableGround"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WalkableGround/GroundBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+shape = SubResource("BoxShape3D_ground")
+
+[node name="Paddock" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -1)
+script = ExtResource("8_hotspot")
+hotspot_id = "paddock"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Paddock"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("BoxShape3D_paddock")
+
+[node name="Patch" type="MeshInstance3D" parent="Paddock"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0)
+mesh = SubResource("PlaneMesh_paddock")
+
 [node name="Keeper" parent="." instance=ExtResource("2_keeper")]
-transform = Transform3D(1.68901, 0, 1.18266, 0, 2.0619, 0, -1.18266, 0, 1.68901, 0, 0, 1)
+unique_name_in_owner = true
+transform = Transform3D(0.81915, 0, 0.57358, 0, 1, 0, -0.57358, 0, 0.81915, 0, 0, 1)
 
 [node name="Cow" parent="." instance=ExtResource("3_cow")]
 transform = Transform3D(0.27582, 0, 0.75782, 0, 0.80645, 0, -0.75782, 0, 0.27582, -2.6, 0, -0.6)

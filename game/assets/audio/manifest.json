@@ -1,0 +1,79 @@
+{
+  "sample_rate": 44100,
+  "channels": 1,
+  "renderer": "game/tools/render_sounds.mjs",
+  "sounds": [
+    {
+      "id": "correct",
+      "file": "correct.ogg",
+      "category": "feedback",
+      "duration_s": 0.28,
+      "limit_s": 0.6,
+      "peak": 0.1579,
+      "source": "packages/audio/src/recipes.ts RECIPES.correct"
+    },
+    {
+      "id": "fluent",
+      "file": "fluent.ogg",
+      "category": "feedback",
+      "duration_s": 0.55,
+      "limit_s": 0.6,
+      "peak": 0.1683,
+      "source": "packages/audio/src/recipes.ts RECIPES.fluent"
+    },
+    {
+      "id": "wrong",
+      "file": "wrong.ogg",
+      "category": "feedback",
+      "duration_s": 0.34,
+      "limit_s": 0.6,
+      "peak": 0.0993,
+      "source": "packages/audio/src/recipes.ts RECIPES.wrong"
+    },
+    {
+      "id": "hatch",
+      "file": "hatch.ogg",
+      "category": "feedback",
+      "duration_s": 0.56,
+      "limit_s": 0.6,
+      "peak": 0.1492,
+      "source": "packages/audio/src/recipes.ts RECIPES.hatch"
+    },
+    {
+      "id": "tap",
+      "file": "tap.ogg",
+      "category": "feedback",
+      "duration_s": 0.05,
+      "limit_s": 0.6,
+      "peak": 0.1061,
+      "source": "packages/audio/src/recipes.ts RECIPES.tap"
+    },
+    {
+      "id": "footstep",
+      "file": "footstep.ogg",
+      "category": "world",
+      "duration_s": 0.07,
+      "limit_s": 1,
+      "peak": 0.1184,
+      "source": "packages/audio/src/recipes.ts RECIPES.footstep"
+    },
+    {
+      "id": "door_open",
+      "file": "door_open.ogg",
+      "category": "world",
+      "duration_s": 0.3,
+      "limit_s": 1,
+      "peak": 0.0795,
+      "source": "packages/audio/src/recipes.ts RECIPES.doorOpen"
+    },
+    {
+      "id": "chew",
+      "file": "chew.ogg",
+      "category": "world",
+      "duration_s": 0.12,
+      "limit_s": 1,
+      "peak": 0.0796,
+      "source": "packages/audio/src/recipes.ts RECIPES.chew"
+    }
+  ]
+}

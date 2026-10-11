@@ -1,31 +1,60 @@
-## The placeholder farm: wires the farm game to the pad and the HUD and plays
-## the characters' idle clips. This script is also the composition root — the
-## one place adapters are built and handed to the application, as
+## The placeholder farm: wires the farm game to the keeper, the pad and the
+## HUD and plays the animals' idle clips. This script is also the composition
+## root — the one place adapters are built and handed to the application, as
 ## `apps/web/src/composition/` is for the web client. It holds no game rules:
-## the placeholder has no walking yet, so the keeper "arrives" at the paddock
-## on load and again whenever a round is done.
+## the keeper says where she stopped, HotspotArrivals says what that opens.
 extends Node3D
 
 ## Every character that should breathe while the farm is idle.
 const IDLE_CLIP := "idle"
-const PADDOCK := "paddock"
 
 var _game: FarmGame
 var _arrivals: HotspotArrivals
+var _audio: FarmAudio
 
 @onready var _pad: NumberPad = %NumberPad
 @onready var _hud: Hud = %Hud
+@onready var _keeper: KeeperController = %Keeper
 
 
 func _ready() -> void:
 	_game = FarmGame.new(UserFileSaveStore.new(), SystemClock.new(), EntropySeed.fresh_rng())
 	_arrivals = HotspotArrivals.new(_game)
+	_audio = FarmAudio.new(_game, GodotAudioBus.new(self))
 	_pad.answer_submitted.connect(_on_answer_submitted)
+	_hud.mute_toggled.connect(_on_mute_toggled)
+	_keeper.page_prefers_reduced_motion = WebPage.prefers_reduced_motion()
+	_keeper.set_off.connect(_on_keeper_set_off)
+	_keeper.stopped.connect(_on_keeper_stopped)
 	if not WebPage.prefers_reduced_motion():
 		_play_idle_clips()
+	_close_pad()
+	_publish_hotspots()
+	WebPage.publish("sfKeeper", "standing")
 	var summary := await _game.load_farm()
+	_audio.restore(summary)
+	_hud.show_muted(summary.muted)
 	_show_coins(summary.coins)
-	await _open_paddock()
+
+
+func _on_keeper_set_off() -> void:
+	_arrivals.keeper_moved()
+	WebPage.publish("sfKeeper", "walking")
+
+
+func _on_keeper_stopped(at: Vector3) -> void:
+	var place := HotspotArea.id_at(get_tree(), at)
+	WebPage.publish("sfKeeper", "standing")
+	WebPage.publish("sfKeeperAt", place)
+	if place.is_empty():
+		return
+	var arrived := await _arrivals.arrive_at(place)
+	if not arrived.ok:
+		push_warning(arrived.error)
+		return
+	var outcome: ArrivalOutcome = arrived.value
+	if outcome.kind == ArrivalOutcome.PRACTICE:
+		_open_pad(_game.current_question())
 
 
 func _on_answer_submitted(value: int) -> void:
@@ -36,6 +65,7 @@ func _on_answer_submitted(value: int) -> void:
 		push_warning(answered.error)
 		return
 	var feedback: AnswerFeedback = answered.value
+	_audio.play_feedback(feedback)
 	_pad.show_result(feedback)
 	_show_coins(_game.summary().value.coins)
 	if feedback.next != null:
@@ -44,15 +74,26 @@ func _on_answer_submitted(value: int) -> void:
 	var ended := await _game.end_round()
 	if not ended.ok:
 		push_warning(ended.error)
-	await _open_paddock()
+	_close_pad()
 
 
-func _open_paddock() -> void:
-	var arrived := await _arrivals.arrive_at(PADDOCK)
-	if not arrived.ok:
-		push_warning(arrived.error)
-		return
-	_show_question(_game.current_question())
+func _open_pad(question: Question) -> void:
+	_pad.visible = true
+	_show_question(question)
+	WebPage.publish("sfPad", "open")
+
+
+func _close_pad() -> void:
+	_pad.visible = false
+	WebPage.publish("sfPad", "closed")
+
+
+func _on_mute_toggled() -> void:
+	var toggled := await _audio.toggle_mute()
+	if not toggled.ok:
+		# The bus already obeyed; only remembering it for next visit failed.
+		push_warning(toggled.error)
+	_hud.show_muted(_audio.is_muted())
 
 
 func _show_question(question: Question) -> void:
@@ -65,10 +106,25 @@ func _show_coins(coins: int) -> void:
 	WebPage.publish("sfCoins", str(coins))
 
 
+## Where each hotspot sits on screen, as fractions of the view, so the web
+## smoke can tap one without knowing the camera.
+func _publish_hotspots() -> void:
+	var camera := get_viewport().get_camera_3d()
+	var view := get_viewport().get_visible_rect().size
+	var on_screen := {}
+	for area: HotspotArea in get_tree().get_nodes_in_group(HotspotArea.GROUP):
+		var point := camera.unproject_position(area.global_position)
+		on_screen[area.hotspot_id] = [point.x / view.x, point.y / view.y]
+	WebPage.publish("sfHotspots", JSON.stringify(on_screen))
+
+
 ## Kenney's clips import without a loop flag, so idle is set to loop here.
 ## Under reduced motion this is skipped and the characters hold their rest pose.
+## The keeper is left out: her AnimationTree blends idle and walk itself.
 func _play_idle_clips() -> void:
 	for player: AnimationPlayer in find_children("*", "AnimationPlayer", true, false):
+		if _keeper.is_ancestor_of(player):
+			continue
 		if player.has_animation(IDLE_CLIP):
 			player.get_animation(IDLE_CLIP).loop_mode = Animation.LOOP_LINEAR
 			player.play(IDLE_CLIP)

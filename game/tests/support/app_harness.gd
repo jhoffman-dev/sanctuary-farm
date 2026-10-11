@@ -1,6 +1,6 @@
 ## A FarmGame wired to fakes only: seeded RNG, settable clock, in-memory store
 ## — `packages/application/src/test-fakes.ts`'s harness. Sounds are data on
-## the feedback, so there is no recording audio bus to wire.
+## the feedback; FarmAudio's tests wire their own RecordingAudioBus.
 extends RefCounted
 
 const FakeClock := preload("res://tests/fakes/fake_clock.gd")

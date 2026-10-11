@@ -21,9 +21,21 @@ offset_bottom = 84.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_hud")
 script = ExtResource("1_hud")
 
-[node name="CoinsLabel" type="Label" parent="."]
+[node name="Row" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="CoinsLabel" type="Label" parent="Row"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.17, 0.17, 0.17, 1)
 theme_override_font_sizes/font_size = 30
 text = "Coins: 0"
+
+[node name="MuteButton" type="Button" parent="Row"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+accessibility_name = "Sound on/off"
+theme_override_font_sizes/font_size = 22
+text = "Sound: on"

@@ -77,7 +77,10 @@ What this means in practice when you build a scene:
 - The export's engine and pack get content-hashed names (`engine-<hash>.wasm`,
   `game-<hash>.pck`) so Hosting can cache them for a year; only `index.html`
   is re-checked on every visit.
-- No procedural audio on the web: sounds must be sample files (ADR-0006).
+- No procedural audio on the web: sounds are OGGs rendered from the synth
+  recipes (ADR-0006, SF-97). `node game/tools/render_sounds.mjs` re-renders
+  them into `assets/audio/` (needs `oggenc`: `brew install vorbis-tools`);
+  they play on the "SFX" bus (`default_bus_layout.tres`).
 - Window 1280 × 800, stretch `canvas_items` / `expand`, so the UI scales to
   phones and wide screens.
 
@@ -85,8 +88,64 @@ What this means in practice when you build a scene:
 
 Everything in `scenes/` is deliberately plain — SF-95 (#143) is the real farm.
 The rules are not: `domain/` and `app/` are the TypeScript rules, ported with
-their tests (SF-94, #142). Until a keeper walks, `scenes/farm/farm.gd` "arrives"
-at the paddock on load and again after each round.
+their tests (SF-94, #142). The placeholder farm has a walkable navmesh, the
+keeper and one hotspot, the paddock: tap the dirt patch, she walks there, and
+the pad opens on a question. When a round ends the pad closes; tap the paddock
+again to play another.
+
+## Dropping the keeper into your scene
+
+The keeper is a ready-made component (SF-98): `scenes/keeper/keeper.tscn`. She
+walks on a navmesh you bake, follows taps/clicks and WASD/arrow keys, blends
+idle ↔ walk by her own speed, turns to face where she goes, and turns a
+three-quarter view to the camera when she gets there. A `HotspotArea` marks a
+place she can stop at; stopping inside one is what opens its activity.
+
+Checklist for a new farm scene:
+
+1. **Root script.** Keep `scenes/farm/farm.gd` on the scene's root node, with
+   the `%NumberPad` and `%Hud` UI from the placeholder. It plugs the game in.
+2. **Ground collision.** Whatever she walks on needs a collider
+   (`StaticBody3D` + `CollisionShape3D`) on physics layer 1 — taps are cast
+   onto it. (Change `TapToWalk → Ground Layers` if you use another layer.)
+3. **Bake the navmesh.** Add a `NavigationRegion3D`, put the ground (and the
+   fences, barn and other things she must walk round) under it, give it a new
+   `NavigationMesh` with *Parsed Geometry Type* = Static Colliders,
+   *Agent Radius* 0.5, *Agent Height* 1.75, then **Bake NavigationMesh** in the
+   toolbar. Re-bake after moving anything under it.
+4. **Drop in the keeper.** Instance `scenes/keeper/keeper.tscn` (drag it into
+   the scene), name it `Keeper` and tick **Access as Unique Name**. Turn her to
+   face where she should start.
+5. **Place the hotspots.** For each place, add an `Area3D`, attach
+   `scenes/hotspot/hotspot_area.gd`, set **Hotspot Id** (`paddock`, `barn`,
+   `feed-shed`, `nest`, `training-ring`, `petting-zoo`, `farmhouse`), and give
+   it a `CollisionShape3D` with a **BoxShape3D** sized over the ground there.
+   Only the box's width and depth matter. Today only `paddock` opens
+   something; the others answer "coming soon".
+6. **Set the camera.** One `Camera3D` marked **Current**. Keys walk relative
+   to it, and she turns to face it when she arrives.
+
+What you can tune on the `Keeper` in the inspector:
+
+| Property | Default | What |
+| --- | --- | --- |
+| Walk Speed | 3.75 m/s | Art-direction §2: the 30 m farm crossed in 8 s |
+| Turn Rate | 10 rad/s | Turning toward where she walks |
+| Facing Turn Rate | 4 rad/s | The unhurried look round to the camera on arrival |
+| Arrival Radius | 0.25 m | How close to the tapped point counts as there |
+| Face Camera On Arrival | on | Off: she keeps facing the way she walked |
+| Reduced Motion | Follow Page | Follow Page uses the browser setting; Always / Never override it. Reduced motion = no walk bob (rest pose), instant turns |
+| Model Scene | Kenney `character-female-a` | Any model with an `AnimationPlayer` holding the two clips below |
+| Model Scale | 2.06 | Kenney's Mini Characters are ~0.78 m; she should be 1.6 m |
+| Idle Clip / Walk Clip | `idle` / `walk` | Clip names in the model's AnimationPlayer |
+| Crossfade Seconds | 0.25 | How long idle ↔ walk takes to blend |
+
+On her children: `TapToWalk → Reach Tolerance` (0.75 m — how far off the
+walkable ground a tap may land and still count), `TapCue → Fade Seconds` and
+`Ring Color` (the soft ring shown where she cannot go — no sound, never red),
+and `NavigationAgent3D → Path Height Offset` (0.3 m — a baked navmesh floats
+above the ground; if you change the navmesh's *Cell Height*, set this to the
+new gap so her feet stay on the ground).
 
 ## Calling the game from a scene
 
@@ -97,6 +156,13 @@ at the paddock on load and again after each round.
   `buy`, `buy_feed`, `set_muted`, `when_saved`, `HotspotArrivals.arrive_at`. Always
   `await` them. They run one at a time, and the farm only moves once the save
   has landed.
+- **An arrival only counts while she is still there.** Call
+  `HotspotArrivals.keeper_moved()` whenever the keeper sets off (the farm root
+  does, from the keeper's `set_off` signal). An arrival still waiting for a save
+  then comes back `MOVED_ON` and opens nothing.
 - **Sounds are data.** `AnswerFeedback.sounds` names what to play (`fluent`,
-  `correct`, `wrong`, `hatch`); the scene plays its sample files for them.
+  `correct`, `wrong`, `hatch`); the scene hands the feedback to
+  `FarmAudio.play_feedback`, which plays it through the `AudioBus` port
+  (`GodotAudioBus` in the build). Mute goes through `FarmAudio.toggle_mute`
+  (await it): the bus goes quiet at once and the setting is saved with the farm.
 
