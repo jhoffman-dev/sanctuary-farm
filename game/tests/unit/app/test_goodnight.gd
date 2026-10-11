@@ -139,6 +139,32 @@ func test_the_feed_shed_is_shut_after_goodnight_and_spends_nothing() -> void:
 	assert_eq(built.game.summary().value.coins, coins_before)
 
 
+func test_buying_any_offer_is_refused_after_goodnight_and_writes_nothing() -> void:
+	var built := await _loaded(FarmSave.with_changes(Fixtures.fresh_farm(), {"coins": 50}))
+	await _tired(built)
+	var writes := built.store.saved.size()
+	var refused: Result = await built.game.buy(FeedShed.FEED_SACK)
+	assert_eq([refused.ok, refused.error], [false, PlaySession.GOODNIGHT])
+	assert_eq(built.store.saved.size(), writes)
+	assert_eq(built.game.shop().value.coins, 50, "no coins were spent")
+
+
+func test_after_goodnight_the_shop_shows_every_offer_shut_for_the_night() -> void:
+	var built := await _loaded(FarmSave.with_changes(Fixtures.fresh_farm(), {"coins": 50}))
+	await _tired(built)
+	for offer: OfferSummary in built.game.shop().value.offers:
+		assert_eq([offer.affordable, offer.reason], [false, PlaySession.GOODNIGHT])
+
+
+func test_buying_is_not_play_and_does_not_start_the_session_clock() -> void:
+	var built := await _loaded(FarmSave.with_changes(Fixtures.fresh_farm(), {"coins": 50}))
+	var bought: Result = await built.game.buy(FeedShed.FEED_SACK)
+	assert_true(bought.ok, bought.error)
+	assert_null(built.store.stored.play_session, "buying left no play mark")
+	built.clock.advance(10 * MINUTE)
+	assert_eq(_session(built).minutes_used, 0.0)
+
+
 func test_a_round_running_at_the_limit_always_finishes() -> void:
 	var built := await _loaded()
 	await _play_a_round(built)
