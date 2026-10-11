@@ -1,0 +1,6 @@
+# The size-optimised web export template the export uses (SF-100): a GitHub
+# release of this repo, built by .github/workflows/godot-template.yml from
+# web_template.gdbuild + build_web_template.sh. Copy both lines from that
+# workflow's job summary after it publishes; fetch_web_template.sh checks them.
+WEB_TEMPLATE_TAG=godot-web-template-4.7.2-7088ee125c16
+WEB_TEMPLATE_SHA256=pending
