@@ -1,10 +1,11 @@
 ## The barn's care rules — the prototype's `completeCare` and `primeSave`,
 ## made pure. The farm keeps `animals`, an Array of plain records:
-##   {"id": String, "species": a Species, "health": int (FLOOR..MAX),
-##    "done": {task: day number or null, for each CareTask}}
+##   {"id": String, "species": a Species, "home": a Zoo home (barn or zoo),
+##    "health": int (FLOOR..MAX), "done": {task: day number or null, for each CareTask}}
 ## `health` is the health on the animal's last care day; decay since then is
 ## worked out on read (AnimalHealth.on_day), so loading a farm twice never
-## decays it twice.
+## decays it twice. Care follows the animal: one visiting the petting zoo is
+## cared for, and decays, exactly as one in the barn.
 class_name Barn
 extends RefCounted
 
@@ -24,7 +25,7 @@ static func new_animal(id: String, species: String) -> Dictionary:
 	var done := {}
 	for task in CareTask.ALL:
 		done[task] = null
-	return {"id": id, "species": species, "health": AnimalHealth.START, "done": done}
+	return {"id": id, "species": species, "home": Zoo.BARN, "health": AnimalHealth.START, "done": done}
 
 
 ## The most recent day any task was done, or null when never cared for.
