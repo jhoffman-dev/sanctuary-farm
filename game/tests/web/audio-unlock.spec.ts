@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { tapHotspot } from './hotspots'
 
 // Browsers hold audio until a user gesture (docs/sound-design.md §5), and the
 // game must ask again on the first input. Under the Playwright runner a page
@@ -48,14 +49,16 @@ test('nothing sounds before the first input, and the first input unlocks audio',
   await page.goto('/')
 
   const body = page.locator('body')
-  await expect(body).toHaveAttribute('data-sf-question', /^\d+x\d+$/, { timeout: 90_000 })
+  await expect(body).toHaveAttribute('data-sf-coins', /^\d+$/, { timeout: 90_000 })
   expect(audioStates.at(-1)).toBe('suspended')
   expect(consoleErrors).toEqual([])
 
-  const [a, b] = ((await body.getAttribute('data-sf-question')) ?? '').split('x').map(Number)
-  // Click the world, not the pad, so the canvas has keyboard focus.
-  await page.mouse.click(300, 400)
+  // The first input is a tap on the world — the paddock, which the keeper
+  // walks to — so the canvas keeps keyboard focus for the answer.
+  await tapHotspot(page, 'paddock')
   await expect.poll(() => audioStates.at(-1)).toBe('running')
+  await expect(body).toHaveAttribute('data-sf-pad', 'open', { timeout: 30_000 })
+  const [a, b] = ((await body.getAttribute('data-sf-question')) ?? '').split('x').map(Number)
   await page.keyboard.type(String(a * b))
   await page.keyboard.press('Enter')
 

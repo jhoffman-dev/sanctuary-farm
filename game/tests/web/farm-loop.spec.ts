@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { tapHotspot } from './hotspots'
 
 // The canvas has no DOM text, so the game mirrors its state onto <body data-*>
 // (adapters/web_page.gd): the question, the coins, the pad, where the keeper
@@ -14,14 +15,6 @@ const saveDocImage = async (page: Page, path: string) => {
 }
 
 // Taps a hotspot where the game says it is on screen (fractions of the view).
-const tapHotspot = async (page: Page, id: string) => {
-  const hotspots = JSON.parse((await page.locator('body').getAttribute('data-sf-hotspots')) ?? '{}')
-  const [fx, fy] = hotspots[id] as [number, number]
-  const canvas = await page.locator('canvas').boundingBox()
-  if (!canvas) throw new Error('the game canvas has no box')
-  await page.mouse.click(canvas.x + fx * canvas.width, canvas.y + fy * canvas.height)
-}
-
 test('tapping the paddock walks the keeper there, the pad opens and a right answer earns coins', async ({ page }) => {
   const consoleErrors: string[] = []
   page.on('console', (message) => {
