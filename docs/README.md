@@ -34,6 +34,7 @@ is the agent entry point).
 | `docs/sound-design.md` — Sound design | [Sound design](https://app.notion.com/p/3d5672aa2c4a817cb90ac1dde2cfeb58) |
 | `docs/firestore-backup.md` — Firestore backup strategy | [Firestore backup strategy](https://app.notion.com/p/3d5672aa2c4a815e83eec341bd398b13) |
 | `docs/deploy.md` — Deploying into the shared Student Games project | *not mirrored yet — add under Docs and link here* |
+| [`docs/sign-in.md`](sign-in.md) — Sign-in without personal data: save codes, username + PIN, hashing, rate limits, what James configures (SF-113) | not yet mirrored; push after merge |
 | [`docs/world-editor.md`](world-editor.md) — World editor: how to use it (`pnpm dev`, `?edit=1`) | not yet mirrored; push after merge |
 
 Repo-only, not mirrored: `docs/notion-migration.md` (the SF-1 … SF-80 → issue
