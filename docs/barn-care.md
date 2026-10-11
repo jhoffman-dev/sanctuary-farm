@@ -56,6 +56,34 @@ one exists and is left in place). `FarmSaveCodec` rejects an unknown species,
 health outside 15..100, a missing or extra task, a bad day, or a repeated id.
 Days are whole days since 1970 at the player's local midnight (`Clock.utc_offset_minutes`).
 
+## Feed shed (SF-108)
+
+Feed comes into the barn from the feed shed, and coins are spent nowhere else.
+The rules are `FeedShed` (`game/domain/economy/feed_shed.gd`); the use-cases
+are `FarmGame.shop()` and `FarmGame.buy(offer_id)`.
+
+| Rule | Value | Where in code | Source |
+| --- | --- | --- | --- |
+| What is sold | one offer, `feed-sack`: 10 feed for 6 coins, a fixed price | `FeedShed.offers`, `SACK_FEED`, `SACK_PRICE` | redesign-notes.md:45 ("buy a 10-feed sack for 6 coins"); prototype `constants.ts:122-124` (`FEED_BUNDLE_UNITS`, `FEED_BUNDLE_PRICE`) |
+| Exact cost | the last coins can be spent; never below 0 | `FeedShed.check_buy` | prototype `gameState.tsx:244` (`coins < price` refuses) |
+| Not enough coins | refused, nothing written, with `FeedShed.NOT_ENOUGH_COINS` ("earn-coins-in-the-paddock-or-nest") — a pointer, not an error | `FeedShed.check_buy` | CLAUDE.md rule 2 and 6; prototype `FeedShedScreen.tsx:45` |
+| No minting | a purchase moves exactly its price out and its feed in; nothing else changes | `FeedShed.buy` | CLAUDE.md rule 2 |
+| No cap on feed held | none | — | neither the redesign notes nor the prototype set one |
+| No questions | buying asks none and starts no round; spending is not a learning action | `FarmGame.buy` | redesign-notes.md:12, 20-21 (coins are earned in the paddock and nest; the shed spends them) |
+| No real money | coins come only from graded answers | — | CLAUDE.md rule 7; PRD.md:25; ADR-0002 |
+| Starting feed | 12 on a fresh farm | `Coins.STARTING_FEED` | prototype `constants.ts:121` |
+
+`FarmGame.shop() -> Result` → `ShopSummary`: `coins`, `feed`, `offers:
+Array[OfferSummary]`. Each `OfferSummary` has `id`, `feed`, `price`,
+`affordable`, and `reason` (`FeedShed.NOT_ENOUGH_COINS`, or `""`). Refused
+before `load_farm`.
+
+`await FarmGame.buy(offer_id) -> Result` → the new `ShopSummary`, once the save
+has landed. Refused, writing nothing, with `FeedShed.NOT_ENOUGH_COINS`,
+`FeedShed.UNKNOWN_OFFER`, or a failed save (coins and feed stay as they were).
+`buy_feed()` is shorthand for `buy(FeedShed.FEED_SACK)`. Buying mid-round is
+allowed and keeps the question in flight. The save shape is unchanged (v4).
+
 ## Open tuning questions
 
 1. Should a round of all-wrong answers still earn the care? (Today: yes — any

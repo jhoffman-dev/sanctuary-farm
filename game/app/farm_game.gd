@@ -3,8 +3,8 @@
 ## question is returned until it is answered, and latency is read from the
 ## injected clock, never from the caller.
 ##
-## Every persisting call (load_farm, answer, end_round, buy_feed, set_muted) is
-## a coroutine — always `await` it. It saves first and commits to memory only
+## Every persisting call (load_farm, answer, end_round, buy, buy_feed,
+## set_muted) is a coroutine — always `await` it. It saves first and commits to memory only
 ## once the store has accepted the farm, so a refused save leaves the game
 ## exactly where the caller last saw it. Those calls run one at a time, in the
 ## order they were made, each against what the previous one committed.
@@ -144,10 +144,25 @@ func end_round() -> Result:
 	return await _serialized(_end_round)
 
 
-## Trades coins for a feed bundle; the value is the new FarmSummary. Refused
-## with Coins.NOT_ENOUGH_COINS (writing nothing), or when the save fails.
+## The value is a ShopSummary — coins, feed, and each feed shed offer with
+## whether it can be bought now; refused before load_farm.
+func shop() -> Result:
+	if _farm == null:
+		return Result.failure(NOT_LOADED)
+	return Result.success(ShopSummary.of(_farm))
+
+
+## Spends coins on a feed shed offer; the value is the new ShopSummary. No
+## question is asked: spending is not a learning action. Refused, writing
+## nothing, with FeedShed.NOT_ENOUGH_COINS ("earn coins in the paddock or the
+## nest") or FeedShed.UNKNOWN_OFFER, and when the save fails.
+func buy(offer_id: String) -> Result:
+	return await _serialized(_buy.bind(offer_id))
+
+
+## Buys the feed sack, the one offer today: buy(FeedShed.FEED_SACK).
 func buy_feed() -> Result:
-	return await _serialized(_buy_feed)
+	return await buy(FeedShed.FEED_SACK)
 
 
 func set_muted(muted: bool) -> Result:
@@ -212,16 +227,16 @@ func _end_round() -> Result:
 	return Result.success(session_log)
 
 
-func _buy_feed() -> Result:
+func _buy(offer_id: String) -> Result:
 	if _farm == null:
 		return Result.failure(NOT_LOADED)
-	var bought := Coins.buy_feed_bundle(_farm)
+	var bought := FeedShed.buy(_farm, offer_id)
 	if not bought.ok:
 		return bought
 	var committed: Result = await _commit(_Snapshot.new(bought.value, _active, null))
 	if not committed.ok:
 		return committed
-	return Result.success(FarmSummary.of(bought.value))
+	return Result.success(ShopSummary.of(bought.value))
 
 
 func _set_muted(muted: bool) -> Result:
