@@ -63,3 +63,25 @@
   game/tools/oracles/vitest.config.ts` rewrites
   `game/tests/oracles/typescript_oracles.json`; rerun it whenever the
   TypeScript rules change, or the GDScript equivalence tests go red.
+
+## Keeper controller (SF-98)
+
+- **A baked navmesh floats above the ground** (≈ 2 cells: 0.3 m at the default
+  0.25 cell height). `keeper.tscn`'s `NavigationAgent3D.path_height_offset`
+  (0.3) takes it back off path points, and `KeeperController._on_navmesh`
+  subtracts the same for keyboard walking. Change both with the cell height.
+- **The navigation map takes the bake on a later physics frame**, and the first
+  one of a GUT run takes longer than a fixed 3 frames. Tests poll
+  `map_get_closest_point` frame by frame until it answers
+  (`test_keeper_navigation.gd::_navmesh_served`).
+- **Driving the keeper deterministically:** switch off her physics processing
+  and call `_physics_process(1.0 / 60.0)` yourself. She moves by
+  `global_position`, not `move_and_slide`, so the step is exactly the delta you
+  pass (move_and_slide would use the engine's delta).
+- **Arrival = she stopped inside a `HotspotArea` box**, worked out from the
+  box (`HotspotBounds`), not `body_entered` — overlap signals land a physics
+  frame late and fire when she merely passes through.
+- **Headless SceneTree scripts** (`-s script.gd`) must do their work in
+  `_initialize()`, not `_init()`, or nodes are not in the tree yet.
+- **`keeper_controller.gd` is `@tool`** so the chosen model shows in the editor;
+  everything else in it returns early under `Engine.is_editor_hint()`.
