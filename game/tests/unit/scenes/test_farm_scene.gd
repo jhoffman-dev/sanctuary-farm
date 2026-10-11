@@ -62,3 +62,16 @@ func test_stopping_between_places_opens_nothing() -> void:
 	_keeper().stopped.emit(Vector3(4, 0, 4))
 	await wait_process_frames(2)
 	assert_false(_pad().visible)
+
+
+func test_the_mute_toggle_flips_sound_and_flips_back() -> void:
+	await wait_process_frames(2)
+	var button: Button = _farm.get_node("%Hud").get_node("%MuteButton")
+	var before := button.text
+	button.pressed.emit()
+	await wait_until(func() -> bool: return button.text != before, 5.0)
+	assert_ne(button.text, before)
+	# Flip back so the real user:// save is left as it was found.
+	button.pressed.emit()
+	await wait_until(func() -> bool: return button.text == before, 5.0)
+	assert_eq(button.text, before)

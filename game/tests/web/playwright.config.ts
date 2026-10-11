@@ -9,6 +9,8 @@ const baseURL = `http://localhost:${server.port}`
 
 export default defineConfig({
   testDir: '.',
+  // The throttled load timer has its own config (load-timing.config.ts).
+  testIgnore: 'load-timing.spec.ts',
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   // The engine is ~40 MB of wasm compiled in a software-GL browser.

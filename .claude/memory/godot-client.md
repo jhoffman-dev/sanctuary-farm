@@ -8,11 +8,31 @@
   line; never call `gut_cmdln.gd` directly in CI.
 - **`GODOT_BIN`** overrides the Godot path in every `godot:*` script (default
   `/Applications/Godot.app/Contents/MacOS/Godot`). CI sets it to the Linux build.
-- **Web export templates** live in
-  `~/Library/Application Support/Godot/export_templates/4.7.2.stable/` (macOS) or
-  `~/.local/share/godot/export_templates/4.7.2.stable/` (Linux). Only the
-  `web_nothreads_*` zips are needed; the full `.tpz` is 1.3 GB — verify it
-  against the release's `SHA512-SUMS.txt`.
+- **The web export uses our own template since SF-100**, not the stock one:
+  `export_presets.cfg` points `custom_template/release` at
+  `res://build/templates/web_nothreads_release.zip`, which
+  `pnpm godot:template` (called by `godot:export:web`) downloads from the
+  GitHub release named in `game/tools/web_template.lock` and checks by SHA-256.
+  The lock's tag must equal `bash game/tools/web_template_id.sh` (a hash of
+  `web_template.gdbuild` + `build_web_template.sh`), so editing either without
+  publishing a new template fails the export on purpose. The
+  `godot-template.yml` workflow builds and publishes on a push that changes
+  them; copy the lock lines from its summary.
+- **Build-profile gotchas (SF-100).** `deprecated` must be a SCons argument:
+  SConstruct reads it *before* it applies `build_profile`, so in the profile it
+  is silently ignored; `module_*_enabled` and `disable_*` work in the profile.
+  The editor's "Detect from Project" is GUI-only (no CLI), and `disabled_classes`
+  would break a scene the moment James uses a class it removed, so the profile
+  turns off modules and build options only. Emscripten is pinned to 4.0.20, the
+  version godotengine/build-containers' 4.7 `Dockerfile.web` builds the
+  official templates with (Godot's own CI uses 4.0.11).
+- **Export file names are content-hashed** (`game/tools/web_export/run_fingerprint.ts`):
+  `engine-<hash>.{wasm,js,audio.worklet.js,audio.position.worklet.js}` and
+  `game-<hash>.pck`; the page's `GODOT_CONFIG` gets `executable` + `mainPack`.
+  Godot's loader derives the wasm and worklet URLs from `executable`
+  (`platform/web/js/engine/config.js` `locateFile`), so they must share one stem.
+- The Hosting emulator serves `.pck` with `Content-Type: false` unless
+  firebase.json sets it; it brotli-compresses `.wasm`/`.js` but not `.pck`.
 - **`check_layers.sh` reads class names too.** GDScript classes are global, so
   `domain/` naming `UserFileSaveStore` is caught even without a path. It strips
   `#` comments but not strings: an error message in `app/` that names an
@@ -75,6 +95,25 @@
   `Barn.starting_animals()`. A future v5 adds its own fallback the same way.
 - **Care days are local**: `CareDay.of(now, Clock.utc_offset_minutes())`. Decay
   is computed on read from the last care day, never written back on load.
+
+## Audio (SF-97)
+
+- **Sounds are rendered, not synthesised.** `node game/tools/render_sounds.mjs`
+  runs the real `packages/audio` recipes in headless Chromium
+  (`OfflineAudioContext`) and encodes with `oggenc` (`brew install
+  vorbis-tools`; Homebrew's ffmpeg has no libvorbis). `--serial` is fixed so
+  reruns are byte-identical. Rerun it whenever `recipes.ts` changes.
+- **`GodotAudioBus` preloads every OGG** (const `STREAMS`) so an export filter
+  that keeps only referenced resources still ships them. Adding a sound means a
+  `Sounds` constant, a `SOUNDS` row in the render script, and a `STREAMS` entry;
+  `test_godot_audio_bus.gd` fails until all three agree.
+- **Playwright's runner makes every page user-activated** (and `page.evaluate`
+  is a user gesture), so headless Chromium never shows the autoplay block in a
+  spec. `game/tests/web/audio-unlock.spec.ts` re-imposes the policy with an
+  init script and reads AudioContext states from the console, not `evaluate`.
+  Godot resumes its context itself on the first pointer/key event.
+- **A clicked HUD button eats Enter** (ui_accept) and the pad would stop
+  submitting, so `Hud` releases focus after a pointer press; Tab still reaches it.
 
 ## Keeper controller (SF-98)
 
