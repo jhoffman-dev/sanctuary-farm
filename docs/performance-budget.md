@@ -71,7 +71,8 @@ JSON-RPC, mbedTLS — `JavaScriptBridge` and `HTTPRequest` use the browser's own
 stack), and editor-only helpers (lightmapper, xatlas, V-HACD, meshoptimizer,
 raycast, ObjectDB profiler). Plus `deprecated=no`, full LTO (the official
 templates use thin), `optimize=size`, single-threaded, release only — no
-debugger in the shipped engine.
+debugger in the shipped engine. The CI build (ubuntu, 15 min) and a local one
+(M4 Mac, ~5 min) produced a byte-identical `godot.wasm`.
 
 Measured and **not** taken, with the reason (each a one-line profile change):
 
