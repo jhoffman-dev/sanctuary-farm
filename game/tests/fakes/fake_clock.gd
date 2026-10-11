@@ -4,6 +4,8 @@ extends Clock
 
 var now := 0
 var step := 0
+## Minutes east of UTC; tests set it to put midnight somewhere else.
+var offset_minutes := 0
 
 
 func _init(start: int = 0) -> void:
@@ -17,3 +19,7 @@ func now_msec() -> int:
 
 func advance(msec: int) -> void:
 	now += msec
+
+
+func utc_offset_minutes() -> int:
+	return offset_minutes
