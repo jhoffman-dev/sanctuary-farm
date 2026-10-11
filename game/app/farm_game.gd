@@ -3,15 +3,17 @@
 ## question is returned until it is answered, and latency is read from the
 ## injected clock, never from the caller.
 ##
-## Every persisting call (load_farm, answer, end_round, buy_feed, set_muted) is
-## a coroutine — always `await` it. It saves first and commits to memory only
-## once the store has accepted the farm, so a refused save leaves the game
-## exactly where the caller last saw it. Those calls run one at a time, in the
-## order they were made, each against what the previous one committed.
+## Every persisting call (load_farm, answer, end_round, buy_feed, hatch,
+## set_muted) is a coroutine — always `await` it. It saves first and commits
+## to memory only once the store has accepted the farm, so a refused save
+## leaves the game exactly where the caller last saw it. Those calls run one
+## at a time, in the order they were made, each against what the previous one
+## committed.
 ##
 ## Sessions end on time (PlaySession): once a session's time is used, starting
-## a round or care and buying feed are refused with PlaySession.GOODNIGHT — the
-## scene's cue to say goodnight — while a round already running still finishes.
+## a round, care or an egg and buying feed are refused with
+## PlaySession.GOODNIGHT — the scene's cue to say goodnight — while a round
+## already running still finishes.
 class_name FarmGame
 extends RefCounted
 
@@ -118,6 +120,38 @@ func barn() -> Result:
 	if _farm == null:
 		return Result.failure(NOT_LOADED)
 	return Result.success(BarnSummary.of(_farm, _today()))
+
+
+## The value is a NestSummary: the eggs and their progress, the egg waiting
+## for its hatch ceremony (never while a round runs), and the animals hatched.
+## Refused before load_farm.
+func nest() -> Result:
+	if _farm == null:
+		return Result.failure(NOT_LOADED)
+	return Result.success(NestSummary.of(_farm, _active != null))
+
+
+## Starts a round practising one egg's family and serves its first question
+## (the value): the family's facts in rotation, at the nest, earning coins.
+## Refused as start_round is, and with a Nest reason (Nest.UNKNOWN_EGG,
+## Nest.READY_TO_HATCH) that writes nothing.
+func start_egg(egg_id: String) -> Result:
+	var ready := _ready_to_start("start_egg")
+	if not ready.ok:
+		return ready
+	var egg := Nest.check_practice(_farm, egg_id)
+	if not egg.ok:
+		return egg
+	return _begin(PracticeRound.begin(RoundPresets.egg(egg.value.family), _clock.now_msec()))
+
+
+## Confirms the hatch once the scene's ceremony has played: the egg's animal
+## joins the barn and the egg leaves the nest. The value is the new animal's
+## AnimalSummary. Allowed after goodnight — the egg was earned by answers
+## already given. Refused before load_farm, while a round is active, with
+## Nest.UNKNOWN_EGG or Nest.NOT_READY (writing nothing), or when the save fails.
+func hatch(egg_id: String) -> Result:
+	return await _serialized(_hatch.bind(egg_id))
 
 
 ## The value is a SessionSummary: time used and left, winding down, goodnight,
@@ -239,6 +273,20 @@ func _buy_feed() -> Result:
 	if not committed.ok:
 		return committed
 	return Result.success(FarmSummary.of(bought.value))
+
+
+func _hatch(egg_id: String) -> Result:
+	if _farm == null:
+		return Result.failure(NOT_LOADED)
+	if _active != null:
+		return Result.failure("hatch: a round is active")
+	var hatched := Nest.hatch(_farm, egg_id)
+	if not hatched.ok:
+		return hatched
+	var committed: Result = await _commit(_Snapshot.new(hatched.value, null, null))
+	if not committed.ok:
+		return committed
+	return Result.success(AnimalSummary.of(hatched.value.animals.back(), _today()))
 
 
 func _set_muted(muted: bool) -> Result:

@@ -7,7 +7,9 @@
 ##   feed: int             bought with coins in the feed shed; consumed by feeding
 ##   sessions: Array       session logs, oldest first
 ##   settings              {"muted": bool, "max_table": int}
-##   animals: Array        the barn's animals and their care (Barn); added in v4
+##   animals: Array        the barn's animals and their care (Barn); added in v4.
+##                         Nest-hatched animals join it; the nest itself is
+##                         derived (Nest), so it adds no key
 ##   play_session          the session clock (PlaySession), or null before any play;
 ##                         saved so a reload cannot restart the session
 ## A session log is {"started_at", "ended_at" (epoch ms), "context" (a

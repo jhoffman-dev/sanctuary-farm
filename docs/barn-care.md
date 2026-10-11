@@ -29,6 +29,9 @@ Prototype sources are in git history before the rebuild commit `db9c208`
 | No coins | stall rounds mint none | `Coins.context_earns_coins` (unchanged) | CLAUDE.md rule 2; redesign-notes.md:20-21; curriculum.md:118 |
 | Glum, never gone | health never below 15; animals are never removed | `AnimalHealth.FLOOR`, `Barn` | CLAUDE.md rule 6; PRD.md:34 |
 
+Animals hatched from the nest join the barn under these same rules
+(`nest.md`).
+
 One deliberate change from the prototype: it wrote the decayed health back on
 every load, so reloading on the same day decayed an animal twice. Here the save
 keeps the health as of the last care day and decay is worked out when read, so
