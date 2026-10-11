@@ -1,7 +1,8 @@
 ## The barn's animals inside a save — FarmSaveCodec's helper for the v4 field.
 ## Parse, don't trust: an animal the rules could not have written (an unknown
-## species, health outside FLOOR..MAX, a missing task, a repeated id) makes
-## the whole list null, and each record is rebuilt from checked values.
+## species, health outside FLOOR..MAX, a missing task, a repeated id, a
+## second animal of one species — each family hatches once) makes the whole
+## list null, and each record is rebuilt from checked values.
 class_name AnimalsCodec
 extends RefCounted
 
@@ -15,11 +16,13 @@ static func parse(value: Variant) -> Variant:
 		return null
 	var animals := []
 	var ids := {}
+	var species := {}
 	for item: Variant in value:
 		var animal: Variant = _animal(item)
-		if animal == null or ids.has(animal.id):
+		if animal == null or ids.has(animal.id) or species.has(animal.species):
 			return null
 		ids[animal.id] = true
+		species[animal.species] = true
 		animals.append(animal)
 	return animals
 

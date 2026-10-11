@@ -17,7 +17,7 @@ const NEED_FEED := "visit-the-feed-shed"
 
 ## The animals already living in the barn on day one — never an empty barn.
 static func starting_animals() -> Array:
-	return Species.ALL.map(func(species: String) -> Dictionary: return new_animal(species, species))
+	return Species.STARTING.map(func(species: String) -> Dictionary: return new_animal(species, species))
 
 
 static func new_animal(id: String, species: String) -> Dictionary:

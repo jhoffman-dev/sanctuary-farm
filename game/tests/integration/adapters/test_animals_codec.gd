@@ -27,6 +27,25 @@ func test_round_trips_cared_for_animals_exactly() -> void:
 	assert_eq(FarmSaveCodec.decode(FarmSaveCodec.encode(farm)), farm)
 
 
+func test_round_trips_animals_hatched_from_the_nest() -> void:
+	var farm := Fixtures.fresh_farm()
+	var ids := Fixtures.ids_of(FactTable.facts_in_family(2).value)
+	var mastered := Fixtures.with_facts(farm.scheduler, ids, {"box": FactTuning.MASTERY_BOX, "recent_latencies": [900.0, 900.0, 900.0]})
+	farm = Nest.hatch(FarmSave.with_changes(farm, {"scheduler": mastered}), "egg-2").value
+	farm = Barn.apply_care(farm, CareOrder.new("duck", CareTask.FEED), DAY).value
+	var loaded: Dictionary = FarmSaveCodec.decode(FarmSaveCodec.encode(farm))
+	assert_eq(loaded, farm)
+	assert_eq(Nest.hatched_animal_ids(loaded), ["duck"] as Array[String])
+	assert_eq(Nest.eggs(loaded), [] as Array[Egg], "a hatched egg stays hatched after a reload")
+
+
+func test_every_species_loads() -> void:
+	var farm := FarmSave.with_changes(Fixtures.fresh_farm(), {
+		"animals": Species.ALL.map(func(kind: String) -> Dictionary: return Barn.new_animal(kind, kind)),
+	})
+	assert_eq(FarmSaveCodec.decode(FarmSaveCodec.encode(farm)), farm)
+
+
 func test_health_and_days_come_back_as_ints() -> void:
 	var loaded: Dictionary = FarmSaveCodec.decode(FarmSaveCodec.encode(_cared_farm()))
 	assert_eq(typeof(loaded.animals[1].health), TYPE_INT)
@@ -68,8 +87,11 @@ func test_rejects_every_impossible_barn() -> void:
 	missing_animals.erase("animals")
 	var twin := _raw(Fixtures.fresh_farm())
 	twin.animals[1].id = "cow"
+	var second_cow := _raw(Fixtures.fresh_farm())
+	second_cow.animals[1].species = Species.COW
 	var cases := {
 		"a v4 save without animals": missing_animals,
+		"two animals of one species": second_cow,
 		"animals as an object": FarmSave.with_changes(_raw(Fixtures.fresh_farm()), {"animals": {}}),
 		"an animal that is not a record": FarmSave.with_changes(_raw(Fixtures.fresh_farm()), {"animals": ["cow"]}),
 		"two animals with one id": twin,

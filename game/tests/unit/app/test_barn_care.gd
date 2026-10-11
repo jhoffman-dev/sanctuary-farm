@@ -46,7 +46,7 @@ func test_the_barn_is_refused_before_load() -> void:
 func test_a_fresh_barn_has_three_happy_animals_with_every_task_due() -> void:
 	var built := await _loaded()
 	var barn: BarnSummary = built.game.barn().value
-	assert_eq(barn.animals.map(func(a: AnimalSummary) -> String: return a.species), Array(Species.ALL))
+	assert_eq(barn.animals.map(func(a: AnimalSummary) -> String: return a.species), Array(Species.STARTING))
 	for animal: AnimalSummary in barn.animals:
 		assert_eq([animal.health, animal.band, animal.tasks_due], [AnimalHealth.START, AnimalHealth.HAPPY, CareTask.ALL])
 	assert_eq([barn.feed, barn.feed_per_feeding, barn.needs_feed_shed, barn.all_done_today], [Coins.STARTING_FEED, 3, false, false])
