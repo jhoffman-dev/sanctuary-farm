@@ -31,9 +31,12 @@
     "godot:layers": "bash game/tools/check_layers.sh",
     "godot:calls": "bash game/tools/check_test_calls.sh",
     "godot:test": "pnpm godot:layers && pnpm godot:calls && bash game/tools/run_tests.sh",
-    "godot:export:web": "mkdir -p game/build/web && \"${GODOT_BIN:-/Applications/Godot.app/Contents/MacOS/Godot}\" --headless --path game --export-release Web build/web/index.html",
+    "godot:template": "bash game/tools/fetch_web_template.sh",
+    "godot:export:web": "pnpm godot:template && rm -rf game/build/web && mkdir -p game/build/web && \"${GODOT_BIN:-/Applications/Godot.app/Contents/MacOS/Godot}\" --headless --path game --export-release Web build/web/index.html && node game/tools/web_export/run_fingerprint.ts game/build/web",
+    "godot:size": "node game/tools/web_export/run_export_size.ts game/build/web",
     "godot:e2e:web": "playwright test --config game/tests/web/playwright.config.ts",
-    "godot:gate": "pnpm godot:import && pnpm godot:test && pnpm godot:export:web && pnpm godot:e2e:web",
+    "godot:load:web": "playwright test --config game/tests/web/load-timing.config.ts",
+    "godot:gate": "pnpm godot:import && pnpm godot:test && pnpm godot:export:web && pnpm godot:size && pnpm godot:e2e:web",
     "gate": "pnpm typecheck && pnpm lint && pnpm boundaries && pnpm test:coverage && pnpm test:functions && pnpm build && pnpm size"
   },
   "devDependencies": {

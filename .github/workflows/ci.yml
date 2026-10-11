@@ -102,35 +102,28 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: pnpm
-      # The editor binary and the web templates only (the full templates
-      # archive is 1.3 GB; the cache keeps the ~20 MB the job uses).
+      # The editor binary only. The web export template is Sanctuary Farm's own
+      # size-optimised build (SF-100), fetched by `pnpm godot:export:web` from
+      # the release named in game/tools/web_template.lock.
       - id: godot-cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: |
-            .godot-bin
-            ~/.local/share/godot/export_templates/${{ env.GODOT_VERSION }}.stable
-          key: godot-${{ env.GODOT_VERSION }}-stable-linux-web-v1
-      - name: Install Godot ${{ env.GODOT_VERSION }} + web templates (checksums verified)
+          path: .godot-bin
+          key: godot-${{ env.GODOT_VERSION }}-stable-linux-editor-v2
+      - name: Install Godot ${{ env.GODOT_VERSION }} (checksum verified)
         if: steps.godot-cache.outputs.cache-hit != 'true'
         run: |
           set -euo pipefail
           base="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable"
           editor="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
-          templates="Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
           mkdir -p "$RUNNER_TEMP/godot-download" && cd "$RUNNER_TEMP/godot-download"
           curl -fsSLO "$base/SHA512-SUMS.txt"
           curl -fsSLO "$base/$editor"
-          curl -fsSLO "$base/$templates"
-          grep -E " (${editor}|${templates})\$" SHA512-SUMS.txt > expected.sha512
-          test "$(wc -l < expected.sha512)" -eq 2
+          grep -E " ${editor}\$" SHA512-SUMS.txt > expected.sha512
+          test "$(wc -l < expected.sha512)" -eq 1
           sha512sum --check --strict expected.sha512
           mkdir -p "$GITHUB_WORKSPACE/.godot-bin"
           unzip -q "$editor" -d "$GITHUB_WORKSPACE/.godot-bin"
-          dest="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
-          mkdir -p "$dest"
-          unzip -q -j "$templates" 'templates/version.txt' 'templates/web_nothreads_release.zip' 'templates/web_nothreads_debug.zip' -d "$dest"
-          test "$(cat "$dest/version.txt")" = "${GODOT_VERSION}.stable"
       - run: pnpm install --frozen-lockfile
       - run: '"$GODOT_BIN" --version'
       # A clean import is part of the check: any engine or script error fails it.
@@ -141,12 +134,28 @@ jobs:
           if grep -E '(SCRIPT )?ERROR:' "$RUNNER_TEMP/godot-import.log"; then exit 1; fi
       # The dependency-rule check (game/tools/check_layers.sh), then GUT.
       - run: pnpm godot:test
+      # Fetches the template release asset (checksum verified), exports,
+      # then content-hashes the engine and pack file names.
       - run: pnpm godot:export:web
-      - name: Export size
+        env:
+          GH_TOKEN: ${{ github.token }}
+      # Fails over the ceilings in game/tools/web_export/budget.ts
+      # (docs/performance-budget.md, "Load — Godot client").
+      - name: Export size (fails over the ceiling)
         run: |
-          node game/tools/export_size.mjs | tee -a "$GITHUB_STEP_SUMMARY"
+          set -o pipefail
+          pnpm --silent godot:size | tee -a "$GITHUB_STEP_SUMMARY"
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm godot:e2e:web
+      # A measurement, not a gate: the first question under the budget's
+      # throttling (10 Mbps, 150 ms RTT, 4x CPU) on a shared runner with
+      # software GL swings too much to fail a merge on. Tracked in the summary.
+      - name: Throttled load timer (reported, not enforced)
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          pnpm godot:load:web
+          { echo '### Throttled load (10 Mbps, 150 ms RTT, 4x CPU, headless Chromium)'; echo '```json'; cat game/build/load-timing.json; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: godot-web-export
