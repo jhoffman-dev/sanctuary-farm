@@ -5,6 +5,19 @@
 - **Deciders:** James
 - **Ticket:** SF-63 "Spike: r3f character controller"
 
+> **Update 2026-10-11 — ADR-0006 (Godot).** The game moved to Godot 4.7, so
+> the **r3f specifics here no longer apply** to it: `AnimationMixer` /
+> `crossFadeTo`, r3f pointer events, `renderer.info`, the jsdom/WebGL test
+> carve-out and the three.js loader wiring. Godot's `AnimationPlayer` /
+> `AnimationTree` and its editor take their place. **What stands:** Kenney
+> GLBs loaded as shipped (ADR-0003 addendum — no meshopt or other conversion),
+> clips chosen by name (`idle`, `walk`, …) from velocity, art-direction §2's
+> fixed camera numbers as the starting point (the Godot skeleton uses them),
+> and the measured lesson that draw calls bite before triangles. Note for
+> Godot: the Kenney GLBs face +Z on import, so they need **no** 180° turn to
+> face the §2 camera (the r3f catalogue's `quarterTurns: 2` does not carry
+> over).
+
 ## Context
 
 ADR-0001 chose react-three-fiber over Unity and named the cost plainly: *"no

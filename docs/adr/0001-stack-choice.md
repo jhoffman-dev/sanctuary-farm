@@ -1,8 +1,15 @@
 # ADR-0001: Stack — TypeScript / React / react-three-fiber
 
-- **Status:** accepted
+- **Status:** accepted — **engine choice superseded by ADR-0006** (2026-10-11)
 - **Date:** 2026-08-31
 - **Deciders:** James (sole developer, working with AI agents)
+
+> **Superseded by ADR-0006 (engine part).** On 2026-10-11 the game moved to
+> **Godot 4.7 (GDScript)** in `game/`, so James can build the world in an
+> editor. The React / react-three-fiber choice below stands only for `apps/web`
+> until it is retired at parity (SF-96). What is *not* superseded: web as the
+> primary target, Firebase (and ADR-0002), and "free, ad-free, PII-free via a
+> link". The text below is kept as decided.
 
 ## Context
 
