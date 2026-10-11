@@ -1,11 +1,59 @@
 rules_version = '2';
 
-// Deny everything by default. Phase 4 (cloud save, ADR-0002) adds per-save
-// ownership rules; until then no client may read or write anything.
+// Cloud save (ADR-0002, SF-114). Schema and the reasoning behind every limit:
+// docs/cloud-save.md. Deny by default: the one thing a client may do is read
+// and write its own farm at saves/{its uid}. Everything else — other farms,
+// listing, deleting, the server-only credential collections — is denied; the
+// custom-auth Cloud Function reaches those through the Admin SDK, which
+// bypasses these rules.
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
+
+    match /saves/{uid} {
+      allow get: if isFarmOwner(uid);
+      allow create, update: if isFarmOwner(uid) && isValidSave(request.resource.data);
+      // No list (no browsing other farms) and no client delete: "Delete my
+      // farm" needs the save code and also removes the server-only credentials
+      // and logs the deletion for backup replay, so it is a function's job.
+      allow list, delete: if false;
+    }
+
+    // Server-only: save-code hashes, generated usernames + PIN hashes, the
+    // deletion log. Named here so the denial is deliberate, not incidental.
+    match /saveCodes/{document=**} {
       allow read, write: if false;
+    }
+    match /usernames/{document=**} {
+      allow read, write: if false;
+    }
+    match /deletions/{document=**} {
+      allow read, write: if false;
+    }
+
+    // Signed in through our own custom-auth function (which sets the `game`
+    // claim; only the Admin SDK can) and asking for the farm keyed by that
+    // uid. The claim matters because Auth is shared by every game in the
+    // `student-games-be188` project: another game's user must not get a farm.
+    function isFarmOwner(uid) {
+      return request.auth != null
+        && request.auth.token.game == 'sanctuary-farm'
+        && request.auth.uid == uid;
+    }
+
+    // Exactly { schemaVersion, updatedAt, save }. `save` is the game's own
+    // JSON (the save codec's output), stored as one string so a single size
+    // check bounds the whole document; the codec validates its contents on
+    // load. 524288 = 512 KiB, half of Firestore's 1 MiB document limit.
+    function isValidSave(save) {
+      return save.keys().hasOnly(['schemaVersion', 'updatedAt', 'save'])
+        && save.keys().hasAll(['schemaVersion', 'updatedAt', 'save'])
+        && save.schemaVersion is int
+        && save.schemaVersion in [4]
+        && save.updatedAt is timestamp
+        && save.updatedAt == request.time
+        && save.save is string
+        && save.save.size() > 0
+        && save.save.size() <= 524288;
     }
   }
 }

@@ -38,7 +38,9 @@ does not otherwise require; keeping it out means `pnpm gate` stays runnable on a
 bare checkout. CI runs it as its own `rules` job in `.github/workflows/ci.yml`
 (Temurin 21 + a pinned `firebase-tools`), in parallel with the gate.
 
-The tests are a deny-all contract: no client — signed in or not — may read or
-write anything until Phase 4 (ADR-0002) adds per-save ownership rules. When
-those rules land, the allowed cases get `assertSucceeds` tests here alongside
-the denials.
+The tests are the cloud-save contract (`docs/cloud-save.md`): a player signed
+in through our custom-auth function may get, create and update only
+`saves/{their uid}`, and only with a valid save document; everything else —
+other farms, listing, deleting, the server-only credential collections, any
+unmentioned path — is denied. Each allowed case has an `assertSucceeds` test and
+each rule has a denial test that fails if the rule is loosened.
