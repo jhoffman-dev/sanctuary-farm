@@ -189,15 +189,15 @@ func test_a_family_completed_by_a_twins_credit_still_reports_family_just_mastere
 
 
 func test_one_coin_short_is_refused_and_leaves_the_farm_untouched() -> void:
-	var farm := FarmSave.with_changes(Fixtures.fresh_farm(), {"coins": Coins.FEED_BUNDLE_PRICE - 1})
-	assert_eq(Coins.buy_feed_bundle(farm).error, Coins.NOT_ENOUGH_COINS)
-	assert_eq(farm.coins, Coins.FEED_BUNDLE_PRICE - 1)
+	var farm := FarmSave.with_changes(Fixtures.fresh_farm(), {"coins": FeedShed.SACK_PRICE - 1})
+	assert_eq(FeedShed.buy(farm, FeedShed.FEED_SACK).error, FeedShed.NOT_ENOUGH_COINS)
+	assert_eq(farm.coins, FeedShed.SACK_PRICE - 1)
 
 
 func test_exactly_the_price_leaves_zero_coins_never_negative() -> void:
-	var bought := Coins.buy_feed_bundle(FarmSave.with_changes(Fixtures.fresh_farm(), {"coins": Coins.FEED_BUNDLE_PRICE}))
+	var bought := FeedShed.buy(FarmSave.with_changes(Fixtures.fresh_farm(), {"coins": FeedShed.SACK_PRICE}), FeedShed.FEED_SACK)
 	assert_eq(bought.value.coins, 0)
 
 
 func test_negative_coins_can_never_buy_feed() -> void:
-	assert_false(Coins.buy_feed_bundle(FarmSave.with_changes(Fixtures.fresh_farm(), {"coins": -Coins.FEED_BUNDLE_PRICE})).ok)
+	assert_false(FeedShed.buy(FarmSave.with_changes(Fixtures.fresh_farm(), {"coins": -FeedShed.SACK_PRICE}), FeedShed.FEED_SACK).ok)

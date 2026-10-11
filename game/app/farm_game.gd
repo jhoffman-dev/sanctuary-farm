@@ -3,8 +3,8 @@
 ## question is returned until it is answered, and latency is read from the
 ## injected clock, never from the caller.
 ##
-## Every persisting call (load_farm, answer, end_round, buy_feed, hatch,
-## set_muted) is a coroutine — always `await` it. It saves first and commits
+## Every persisting call (load_farm, answer, end_round, buy, buy_feed, hatch,
+## move_to_zoo, move_to_barn, set_muted) is a coroutine — always `await` it. It saves first and commits
 ## to memory only once the store has accepted the farm, so a refused save
 ## leaves the game exactly where the caller last saw it. Those calls run one
 ## at a time, in the order they were made, each against what the previous one
@@ -13,7 +13,8 @@
 ## Sessions end on time (PlaySession): once a session's time is used, starting
 ## a round, care or an egg and buying feed are refused with
 ## PlaySession.GOODNIGHT — the scene's cue to say goodnight — while a round
-## already running still finishes.
+## already running still finishes. The petting zoo settles down for the night
+## too: moving animals is refused the same way.
 ##
 ## The training ring (start_training … end_training) is in memory only and
 ## runs on its own: no round starts while it is under way, nor it during one.
@@ -26,6 +27,9 @@ signal _settled
 const NOT_LOADED := "FarmGame: call load_farm() first"
 const NO_ACTIVE_ROUND := "FarmGame: no active round"
 const NO_TRAINING := "FarmGame: no training under way"
+## Animals stay put while a round runs: the round's screen is in front of the
+## farm, and the animal being cared for stays where its care began.
+const ROUND_IS_ACTIVE := "round-is-active"
 const _FAMILY_CONTEXTS: Array[String] = [SessionContext.EGG, SessionContext.STALL]
 
 
@@ -220,6 +224,31 @@ func hatch(egg_id: String) -> Result:
 	return await _serialized(_hatch.bind(egg_id))
 
 
+## The value is a ZooSummary: the visitors, the barn animals that could come
+## over, the room left, and which moves would be accepted now. Refused before
+## load_farm.
+func zoo() -> Result:
+	if _farm == null:
+		return Result.failure(NOT_LOADED)
+	return Result.success(ZooSummary.of(_farm, _today(), _zoo_closed_because()))
+
+
+## Sends a barn animal to visit the petting zoo; the value is the new
+## ZooSummary. Free — it costs, earns and asks nothing, and is not play that
+## keeps the session clock running. Refused, writing nothing, before
+## load_farm, while a round is active (ROUND_IS_ACTIVE), after goodnight
+## (PlaySession.GOODNIGHT), with a Zoo reason (Zoo.ZOO_FULL,
+## Zoo.ALREADY_THERE, Barn.UNKNOWN_ANIMAL), or when the save fails.
+func move_to_zoo(animal_id: String) -> Result:
+	return await _serialized(_move.bind(animal_id, Zoo.ZOO))
+
+
+## Brings a visiting animal home to the barn; refused as move_to_zoo is
+## (the barn always has room).
+func move_to_barn(animal_id: String) -> Result:
+	return await _serialized(_move.bind(animal_id, Zoo.BARN))
+
+
 ## The value is a SessionSummary: time used and left, winding down, goodnight,
 ## and today's tally for the goodnight summary. Refused before load_farm.
 func session() -> Result:
@@ -257,11 +286,28 @@ func end_round() -> Result:
 	return await _serialized(_end_round)
 
 
-## Trades coins for a feed bundle; the value is the new FarmSummary. Refused
-## with Coins.NOT_ENOUGH_COINS or, the shed being shut for the night, with
-## PlaySession.GOODNIGHT (writing nothing), or when the save fails.
+## The value is a ShopSummary — coins, feed, and each feed shed offer with
+## whether it can be bought now (after goodnight, none can); refused before
+## load_farm.
+func shop() -> Result:
+	if _farm == null:
+		return Result.failure(NOT_LOADED)
+	return Result.success(ShopSummary.of(_farm, _shed_closed_because()))
+
+
+## Spends coins on a feed shed offer; the value is the new ShopSummary. No
+## question is asked: spending is not a learning action, nor play that keeps
+## the session clock running. Refused, writing nothing, with
+## FeedShed.NOT_ENOUGH_COINS ("earn coins in the paddock or the nest") or
+## FeedShed.UNKNOWN_OFFER, after goodnight (PlaySession.GOODNIGHT), and when
+## the save fails. Allowed mid-round: the round's question stays in flight.
+func buy(offer_id: String) -> Result:
+	return await _serialized(_buy.bind(offer_id))
+
+
+## Buys the feed sack, the one offer today: buy(FeedShed.FEED_SACK).
 func buy_feed() -> Result:
-	return await _serialized(_buy_feed)
+	return await buy(FeedShed.FEED_SACK)
 
 
 func set_muted(muted: bool) -> Result:
@@ -328,18 +374,18 @@ func _end_round() -> Result:
 	return Result.success(session_log)
 
 
-func _buy_feed() -> Result:
+func _buy(offer_id: String) -> Result:
 	if _farm == null:
 		return Result.failure(NOT_LOADED)
 	if _is_goodnight():
 		return Result.failure(PlaySession.GOODNIGHT)
-	var bought := Coins.buy_feed_bundle(_farm)
+	var bought := FeedShed.buy(_farm, offer_id)
 	if not bought.ok:
 		return bought
 	var committed: Result = await _commit(_Snapshot.new(bought.value, _active, null))
 	if not committed.ok:
 		return committed
-	return Result.success(FarmSummary.of(bought.value))
+	return Result.success(ShopSummary.of(bought.value))
 
 
 func _hatch(egg_id: String) -> Result:
@@ -354,6 +400,34 @@ func _hatch(egg_id: String) -> Result:
 	if not committed.ok:
 		return committed
 	return Result.success(AnimalSummary.of(hatched.value.animals.back(), _today()))
+
+
+func _move(animal_id: String, home: String) -> Result:
+	if _farm == null:
+		return Result.failure(NOT_LOADED)
+	var closed := _zoo_closed_because()
+	if not closed.is_empty():
+		return Result.failure(closed)
+	var moved := Zoo.move(_farm, animal_id, home)
+	if not moved.ok:
+		return moved
+	var committed: Result = await _commit(_Snapshot.new(moved.value, null, null))
+	if not committed.ok:
+		return committed
+	return Result.success(ZooSummary.of(moved.value, _today(), ""))
+
+
+## Why no animal may move now, or empty when the zoo is open.
+func _zoo_closed_because() -> String:
+	if _active != null:
+		return ROUND_IS_ACTIVE
+	if _is_goodnight():
+		return PlaySession.GOODNIGHT
+	return ""
+
+
+func _shed_closed_because() -> String:
+	return PlaySession.GOODNIGHT if _is_goodnight() else ""
 
 
 func _set_muted(muted: bool) -> Result:

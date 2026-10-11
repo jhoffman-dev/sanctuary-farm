@@ -6,8 +6,9 @@ Phase 4 alongside the save schema; nothing here exists yet.
 
 ## 1. What is at stake
 
-A cloud save is one small document per farm — save code, animals, mastery record,
-a few KB — written once per session. The data is tiny; the promise is not. "Come
+A cloud save is one small document per farm — animals, mastery record, session
+logs, tens of KB — written once per session (`cloud-save.md`). Save-code hashes
+and usernames live in server-only collections beside it. The data is tiny; the promise is not. "Come
 back tomorrow and your farm is here" is the whole reason cloud save exists, and a
 child who loses a farm does not read the incident report — they stop playing.
 
@@ -61,7 +62,7 @@ save id and a timestamp from *before* the damage, within 7 days.
 1. `functions/scripts/restore-doc.ts` (to be written): a read-only Admin SDK
    transaction with `readTime` set, `tx.get(db.doc('saves/<id>'))`. Eyeball the payload.
 2. Write it back with `set()` — overwrite, not merge, so corrupt fields vanish.
-   Bump `syncedAt` so clients re-pull.
+   Set `updatedAt` to the server time so clients re-pull.
 3. Open it in the game with the save code. Record id, timestamps and cause in the
    ticket. Never ask the child for anything beyond the save code.
 
