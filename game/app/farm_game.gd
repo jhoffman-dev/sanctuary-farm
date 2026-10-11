@@ -15,6 +15,9 @@
 ## PlaySession.GOODNIGHT — the scene's cue to say goodnight — while a round
 ## already running still finishes. The petting zoo settles down for the night
 ## too: moving animals is refused the same way.
+##
+## The training ring (start_training … end_training) is in memory only and
+## runs on its own: no round starts while it is under way, nor it during one.
 class_name FarmGame
 extends RefCounted
 
@@ -23,6 +26,7 @@ signal _settled
 
 const NOT_LOADED := "FarmGame: call load_farm() first"
 const NO_ACTIVE_ROUND := "FarmGame: no active round"
+const NO_TRAINING := "FarmGame: no training under way"
 ## Animals stay put while a round runs: the round's screen is in front of the
 ## farm, and the animal being cared for stays where its care began.
 const ROUND_IS_ACTIVE := "round-is-active"
@@ -58,6 +62,9 @@ var _clock: Clock
 var _rng: Rng
 var _farm: Variant = null
 var _active: ActiveRound = null
+## The training ring visit under way, or null. Held in memory only: nothing
+## the ring does is saved (docs/training-ring.md).
+var _training: Training = null
 var _queue: Array[_Queued] = []
 var _draining := false
 var _pending := 0
@@ -147,6 +154,65 @@ func start_egg(egg_id: String) -> Result:
 	if not egg.ok:
 		return egg
 	return _begin(PracticeRound.begin(RoundPresets.egg(egg.value.family), _clock.now_msec()))
+
+
+## The value is a RingSummary: the facts the ring offers and the training
+## under way. Refused before load_farm.
+func ring() -> Result:
+	if _farm == null:
+		return Result.failure(NOT_LOADED)
+	return Result.success(RingSummary.of(_farm.scheduler.max_table, _training))
+
+
+## Starts the training ring on `fact_id` — any fact of the table; "" picks an
+## offered one — at its first strategy. The value is a TrainingSummary.
+## Refused as start_round is (goodnight included), and with a TrainingRing
+## reason (UNKNOWN_FACT, NOTHING_TO_BREAK_DOWN). Starting counts as play.
+func start_training(fact_id: String = "") -> Result:
+	var ready := _ready_to_start("start_training")
+	if not ready.ok:
+		return ready
+	var max_table: int = _farm.scheduler.max_table
+	var chosen := TrainingRing.pick_fact(max_table, _rng) if fact_id == "" else Result.success(fact_id)
+	if not chosen.ok:
+		return chosen
+	var checked := TrainingRing.check_fact(chosen.value, max_table)
+	if not checked.ok:
+		return checked
+	_training = TrainingRing.begin(checked.value)
+	_farm = FarmSave.with_changes(_farm, {"play_session": _played_now()})
+	return Result.success(TrainingSummary.of(_training))
+
+
+## Answers the training step on the pad; the value is a StepFeedback. Never
+## graded by the scheduler and never paid: strategy steps are scaffolded, not
+## recall, so they move no fact's mastery (docs/training-ring.md). Refused
+## with no training, or with TrainingRing.STRATEGY_DONE.
+func answer_step(given: float) -> Result:
+	if _training == null:
+		return Result.failure(NO_TRAINING)
+	var answered := TrainingRing.answer_step(_training, given)
+	if not answered.ok:
+		return answered
+	_training = answered.value
+	return Result.success(StepFeedback.of(_training))
+
+
+## "Show me another way": the fact's next strategy, from its first step. The
+## value is a TrainingSummary. Allowed after goodnight, as a running round is.
+func another_way() -> Result:
+	if _training == null:
+		return Result.failure(NO_TRAINING)
+	_training = TrainingRing.another_way(_training)
+	return Result.success(TrainingSummary.of(_training))
+
+
+## Leaves the ring — any time, done or not. Refused with no training.
+func end_training() -> Result:
+	if _training == null:
+		return Result.failure(NO_TRAINING)
+	_training = null
+	return Result.success()
 
 
 ## Confirms the hatch once the scene's ceremony has played: the egg's animal
@@ -262,6 +328,7 @@ func _load() -> FarmSummary:
 		loaded = FarmSave.empty().value
 	_farm = loaded
 	_active = null
+	_training = null
 	return FarmSummary.of(loaded)
 
 
@@ -377,6 +444,8 @@ func _ready_to_start(caller: String) -> Result:
 		return Result.failure(NOT_LOADED)
 	if _active != null:
 		return Result.failure("%s: a round is already active" % caller)
+	if _training != null:
+		return Result.failure("%s: training is under way" % caller)
 	# Serving is synchronous and unsaved; a commit landing afterwards would overwrite it.
 	if _pending > 0:
 		return Result.failure("%s: a save is still in progress" % caller)

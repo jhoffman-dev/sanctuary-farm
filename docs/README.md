@@ -41,6 +41,7 @@ is the agent entry point).
 | [`docs/nest.md`](nest.md) — Nest rules: eggs, family practice, hatching (SF-106) | not yet mirrored; push after merge |
 | [`docs/petting-zoo.md`](petting-zoo.md) — Petting zoo rules: visitors, room, moving animals (SF-110) | not yet mirrored; push after merge |
 | [`docs/session.md`](session.md) — Sessions end on time: the goodnight rules (SF-111) | not yet mirrored; push after merge |
+| [`docs/training-ring.md`](training-ring.md) — Training ring rules: strategies as typed steps (SF-109) | not yet mirrored; push after merge |
 | `docs/notion-migration.md` — Notion → GitHub board migration (the SF-1 … SF-80 → issue #30 … #109 map from the 2026-10-04 board move) | [Notion → GitHub board migration](https://app.notion.com/p/3f6672aa2c4a81e882c7f3d91597c3da) |
 
 History only, not mirrored: `docs/original-spec.md` and `docs/redesign-notes.md`
