@@ -33,13 +33,13 @@ means you can rebuild every scene without breaking the maths.
 
 | Folder | What lives here | May use |
 | --- | --- | --- |
-| `domain/` | The rules: facts, grading, coins, progress. Plain classes (`RefCounted`), no nodes, no files, no clock, no randomness — those are handed in. | nothing else in the game |
-| `app/` | Use-cases that run the rules (`PracticeSession`) and the **ports** they need (`SaveStore`, `Clock`; the `Rng` type lives in `domain/`). Returns plain read-models (`QuestionView`, `AnswerResult`). | `domain/` |
+| `domain/` | The rules — `packages/domain` ported case for case: facts and tiers, the scheduler (Leitner boxes, latency, interleave, egg rotation), mastery, coins, the save shape. Plain classes (`RefCounted`) and plain-data dictionaries, no nodes, no files, no clock, no randomness — those are handed in. | nothing else in the game |
+| `app/` | Use-cases that run the rules (`FarmGame`, `HotspotArrivals`) and the **ports** they need (`SaveStore`, `Clock`; the `Rng` type lives in `domain/`). Returns plain read-models (`Question`, `AnswerFeedback`, `FarmSummary`, …). | `domain/` |
 | `adapters/` | The real implementations of the ports: the save file in `user://`, the system clock, engine randomness, the browser page. Thin — they translate, they do not decide. | `app/`, `domain/` |
 | `scenes/` | **Yours.** Scenes and their small scripts: the farm, the pad, the HUD. They show what `app/` returns and pass taps and keys back. `scenes/farm/farm.gd` is also where adapters are plugged into the use-case. | `app/` (and `domain/` types) |
 | `assets/kenney/` | Kenney models, unmodified; licences in `assets/LICENSES.md`. | — |
 | `tests/` | GUT tests (`unit/`, `integration/`), fakes for the ports, and the Playwright web smoke (`web/`). | everything |
-| `tools/` | `check_layers.sh` — fails CI if `domain/` or `app/` reach for the engine or an outer layer. | — |
+| `tools/` | `check_layers.sh` — fails CI if `domain/` or `app/` reach for the engine or an outer layer. `check_test_calls.sh` — fails CI if a public function in `domain/` or `app/` is never called by a test (GDScript has no coverage tool). `oracles/` — prints what the TypeScript rules do on fixed seeds, for the equivalence tests. | — |
 
 What this means in practice when you build a scene:
 
@@ -66,6 +66,19 @@ What this means in practice when you build a scene:
 ## What is placeholder
 
 Everything in `scenes/` is deliberately plain — SF-95 (#143) is the real farm.
-The "next question" rule in `domain/question_picker.gd` is a stand-in (uniform,
-never the same fact twice); SF-94 (#142) ports the full scheduler (Leitner
-boxes, latency, interleave, tiers) and its tests from `packages/domain`.
+The rules are not: `domain/` and `app/` are the TypeScript rules, ported with
+their tests (SF-94, #142). Until a keeper walks, `scenes/farm/farm.gd` "arrives"
+at the paddock on load and again after each round.
+
+## Calling the game from a scene
+
+- **Refusals are values, not crashes.** GDScript has no exceptions, so every call
+  that can refuse returns a `Result`: check `ok`, then read `value` (or show
+  nothing and read `error`). A refused call changed nothing.
+- **Saving calls are coroutines** — `load_farm`, `answer`, `end_round`,
+  `buy_feed`, `set_muted`, `when_saved`, `HotspotArrivals.arrive_at`. Always
+  `await` them. They run one at a time, and the farm only moves once the save
+  has landed.
+- **Sounds are data.** `AnswerFeedback.sounds` names what to play (`fluent`,
+  `correct`, `wrong`, `hatch`); the scene plays its sample files for them.
+

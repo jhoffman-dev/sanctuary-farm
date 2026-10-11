@@ -23,16 +23,21 @@ func _tap(button_name: String) -> void:
 	_pad.get_node("%" + button_name).pressed.emit()
 
 
-func _result(correct: bool, answer: int, coins: int) -> AnswerResult:
-	var result := AnswerResult.new()
-	result.correct = correct
-	result.correct_answer = answer
-	result.coins_awarded = coins
-	return result
+func _question(a: int, b: int) -> Question:
+	return Question.of(FactTable.get_fact("%dx%d" % [a, b]), 0)
+
+
+func _feedback(question: Question, correct: bool, coins: int) -> AnswerFeedback:
+	var feedback := AnswerFeedback.new()
+	feedback.question = question
+	feedback.correct = correct
+	feedback.correct_answer = question.a * question.b
+	feedback.coins_earned = coins
+	return feedback
 
 
 func test_shows_the_question_with_a_times_sign() -> void:
-	_pad.show_question(QuestionView.new(7, 8))
+	_pad.show_question(_question(7, 8))
 	assert_eq(_pad.get_node("%QuestionLabel").text, "7 × 8")
 	assert_eq(_pad.get_node("%AnswerLabel").text, "?")
 
@@ -74,17 +79,17 @@ func test_a_long_answer_stops_at_four_digits() -> void:
 
 func test_a_new_question_clears_the_typed_answer() -> void:
 	_press_key(KEY_3)
-	_pad.show_question(QuestionView.new(2, 2))
+	_pad.show_question(_question(2, 2))
 	assert_eq(_pad.get_node("%AnswerLabel").text, "?")
 
 
 func test_a_right_answer_is_celebrated_with_its_coins() -> void:
-	_pad.show_result(QuestionView.new(6, 7), _result(true, 42, 2))
+	_pad.show_result(_feedback(_question(6, 7), true, 2))
 	assert_eq(_pad.get_node("%FeedbackLabel").text, "Yes! 6 × 7 = 42  (+2)")
 
 
 func test_a_wrong_answer_is_shown_gently_with_the_fact() -> void:
-	_pad.show_result(QuestionView.new(6, 7), _result(false, 42, 0))
+	_pad.show_result(_feedback(_question(6, 7), false, 0))
 	var feedback: String = _pad.get_node("%FeedbackLabel").text
 	assert_string_contains(feedback, "6 × 7 = 42")
 	assert_false(feedback.to_lower().contains("wrong"), feedback)
