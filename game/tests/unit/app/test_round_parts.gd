@@ -127,3 +127,5 @@ func test_arrival_outcomes_say_what_opened() -> void:
 	var soon := ArrivalOutcome.coming_soon("barn")
 	assert_eq([practice.kind, practice.started], [ArrivalOutcome.PRACTICE, true])
 	assert_eq([soon.kind, soon.place], [ArrivalOutcome.COMING_SOON, "barn"])
+	var left := ArrivalOutcome.moved_on("paddock")
+	assert_eq([left.kind, left.place, left.started], [ArrivalOutcome.MOVED_ON, "paddock", false])

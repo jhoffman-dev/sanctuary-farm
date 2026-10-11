@@ -77,7 +77,7 @@ func test_still_opens_practice_when_the_save_it_waited_for_failed() -> void:
 	assert_false(built.game.summary().value.muted, "the refused mute never landed")
 
 
-func test_opens_one_round_when_two_arrivals_wait_on_the_same_save() -> void:
+func test_opens_one_round_for_the_latest_of_two_arrivals_waiting_on_the_same_save() -> void:
 	var built := await _loaded()
 	built.store.hold_writes = true
 	built.game.set_muted(true)
@@ -86,7 +86,11 @@ func test_opens_one_round_when_two_arrivals_wait_on_the_same_save() -> void:
 	_arrive_into(arrivals, "paddock", outcomes)
 	_arrive_into(arrivals, "paddock", outcomes)
 	built.store.release()
-	assert_eq(outcomes.map(func(arrived: Result) -> bool: return arrived.value.started), [true, false])
+	assert_eq(
+		outcomes.map(func(arrived: Result) -> Array: return [arrived.value.kind, arrived.value.started]),
+		[[ArrivalOutcome.MOVED_ON, false], [ArrivalOutcome.PRACTICE, true]]
+	)
+	assert_eq(Harness.progress_of(built.game.round_progress()), [1, RoundPresets.PADDOCK_QUESTIONS, false])
 
 
 func test_rejects_when_the_farm_has_not_loaded_as_starting_a_round_would() -> void:
@@ -106,5 +110,41 @@ func test_drops_a_paddock_arrival_once_the_keeper_has_stopped_somewhere_newer() 
 	await arrivals.arrive_at("barn")
 	built.store.release()
 	assert_eq(outcomes.size(), 1)
+	assert_eq([outcomes[0].value.kind, outcomes[0].value.place], [ArrivalOutcome.MOVED_ON, "paddock"])
 	assert_false(outcomes[0].value.started)
 	assert_eq(built.game.round_progress().total, 0, "no round opened behind her")
+
+
+func test_drops_a_paddock_arrival_once_the_keeper_sets_off_before_the_save_lands() -> void:
+	var built := await _loaded()
+	built.store.hold_writes = true
+	built.game.set_muted(true)
+	var arrivals := HotspotArrivals.new(built.game)
+	var outcomes := []
+	_arrive_into(arrivals, "paddock", outcomes)
+	arrivals.keeper_moved()
+	built.store.release()
+	assert_eq(outcomes[0].value.kind, ArrivalOutcome.MOVED_ON)
+	assert_eq(built.game.round_progress().total, 0)
+
+
+func test_opens_practice_when_she_comes_back_and_stops_at_the_paddock_again() -> void:
+	var built := await _loaded()
+	built.store.hold_writes = true
+	built.game.set_muted(true)
+	var arrivals := HotspotArrivals.new(built.game)
+	var outcomes := []
+	_arrive_into(arrivals, "paddock", outcomes)
+	arrivals.keeper_moved()
+	_arrive_into(arrivals, "paddock", outcomes)
+	built.store.release()
+	assert_eq(outcomes.map(func(arrived: Result) -> String: return arrived.value.kind), [ArrivalOutcome.MOVED_ON, ArrivalOutcome.PRACTICE])
+	assert_true(outcomes[1].value.started)
+
+
+func test_setting_off_after_practice_opened_leaves_the_round_running() -> void:
+	var built := await _loaded()
+	var arrivals := HotspotArrivals.new(built.game)
+	await arrivals.arrive_at("paddock")
+	arrivals.keeper_moved()
+	assert_eq(Harness.progress_of(built.game.round_progress()), [1, RoundPresets.PADDOCK_QUESTIONS, false])
