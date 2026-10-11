@@ -130,6 +130,11 @@ exposes no line-hit hook. Until a tool exists, the bars are held this way:
   `vitest --coverage` until SF-96 retires them. For `game/`, SF-94 should
   evaluate a GDScript coverage add-on or a "every public `func` is called from a
   test" check in CI; neither is assumed here.
+- **Update, SF-94 (2026-10-11):** CI runs the second option (a coverage add-on
+  was not evaluated) — `game/tools/check_test_calls.sh` fails when a public function in `domain/` or
+  `app/` is never called by a test. Equivalence with the TypeScript rules is
+  checked directly: seeded runs are compared trace for trace and state for state
+  with what the TypeScript rules produce (`game/tests/oracles/`).
 
 ## Alternatives considered
 

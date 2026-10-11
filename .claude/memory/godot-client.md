@@ -20,7 +20,7 @@
 - **GDScript has no exceptions.** The TS domain throws on caller bugs; the
   port returns an empty/null value and documents it (`FactTable.build` of a bad
   size is `[]`). Comparing a String to an int with `==` is a runtime error, so
-  parsers check `typeof` first (`FarmProgressCodec._count`).
+  parsers check `typeof` first (`FarmSaveCodec._count`).
 - **`SeededRng` is bit-identical to `@sf/domain`'s mulberry32.** Compare draws
   as `int(draw * 2^32)`, not as long float literals — GDScript and JS round some
   17-digit literals differently.
@@ -38,3 +38,28 @@
   (`game/tests/web/`). Keep those keys if the pad or HUD is rebuilt.
 - **`user://` in tests** is the real per-user folder of the "Sanctuary Farm"
   project; integration tests use their own file name and delete it.
+
+## Rules port (SF-94)
+
+- **Refusals are `Result`s** (`domain/result.gd`): everywhere the TypeScript
+  rules throw, the port returns `Result.failure(reason)`. `push_error` fails a
+  GUT test by default (`failure_error_types`), so it is reserved for real
+  bugs (writing to an immutable `Fact`), and tests expect it with
+  `assert_push_error`.
+- **State is plain-data Dictionaries**, as in TypeScript. `Dictionary ==` is
+  deep, but `1 != 1.0` inside one and a float key never finds an int key — JSON
+  hands every number back as a float, so `FarmSaveCodec` restores ints and
+  `FactTuning.whole_number` normalises families/sizes from outside.
+- **Typed loops over mixed numbers** (`for ms: float in [900, 900]`) are a
+  runtime risk; the rules iterate untyped and convert with `float()`.
+- **GDScript `sort_custom` is not stable.** TypeScript's `toSorted(...)[0]` is
+  ported as a linear "first best" scan (`Selection.neediest`), which picks the
+  same element.
+- **FarmGame's saving calls are coroutines.** A coroutine called as a statement
+  runs to its first `await` — that is how tests make a second tap while a held
+  save (`InMemorySaveStore.hold_writes`) is pending. Using its return value
+  without `await` is a parse error.
+- **Equivalence oracles:** `pnpm exec vitest run --config
+  game/tools/oracles/vitest.config.ts` rewrites
+  `game/tests/oracles/typescript_oracles.json`; rerun it whenever the
+  TypeScript rules change, or the GDScript equivalence tests go red.

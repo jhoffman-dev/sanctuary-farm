@@ -108,9 +108,9 @@ SF-96 retires them at parity.
 
 | Folder | Layer | Holds | May use |
 | --- | --- | --- | --- |
-| `game/domain/` | domain | rules as plain `RefCounted` classes: facts, grading, coins, progress (the scheduler port arrives in SF-94); the `Rng` type and `SeededRng` (mulberry32, bit-identical to `@sf/domain`) | nothing else |
-| `game/app/` | application | use-cases (`PracticeSession`), ports (`SaveStore`, `Clock`), read-models (`QuestionView`, `AnswerResult`) | `domain/` |
-| `game/adapters/` | infrastructure | `UserFileSaveStore` (+ `FarmProgressCodec`, parse-don't-trust), `SystemClock`, `EntropySeed`, `WebPage` (browser bridge) | `app/`, `domain/` |
+| `game/domain/` | domain | `@sf/domain` ported case for case (SF-94): facts, the scheduler, mastery, coins and the save shape as plain `RefCounted` classes over plain-data dictionaries; the `Rng` type and `SeededRng` (mulberry32, bit-identical to `@sf/domain`); `Result` for every refusal | nothing else |
+| `game/app/` | application | `@sf/application` ported (SF-94): `FarmGame` (serialised saves, commit after save), `HotspotArrivals`, the round rules; ports (`SaveStore`, `Clock`); read-models (`Question`, `AnswerFeedback`, `FarmSummary`, …) | `domain/` |
+| `game/adapters/` | infrastructure | `UserFileSaveStore` (+ `FarmSaveCodec`, `parseFarmSave`'s guard), `SystemClock`, `EntropySeed`, `WebPage` (browser bridge) | `app/`, `domain/` |
 | `game/scenes/` | presentation | scenes + thin scripts; `scenes/farm/farm.gd` is the composition root | `app/`, `domain/` types |
 
 - **No engine in the core.** `domain/` and `app/` never touch nodes, the scene
@@ -122,7 +122,10 @@ SF-96 retires them at parity.
   `tests/fakes/`, scene components), `integration/` (adapters against the real
   `user://` filesystem), `web/` (Playwright plays one question on the web
   export). There is no GDScript line-coverage tool; ADR-0006 says how the bars
-  are held meanwhile.
+  are held meanwhile — `game/tools/check_test_calls.sh` (`pnpm godot:calls`, in
+  `pnpm godot:test`) fails if a public function in `domain/` or `app/` is never
+  called by a test, and seeded runs are compared with the TypeScript rules'
+  own output (`game/tests/oracles/`, written by `game/tools/oracles/`).
 - **Commands:** `pnpm godot:import` · `godot:test` · `godot:export:web` ·
   `godot:e2e:web` · `godot:gate` (Godot from `GODOT_BIN`, defaulting to the macOS
   app). How to open and work in it: `game/README.md`.
