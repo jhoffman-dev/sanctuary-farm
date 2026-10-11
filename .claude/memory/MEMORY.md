@@ -17,4 +17,5 @@ Bigger stuff belongs elsewhere: product intent → `docs/PRD.md`, architecture �
 - [world-layout.md](world-layout.md) — `@sf/world`: where `farm.json` lives, the parser contract, the art-direction rules it enforces, and the keeper-speed constant.
 - [tile-world.md](tile-world.md) — `@sf/world` tile world: generate(seed) + overrides, chunk independence, connectors, PieceId contract with the GLB adapter.
 - [farm-game-facade.md](farm-game-facade.md) — `createFarmGame` contract gotchas: rounds stay active until `endRound`, latency is measured here, progress semantics.
+- [godot-client.md](godot-client.md) — the Godot 4.7 client in `game/` (ADR-0006): import before tests, `GODOT_BIN`, templates, the layer check, GDScript-vs-TS porting traps, Kenney facing/loops in Godot.
 - [3d-assets-and-r3f.md](3d-assets-and-r3f.md) — from the SF-63/64 spikes: Quaternius' licence change and download route, the glTF pipeline (`gltf-transform`, meshopt, `metallicFactor`), why draw calls bite before triangles, testing r3f without WebGL.

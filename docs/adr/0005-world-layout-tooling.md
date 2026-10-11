@@ -5,6 +5,20 @@
 - **Deciders:** James Hoffman (sole developer, working with AI agents)
 - **Ticket:** SF-65 "Spike: world layout tooling decision"; revised for SF-87 (#118)
 
+> **Update 2026-10-11 — ADR-0006 (Godot).** The game moved to Godot 4.7. The
+> **Godot editor replaces the in-browser world editor** (`?edit=1`, SF-87) as
+> the way James places things by eye; `@sf/world`, `farm.json` and the editor
+> stay only as long as `apps/web` does (SF-96). **Whether the procedural tile
+> world continues is open — not decided here.** James's 2026-10-08 requirement
+> still stands: *"the game needs to be expandable so we need to have a
+> procedural process for laying ground and building tiles."* In Godot that can
+> be served by a **GridMap** over a **MeshLibrary** built from the Kenney tiles
+> (painted in the editor, filled by script), or by a generator script that
+> writes nodes or a GridMap from (seed, rules) with James's edits layered on
+> top — the same "generate + overrides" idea as below. The choice belongs to
+> the scene work (SF-95) and James. The rest of this ADR is kept as decided for
+> the r3f client.
+
 ## Context
 
 Phase 2 builds the 3D farm: ground, paths, the seven hotspots (barn, feed shed,

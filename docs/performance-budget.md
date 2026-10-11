@@ -27,6 +27,13 @@ Target is what we build to; ceiling fails the gate or blocks a merge.
 
 ### Load (cold cache, throttled network, reference device)
 
+> **Godot client (ADR-0006, 2026-10-11): these load lines are for `apps/web`
+> only and must be re-baselined for `game/`.** The stock Godot 4.7.2 web export
+> is ~7.5 MB brotli / 10.7 MB gzip to the first question (engine wasm 6.90 MB
+> br / 10.05 MB gz; pack 0.49 / 0.53 MB) — two orders of magnitude over the
+> 100 kB shell line. ADR-0006 lists how the new lines will be measured (CI size
+> report, a throttled Playwright timer to the first question, the device run).
+
 Measured 2026-10-08 (SF-80). Build-time sizes are exact; the Lighthouse
 numbers are **a laptop running headless Chrome** with simulated throttling
 (below), median of three runs — a regression guard, not the reference device.

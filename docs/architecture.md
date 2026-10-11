@@ -100,6 +100,33 @@ Package manager: **pnpm** workspaces. Node pinned via `.nvmrc` + `engines`.
 - Public APIs of a package are the only entry point; internals aren't imported
   across package lines.
 
+## Godot client (`game/`, ADR-0006)
+
+The game is moving to Godot 4.7 in GDScript (ADR-0006). Same four layers, as
+folders of one Godot project; `apps/web` and the TypeScript packages stay until
+SF-96 retires them at parity.
+
+| Folder | Layer | Holds | May use |
+| --- | --- | --- | --- |
+| `game/domain/` | domain | rules as plain `RefCounted` classes: facts, grading, coins, progress (the scheduler port arrives in SF-94); the `Rng` type and `SeededRng` (mulberry32, bit-identical to `@sf/domain`) | nothing else |
+| `game/app/` | application | use-cases (`PracticeSession`), ports (`SaveStore`, `Clock`), read-models (`QuestionView`, `AnswerResult`) | `domain/` |
+| `game/adapters/` | infrastructure | `UserFileSaveStore` (+ `FarmProgressCodec`, parse-don't-trust), `SystemClock`, `EntropySeed`, `WebPage` (browser bridge) | `app/`, `domain/` |
+| `game/scenes/` | presentation | scenes + thin scripts; `scenes/farm/farm.gd` is the composition root | `app/`, `domain/` types |
+
+- **No engine in the core.** `domain/` and `app/` never touch nodes, the scene
+  tree, `Time`, engine randomness, files or the browser. Enforced by
+  `game/tools/check_layers.sh` (`pnpm godot:layers`, part of `pnpm godot:test`
+  and the CI `godot` job) — dependency-cruiser's role for `game/`. Because
+  GDScript `class_name`s are global, it checks class names as well as paths.
+- **Tests:** GUT 9.7.1, `game/tests/` — `unit/` (domain, app with fakes from
+  `tests/fakes/`, scene components), `integration/` (adapters against the real
+  `user://` filesystem), `web/` (Playwright plays one question on the web
+  export). There is no GDScript line-coverage tool; ADR-0006 says how the bars
+  are held meanwhile.
+- **Commands:** `pnpm godot:import` · `godot:test` · `godot:export:web` ·
+  `godot:e2e:web` · `godot:gate` (Godot from `GODOT_BIN`, defaulting to the macOS
+  app). How to open and work in it: `game/README.md`.
+
 ## What a stack change would touch
 
 If we ever move renderers: `apps/web` and the `infrastructure` adapters it wires.

@@ -21,7 +21,8 @@ is the agent entry point).
 | `docs/adr/0002-identity-and-save.md` — ADR-0002 — Identity and save | [ADR-0002 — Identity and save](https://app.notion.com/p/3cd672aa2c4a81248dc7e3fe500b1e02) |
 | `docs/adr/0003-asset-pack.md` — ADR-0003 — Asset pack: Kenney (accepted 2026-10-07, SF-64) | to mirror under ADR's after merge (skill: `notion-docs`) |
 | `docs/adr/0004-3d-foundation.md` — ADR-0004 — 3D foundation (proposed, SF-63) | to mirror under ADR's after merge (skill: `notion-docs`) |
-| `docs/adr/0005-world-layout-tooling.md` — ADR-0005 — World layout tooling: procedural tile world with authored overrides (proposed, SF-65, revised for SF-87) | to mirror under ADR's after merge (skill: `notion-docs`) |
+| `docs/adr/0005-world-layout-tooling.md` — ADR-0005 — World layout tooling: procedural tile world with authored overrides (proposed, SF-65, revised for SF-87; Godot update 2026-10-11) | to mirror under ADR's after merge (skill: `notion-docs`) |
+| `docs/adr/0006-engine-godot.md` — ADR-0006 — Engine: Godot 4.7 (GDScript) in `game/` (accepted 2026-10-11, SF-93; supersedes ADR-0001's engine choice) | to mirror under ADR's after merge (skill: `notion-docs`) |
 | `docs/definition-of-done.md` — Definition of Done | [Definition of Done](https://app.notion.com/p/3d5672aa2c4a81e3b249d3d0eadd617f) |
 | `docs/secrets.md` — Secrets | [Secrets](https://app.notion.com/p/3d5672aa2c4a81579d29fec27113d844) |
 | `docs/curriculum.md` — Curriculum | [Curriculum](https://app.notion.com/p/3d5672aa2c4a811abf0fdab381a16881) |

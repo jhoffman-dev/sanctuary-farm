@@ -1,0 +1,61 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scenes/farm/farm.gd" id="1_farm"]
+[ext_resource type="PackedScene" path="res://assets/kenney/mini-characters/character-female-a.glb" id="2_keeper"]
+[ext_resource type="PackedScene" path="res://assets/kenney/cube-pets/animal-cow.glb" id="3_cow"]
+[ext_resource type="PackedScene" path="res://assets/kenney/cube-pets/animal-pig.glb" id="4_pig"]
+[ext_resource type="PackedScene" path="res://assets/kenney/cube-pets/animal-chick.glb" id="5_chick"]
+[ext_resource type="PackedScene" path="res://scenes/ui/number_pad.tscn" id="6_pad"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="7_hud"]
+
+[sub_resource type="Environment" id="Environment_farm"]
+background_mode = 1
+background_color = Color(0.75, 0.89, 0.95, 1)
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 0.45
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_grass"]
+albedo_color = Color(0.55, 0.76, 0.44, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
+material = SubResource("StandardMaterial3D_grass")
+size = Vector2(120, 120)
+
+[node name="Farm" type="Node3D"]
+script = ExtResource("1_farm")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_farm")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.5547, -0.67488, 0.48666, 0, 0.5849, 0.81111, -0.83205, -0.44992, 0.32444, 6, 10, 4)
+light_energy = 1.1
+shadow_enabled = true
+
+[node name="Camera" type="Camera3D" parent="."]
+transform = Transform3D(0.80274, -0.28572, 0.52342, 0, 0.87774, 0.47913, -0.59632, -0.38462, 0.7046, 13, 12.5, 18.5)
+fov = 35.0
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_ground")
+
+[node name="Keeper" parent="." instance=ExtResource("2_keeper")]
+transform = Transform3D(1.68901, 0, 1.18266, 0, 2.0619, 0, -1.18266, 0, 1.68901, 0, 0, 1)
+
+[node name="Cow" parent="." instance=ExtResource("3_cow")]
+transform = Transform3D(0.27582, 0, 0.75782, 0, 0.80645, 0, -0.75782, 0, 0.27582, -2.6, 0, -0.6)
+
+[node name="Pig" parent="." instance=ExtResource("4_pig")]
+transform = Transform3D(0.56818, 0, 0, 0, 0.56818, 0, 0, 0, 0.56818, 2.4, 0, 0)
+
+[node name="Chick" parent="." instance=ExtResource("5_chick")]
+transform = Transform3D(0.25695, 0, 0.17992, 0, 0.31368, 0, -0.17992, 0, 0.25695, 1.2, 0, 2.8)
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Hud" parent="UI" instance=ExtResource("7_hud")]
+unique_name_in_owner = true
+
+[node name="NumberPad" parent="UI" instance=ExtResource("6_pad")]
+unique_name_in_owner = true

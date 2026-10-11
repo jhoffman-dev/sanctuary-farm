@@ -18,6 +18,11 @@ the exception — it stays repo-only.
 
 ## Stack
 
+- **The game is moving to Godot 4.7 (GDScript) in `game/` — ADR-0006.** Same
+  layers as folders (`domain/`, `app/`, `adapters/`, `scenes/`), GUT tests,
+  `pnpm godot:*` scripts; start at `game/README.md`. James builds the scenes in
+  the editor; agents own rules, saves, tests, CI. Until SF-96 retires it, the
+  web client below still builds and `pnpm gate` stays green.
 - TypeScript (strict) · React 19 · **react-three-fiber / Three.js** for the world ·
   Tailwind for 2D UI · Vitest · Playwright for e2e.
 - **pnpm** workspaces. Node pinned in `.nvmrc` + `engines`.
@@ -86,6 +91,7 @@ No snapshot test as a stand-in for a behaviour test.
 | `pnpm vitest run --project domain` | one package's tests (`domain` · `application` · `persistence` · `audio` · `web`) |
 | `pnpm emulators` / `pnpm test:rules` | Firebase emulators / Firestore rules tests, both pinned to `demo-sanctuary-farm` (needs a JDK) |
 | `pnpm deploy:game` · `:landing` · `:functions` · `:rules` | the only sanctioned deploys — see `docs/deploy.md` |
+| `pnpm godot:import` · `godot:test` · `godot:export:web` · `godot:e2e:web` · `godot:gate` | the Godot client (`game/`): headless import, layer check + GUT, web export to `game/build/web`, Playwright smoke on it; `GODOT_BIN` overrides the macOS Godot path |
 
 Node is Homebrew-installed — prefix bash calls with `export PATH="/opt/homebrew/bin:$PATH"`.
 

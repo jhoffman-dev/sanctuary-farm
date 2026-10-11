@@ -47,3 +47,6 @@ functions/lib
 
 # Lighthouse CI reports (`pnpm lhci`)
 .lighthouseci
+
+# The Godot binary the CI `godot` job unpacks into the workspace
+.godot-bin/
