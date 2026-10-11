@@ -24,6 +24,17 @@
         {
           "source": "/assets/**",
           "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+        },
+        {
+          "source": "/engine-+([0-9a-f])?(.audio?(.position).worklet).@(wasm|js)",
+          "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+        },
+        {
+          "source": "/game-+([0-9a-f]).pck",
+          "headers": [
+            { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },
+            { "key": "Content-Type", "value": "application/octet-stream" }
+          ]
         }
       ]
     },
