@@ -64,6 +64,18 @@
   `game/tests/oracles/typescript_oracles.json`; rerun it whenever the
   TypeScript rules change, or the GDScript equivalence tests go red.
 
+## Barn care (SF-107)
+
+- **`run_tests.sh` now fails on a test script that does not parse.** GUT skips
+  such a script with a warning and still prints "All tests passed" — a
+  `var x := <Variant>` in a new test (warnings are errors) silently dropped its
+  tests. Type those locals (`var farm: Dictionary = ...`).
+- **Saves are v4** (`animals`). `UserFileSaveStore` reads `farm-save.v4.json`,
+  falling back to the v3 file; `FarmSaveCodec` migrates v3 by adding
+  `Barn.starting_animals()`. A future v5 adds its own fallback the same way.
+- **Care days are local**: `CareDay.of(now, Clock.utc_offset_minutes())`. Decay
+  is computed on read from the last care day, never written back on load.
+
 ## Audio (SF-97)
 
 - **Sounds are rendered, not synthesised.** `node game/tools/render_sounds.mjs`

@@ -80,15 +80,17 @@ Sign-off: **James** at each gate. Agents propose row changes via PR; the
 
 ## 5. Open questions
 
-- **Lockout numbers (row 4):** how many PIN failures before cool-down, and how
-  long? Needs to be kind to a 7-year-old who mistypes and hostile to a script.
+- ~~**Lockout numbers (row 4)**~~ — answered by SF-113: 5 free failures, then
+  1, 2, 4 … minutes capped at 24 h; 100 sign-ins / 10 min per address
+  (`sign-in.md` §5).
 - **Retention (row 13):** 12 months is a proposal (`privacy.md` uses the same number). Is a school-year-plus-summer the
   right unit?
 - **Analytics (SF-31):** if aggregate counts are approved, where is the line
   between "how many farms hatched a 7s egg this week" and profiling?
 - **App Check:** worth the setup cost for the auth and feedback functions, or is
   rate limiting enough for our scale?
-- **Save-code entropy vs. typeability:** `farm-7K2P-9QXM` is ~40 bits. Enough
-  when paired with rate limiting, or do we go longer and let the parent copy it?
+- ~~**Save-code entropy vs. typeability**~~ — answered by SF-113: 15 symbols
+  from a 27-symbol no-look-alike alphabet, ≈ 71 bits (`FARM-7K4QX-MN3TD-9HWAC`;
+  `sign-in.md` §2).
 - **Visiting (row 14):** should a visit even reveal the friend's username, or
   only the farm?

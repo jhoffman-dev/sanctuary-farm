@@ -16,6 +16,7 @@
     "test:coverage": "vitest run --coverage",
     "test:functions": "pnpm --filter @sf/functions test",
     "test:rules": "firebase emulators:exec --only firestore --project demo-sanctuary-farm \"vitest run --config firestore/vitest.config.ts\"",
+    "test:auth": "pnpm --filter @sf/functions build && node functions/scripts/emulator-secret.mjs && firebase emulators:exec --only auth,firestore,functions --project demo-sanctuary-farm \"vitest run --config functions/vitest.integration.config.ts\"",
     "emulators": "firebase emulators:start --only hosting,firestore,functions,auth --project demo-sanctuary-farm",
     "deploy:game": "firebase deploy --only hosting:game",
     "deploy:landing": "firebase deploy --only hosting:landing",

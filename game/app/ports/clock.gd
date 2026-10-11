@@ -10,3 +10,9 @@ extends RefCounted
 func now_msec() -> int:
 	push_error("Clock.now_msec() is abstract; inject an adapter or a fake")
 	return 0
+
+
+## Minutes east of UTC where the player is, so a care day turns over at their
+## midnight rather than at UTC's. 0 unless an adapter knows the time zone.
+func utc_offset_minutes() -> int:
+	return 0
