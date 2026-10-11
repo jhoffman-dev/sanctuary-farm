@@ -27,6 +27,12 @@
     "e2e": "pnpm e2e:web && pnpm e2e:landing",
     "e2e:web": "pnpm --filter @sf/web e2e",
     "e2e:landing": "playwright test --config apps/landing/playwright.config.ts",
+    "godot:import": "\"${GODOT_BIN:-/Applications/Godot.app/Contents/MacOS/Godot}\" --headless --path game --import",
+    "godot:layers": "bash game/tools/check_layers.sh",
+    "godot:test": "pnpm godot:layers && bash game/tools/run_tests.sh",
+    "godot:export:web": "mkdir -p game/build/web && \"${GODOT_BIN:-/Applications/Godot.app/Contents/MacOS/Godot}\" --headless --path game --export-release Web build/web/index.html",
+    "godot:e2e:web": "playwright test --config game/tests/web/playwright.config.ts",
+    "godot:gate": "pnpm godot:import && pnpm godot:test && pnpm godot:export:web && pnpm godot:e2e:web",
     "gate": "pnpm typecheck && pnpm lint && pnpm boundaries && pnpm test:coverage && pnpm test:functions && pnpm build && pnpm size"
   },
   "devDependencies": {

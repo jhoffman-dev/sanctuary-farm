@@ -17,6 +17,8 @@
     "**/coverage/**",
     "**/playwright-report/**",
     "docs/**",
+    "game/build/**",
+    "game/addons/**",
     "scripts/**"
   ]
 }
