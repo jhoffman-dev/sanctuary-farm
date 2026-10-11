@@ -89,6 +89,25 @@ where detectable (an `AudioContext` that stays `suspended` after resume, or a
 `play()` that throws): stay silent, do not prompt, do not flip the saved
 setting. A device that is muted at the OS level is the OS's decision.
 
+### 5a. The Godot client (SF-97)
+
+Godot's web export has no procedural audio (ADR-0006), so the Godot client
+plays files: `game/tools/render_sounds.mjs` loads the real `recipes.ts` and
+`web-audio-bus.ts` into headless Chromium, plays each recipe into an
+`OfflineAudioContext`, and writes `game/assets/audio/<id>.ogg` (44.1 kHz mono
+Vorbis q6, reproducible byte for byte) plus `manifest.json`. A render stops
+when the last envelope reaches silence, so the files are exactly the lengths in
+§3 (`fluent` 0.55 s, `hatch` 0.56 s); a GUT test holds every file to §6's
+limits. Change a recipe → rerun the script and commit the OGGs.
+
+`GodotAudioBus` plays them from a pool of 8 players on the "SFX" bus. Mute is
+the same saved setting as above (`FarmSave.settings.muted`, via
+`FarmAudio.toggle_mute` → `FarmGame.set_muted`), not a separate settings file:
+it is per farm like every other choice, travels with the save, and needs no
+second file to keep in step. The bus goes quiet at once; a refused save leaves
+this visit muted and only the next load forgets it. The HUD's toggle is a plain
+button ("Sound: on/off", accessible name "Sound on/off", Tab-reachable).
+
 ## 6. Rules for implementers
 
 - Every sound goes through the `AudioBus` port. Presentation never touches

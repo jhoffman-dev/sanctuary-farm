@@ -12,6 +12,7 @@ const PADDOCK := "paddock"
 
 var _game: FarmGame
 var _arrivals: HotspotArrivals
+var _audio: FarmAudio
 
 @onready var _pad: NumberPad = %NumberPad
 @onready var _hud: Hud = %Hud
@@ -20,10 +21,14 @@ var _arrivals: HotspotArrivals
 func _ready() -> void:
 	_game = FarmGame.new(UserFileSaveStore.new(), SystemClock.new(), EntropySeed.fresh_rng())
 	_arrivals = HotspotArrivals.new(_game)
+	_audio = FarmAudio.new(_game, GodotAudioBus.new(self))
 	_pad.answer_submitted.connect(_on_answer_submitted)
+	_hud.mute_toggled.connect(_on_mute_toggled)
 	if not WebPage.prefers_reduced_motion():
 		_play_idle_clips()
 	var summary := await _game.load_farm()
+	_audio.restore(summary)
+	_hud.show_muted(summary.muted)
 	_show_coins(summary.coins)
 	await _open_paddock()
 
@@ -36,6 +41,7 @@ func _on_answer_submitted(value: int) -> void:
 		push_warning(answered.error)
 		return
 	var feedback: AnswerFeedback = answered.value
+	_audio.play_feedback(feedback)
 	_pad.show_result(feedback)
 	_show_coins(_game.summary().value.coins)
 	if feedback.next != null:
@@ -45,6 +51,14 @@ func _on_answer_submitted(value: int) -> void:
 	if not ended.ok:
 		push_warning(ended.error)
 	await _open_paddock()
+
+
+func _on_mute_toggled() -> void:
+	var toggled := await _audio.toggle_mute()
+	if not toggled.ok:
+		# The bus already obeyed; only remembering it for next visit failed.
+		push_warning(toggled.error)
+	_hud.show_muted(_audio.is_muted())
 
 
 func _open_paddock() -> void:
