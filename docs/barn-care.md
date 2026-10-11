@@ -62,7 +62,7 @@ Days are whole days since 1970 at the player's local midnight (`Clock.utc_offset
    completed round counts, matching the prototype.)
 2. Animals never cared for do not decay, so a new player's animals stay at 70
    (happy) until first cared for. Start decaying from the first visit instead?
-3. Is 5 questions for feeding (≈ 20 a day per animal, 60 for three) right for a
+3. Is 5 + 4 + 4 + 3 = 16 questions a day per animal (48 for three) right for a
    10-minute session? The prototype tuned it for one animal.
 4. Should `start_round` stop requiring a family for `stall` rounds? Care rounds
    are mixed (curriculum.md) and use `start_care`; the family rule came from the
