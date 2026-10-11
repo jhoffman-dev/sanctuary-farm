@@ -76,23 +76,43 @@ func summary() -> Result:
 ## while a round is active (a finished round stays active until end_round),
 ## while a save is still in progress, and for a plan that cannot be played.
 func start_round(plan: RoundPlan) -> Result:
-	if _farm == null:
-		return Result.failure(NOT_LOADED)
-	if _active != null:
-		return Result.failure("start_round: a round is already active")
-	# Serving is synchronous and unsaved; a commit landing afterwards would overwrite it.
-	if _pending > 0:
-		return Result.failure("start_round: a save is still in progress")
+	var ready := _ready_to_start("start_round")
+	if not ready.ok:
+		return ready
 	var checked := _checked_plan(plan, _farm.scheduler.max_table)
 	if not checked.ok:
 		return checked
-	var served := _serve(PracticeRound.begin(checked.value, _clock.now_msec()), _farm)
-	if not served.ok:
-		return served
-	var snapshot: _Snapshot = served.value
-	_farm = snapshot.farm
-	_active = snapshot.active
-	return Result.success(snapshot.question)
+	return _begin(PracticeRound.begin(checked.value, _clock.now_msec()))
+
+
+## Starts the care round for one animal's task and serves its first question
+## (the value): mixed facts in the stall, no coins. The care itself — health,
+## the task marked done, feed used — lands only when end_round closes the
+## round with every question graded. Refused as start_round is, and with a
+## Barn reason (Barn.NEED_FEED: "visit the feed shed") that writes nothing.
+func start_care(animal_id: String, task: String) -> Result:
+	var ready := _ready_to_start("start_care")
+	if not ready.ok:
+		return ready
+	var order := CareOrder.new(animal_id, task)
+	var allowed := Barn.check_care(_farm, order, _today())
+	if not allowed.ok:
+		return allowed
+	var active := PracticeRound.begin(RoundPresets.care(task), _clock.now_msec())
+	active.care = order
+	return _begin(active)
+
+
+## What the active round is caring for, or null (no round, or not a care round).
+func care_in_progress() -> CareOrder:
+	return _active.care if _active != null else null
+
+
+## The value is a BarnSummary for today; refused before load_farm.
+func barn() -> Result:
+	if _farm == null:
+		return Result.failure(NOT_LOADED)
+	return Result.success(BarnSummary.of(_farm, _today()))
 
 
 ## The question in flight, or null.
@@ -117,7 +137,9 @@ func answer(given: float) -> Result:
 
 
 ## Closes the round — early is fine — appends its session log (the value) to
-## the save and persists. Refused when no round is active or the save fails.
+## the save and persists. A care round closed with every question graded also
+## applies its care; closed early, it applies none and uses no feed. Refused
+## when no round is active or the save fails.
 func end_round() -> Result:
 	return await _serialized(_end_round)
 
@@ -181,7 +203,10 @@ func _end_round() -> Result:
 	var session_log := PracticeRound.session_log(_active, _clock.now_msec())
 	var sessions: Array = _farm.sessions.duplicate()
 	sessions.append(session_log)
-	var committed: Result = await _commit(_Snapshot.new(FarmSave.with_changes(_farm, {"sessions": sessions}), null, null))
+	var cared := _with_care_applied(FarmSave.with_changes(_farm, {"sessions": sessions}), _active)
+	if not cared.ok:
+		return cared
+	var committed: Result = await _commit(_Snapshot.new(cared.value, null, null))
 	if not committed.ok:
 		return committed
 	return Result.success(session_log)
@@ -205,6 +230,42 @@ func _set_muted(muted: bool) -> Result:
 	var settings: Dictionary = _farm.settings.duplicate()
 	settings["muted"] = muted
 	return await _commit(_Snapshot.new(FarmSave.with_changes(_farm, {"settings": settings}), _active, null))
+
+
+## Why no round may start now, if anything stops it.
+func _ready_to_start(caller: String) -> Result:
+	if _farm == null:
+		return Result.failure(NOT_LOADED)
+	if _active != null:
+		return Result.failure("%s: a round is already active" % caller)
+	# Serving is synchronous and unsaved; a commit landing afterwards would overwrite it.
+	if _pending > 0:
+		return Result.failure("%s: a save is still in progress" % caller)
+	return Result.success()
+
+
+func _begin(active: ActiveRound) -> Result:
+	var served := _serve(active, _farm)
+	if not served.ok:
+		return served
+	var snapshot: _Snapshot = served.value
+	_farm = snapshot.farm
+	_active = snapshot.active
+	return Result.success(snapshot.question)
+
+
+## The farm with the round's care applied, when it is a care round whose every
+## question was graded. start_care checked the order and nothing else spends
+## feed or does a task while the round runs, so a refusal here is a bug, and
+## is passed on rather than dropped.
+func _with_care_applied(farm: Dictionary, finished: ActiveRound) -> Result:
+	if finished.care == null or not PracticeRound.is_complete(finished):
+		return Result.success(farm)
+	return Barn.apply_care(farm, finished.care, _today())
+
+
+func _today() -> int:
+	return CareDay.of(_clock.now_msec(), _clock.utc_offset_minutes())
 
 
 ## The plan with its numbers as ints, or why it cannot be played: questions
