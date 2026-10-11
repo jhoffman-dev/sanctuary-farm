@@ -126,3 +126,36 @@ func test_whole_numbers_come_back_as_ints() -> void:
 func test_text_that_is_not_json_decodes_to_null() -> void:
 	assert_null(FarmSaveCodec.decode("{\"schema_version\": 3, \"coins\""))
 	assert_null(FarmSaveCodec.decode(""))
+
+
+# ─── the session clock (SF-111) ───
+
+func test_the_session_clock_survives_a_round_trip_with_ints() -> void:
+	var session := PlaySession.played(PlaySession.begin(1_728_640_000_000, 20_006), 1_728_640_180_000, 20_006)
+	var loaded: Dictionary = _round_trip(FarmSave.with_changes(_fresh(), {"play_session": session}))
+	assert_eq(loaded.play_session, session)
+	for field: String in session:
+		assert_eq(typeof(loaded.play_session[field]), TYPE_INT, field)
+
+
+func test_a_save_without_a_session_clock_loads_with_none() -> void:
+	var raw := _without(_raw({}), ["play_session"])
+	var loaded: Variant = FarmSaveCodec.parse_farm_save(raw)
+	assert_not_null(loaded)
+	assert_null(loaded.play_session)
+
+
+func test_a_malformed_session_clock_loads_as_none_and_keeps_the_farm() -> void:
+	var good := PlaySession.begin(1000, 0)
+	var cases := {
+		"not a dictionary": "5 minutes",
+		"a missing field": {"started_at": 1000, "last_played_at": 1000, "played_msec": 0},
+		"negative play": FarmSave.with_changes(good, {"played_msec": -1}),
+		"a fractional day": FarmSave.with_changes(good, {"day": 0.5}),
+		"a string time": FarmSave.with_changes(good, {"last_played_at": "now"}),
+	}
+	for label: String in cases:
+		var loaded: Variant = FarmSaveCodec.parse_farm_save(_raw({"coins": 9, "play_session": cases[label]}))
+		assert_not_null(loaded, label)
+		if loaded != null:
+			assert_eq([loaded.coins, loaded.play_session], [9, null], label)

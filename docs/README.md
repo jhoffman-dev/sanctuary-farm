@@ -36,6 +36,7 @@ is the agent entry point).
 | `docs/deploy.md` — Deploying into the shared Student Games project | *not mirrored yet — add under Docs and link here* |
 | [`docs/world-editor.md`](world-editor.md) — World editor: how to use it (`pnpm dev`, `?edit=1`) | not yet mirrored; push after merge |
 | [`docs/barn-care.md`](barn-care.md) — Barn care rules: health, the four care tasks, glum not gone (SF-107) | not yet mirrored; push after merge |
+| [`docs/session.md`](session.md) — Sessions end on time: the goodnight rules (SF-111) | not yet mirrored; push after merge |
 
 Repo-only, not mirrored: `docs/notion-migration.md` (the SF-1 … SF-80 → issue
 #30 … #109 map from the 2026-10-04 board move).

@@ -75,4 +75,8 @@
   `Barn.starting_animals()`. A future v5 adds its own fallback the same way.
 - **Care days are local**: `CareDay.of(now, Clock.utc_offset_minutes())`. Decay
   is computed on read from the last care day, never written back on load.
+- **Sessions end on time** (`PlaySession`, `docs/session.md`): the save's
+  `play_session` is updated on play only (start, answer, end_round) — never on a
+  read or a refusal. Round logs' `asked_at` is the scheduler counter, not a time;
+  read a round's day from its `started_at`.
 

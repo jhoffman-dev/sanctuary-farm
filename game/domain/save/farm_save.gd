@@ -8,6 +8,8 @@
 ##   sessions: Array       session logs, oldest first
 ##   settings              {"muted": bool, "max_table": int}
 ##   animals: Array        the barn's animals and their care (Barn); added in v4
+##   play_session          the session clock (PlaySession), or null before any play;
+##                         saved so a reload cannot restart the session
 ## A session log is {"started_at", "ended_at" (epoch ms), "context" (a
 ## SessionContext), "family" (int or null), "entries": Array}; an entry is
 ## {"fact_id", "given", "correct", "latency_ms", "outcome", "asked_at"}.
@@ -34,6 +36,7 @@ static func empty(max_table: Variant = FactTuning.MAX_TABLE_DEFAULT) -> Result:
 		"sessions": [],
 		"settings": {"muted": false, "max_table": scheduler.value.max_table},
 		"animals": Barn.starting_animals(),
+		"play_session": null,
 	})
 
 

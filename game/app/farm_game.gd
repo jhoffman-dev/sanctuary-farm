@@ -8,6 +8,10 @@
 ## once the store has accepted the farm, so a refused save leaves the game
 ## exactly where the caller last saw it. Those calls run one at a time, in the
 ## order they were made, each against what the previous one committed.
+##
+## Sessions end on time (PlaySession): once a session's time is used, starting
+## a round or care and buying feed are refused with PlaySession.GOODNIGHT — the
+## scene's cue to say goodnight — while a round already running still finishes.
 class_name FarmGame
 extends RefCounted
 
@@ -74,7 +78,8 @@ func summary() -> Result:
 
 ## Serves the round's first question (the value). Refused before load_farm,
 ## while a round is active (a finished round stays active until end_round),
-## while a save is still in progress, and for a plan that cannot be played.
+## while a save is still in progress, after goodnight (PlaySession.GOODNIGHT),
+## and for a plan that cannot be played.
 func start_round(plan: RoundPlan) -> Result:
 	var ready := _ready_to_start("start_round")
 	if not ready.ok:
@@ -115,6 +120,14 @@ func barn() -> Result:
 	return Result.success(BarnSummary.of(_farm, _today()))
 
 
+## The value is a SessionSummary: time used and left, winding down, goodnight,
+## and today's tally for the goodnight summary. Refused before load_farm.
+func session() -> Result:
+	if _farm == null:
+		return Result.failure(NOT_LOADED)
+	return Result.success(SessionSummary.of(_farm, _clock.now_msec(), _clock.utc_offset_minutes()))
+
+
 ## The question in flight, or null.
 func current_question() -> Question:
 	if _active == null or _active.in_flight == null:
@@ -145,7 +158,8 @@ func end_round() -> Result:
 
 
 ## Trades coins for a feed bundle; the value is the new FarmSummary. Refused
-## with Coins.NOT_ENOUGH_COINS (writing nothing), or when the save fails.
+## with Coins.NOT_ENOUGH_COINS or, the shed being shut for the night, with
+## PlaySession.GOODNIGHT (writing nothing), or when the save fails.
 func buy_feed() -> Result:
 	return await _serialized(_buy_feed)
 
@@ -185,7 +199,7 @@ func _grade(given: float, tapped: InFlight) -> Result:
 	var active: ActiveRound = still.value
 	var coins := AnswerFeedbacks.coins_earned_for(active.plan.context, moment.result)
 	var answered := PracticeRound.record_answer(active, AnswerFeedbacks.session_entry_for(moment))
-	var changes := {"scheduler": graded.value.state, "coins": _farm.coins + coins}
+	var changes := {"scheduler": graded.value.state, "coins": _farm.coins + coins, "play_session": _played_now()}
 	var advanced := _advance(answered, FarmSave.with_changes(_farm, changes))
 	if not advanced.ok:
 		return advanced
@@ -203,7 +217,8 @@ func _end_round() -> Result:
 	var session_log := PracticeRound.session_log(_active, _clock.now_msec())
 	var sessions: Array = _farm.sessions.duplicate()
 	sessions.append(session_log)
-	var cared := _with_care_applied(FarmSave.with_changes(_farm, {"sessions": sessions}), _active)
+	var closed := FarmSave.with_changes(_farm, {"sessions": sessions, "play_session": _played_now()})
+	var cared := _with_care_applied(closed, _active)
 	if not cared.ok:
 		return cared
 	var committed: Result = await _commit(_Snapshot.new(cared.value, null, null))
@@ -215,6 +230,8 @@ func _end_round() -> Result:
 func _buy_feed() -> Result:
 	if _farm == null:
 		return Result.failure(NOT_LOADED)
+	if _is_goodnight():
+		return Result.failure(PlaySession.GOODNIGHT)
 	var bought := Coins.buy_feed_bundle(_farm)
 	if not bought.ok:
 		return bought
@@ -241,11 +258,13 @@ func _ready_to_start(caller: String) -> Result:
 	# Serving is synchronous and unsaved; a commit landing afterwards would overwrite it.
 	if _pending > 0:
 		return Result.failure("%s: a save is still in progress" % caller)
+	if _is_goodnight():
+		return Result.failure(PlaySession.GOODNIGHT)
 	return Result.success()
 
 
 func _begin(active: ActiveRound) -> Result:
-	var served := _serve(active, _farm)
+	var served := _serve(active, FarmSave.with_changes(_farm, {"play_session": _played_now()}))
 	if not served.ok:
 		return served
 	var snapshot: _Snapshot = served.value
@@ -262,6 +281,18 @@ func _with_care_applied(farm: Dictionary, finished: ActiveRound) -> Result:
 	if finished.care == null or not PracticeRound.is_complete(finished):
 		return Result.success(farm)
 	return Barn.apply_care(farm, finished.care, _today())
+
+
+## The session after play now. Starting a round counts as play (and starts a
+## session); a refusal does not, so asking after goodnight never delays the next.
+func _played_now() -> Dictionary:
+	var now := _clock.now_msec()
+	return PlaySession.played(_farm.play_session, now, CareDay.of(now, _clock.utc_offset_minutes()))
+
+
+func _is_goodnight() -> bool:
+	var now := _clock.now_msec()
+	return PlaySession.is_goodnight(_farm.play_session, now, CareDay.of(now, _clock.utc_offset_minutes()))
 
 
 func _today() -> int:
